@@ -108,7 +108,7 @@ void gerar_zona_irregular(IrregularZone *zone, int centro_x, int centro_y, int n
 
 void inicializar_zonas() {
     // Gerar zonas seguras com formas irregulares
-    gerar_zona_irregular(&safe_zones[0], 10, 10, 20);
+    gerar_zona_irregular(&safe_zones[0], 10, 10, 21);
     gerar_zona_irregular(&safe_zones[1], 35, 5, 30);
     gerar_zona_irregular(&safe_zones[2], 60, 15, 25);
     gerar_zona_irregular(&safe_zones[3], 20, 25, 30);
