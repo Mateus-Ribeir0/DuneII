@@ -5,6 +5,7 @@
 #include "keyboard.h"
 #include "screen.h"
 #include "timer.h"
+#include "music.h"
 
 #define MAX_HISTORICO 1000
 #define MAX_PADRAO 9
@@ -293,6 +294,7 @@ void menu_principal() {
 }
 
 int main() {
+    tocar_musica();
     while (1) {
         menu_principal();
     }
