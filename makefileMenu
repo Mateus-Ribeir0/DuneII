@@ -1,5 +1,5 @@
 # Nome do executável
-TARGET = duneII
+TARGET = vendedor
 
 # Compilador e flags
 CC = gcc
@@ -9,10 +9,14 @@ CFLAGS = -Wall
 SOURCES = $(wildcard src/*.c)
 HEADERS = $(wildcard include/*.h)
 
+# Bibliotecas necessárias
+LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+
 # Regra para gerar o executável
 $(TARGET): $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) $(SOURCES) -Iinclude -o $(TARGET)
+	$(CC) $(CFLAGS) $(SOURCES) -Iinclude -o $(TARGET) $(LIBS)
 
 # Limpeza dos arquivos temporários
 clean:
 	rm -f $(TARGET) src/*.o
+
