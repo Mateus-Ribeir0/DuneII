@@ -5,7 +5,6 @@
 #include "keyboard.h"
 #include "screen.h"
 #include "timer.h"
-#include "music.h"
 
 #define MAX_HISTORICO 1000
 #define MAX_PADRAO 9
@@ -180,6 +179,7 @@ void menu_principal() {
     keyboardInit();
     screenInit(0);
 
+    
     inicializar_zonas();
 
     do {
@@ -294,7 +294,9 @@ void menu_principal() {
 }
 
 int main() {
-    tocar_musica();
+
+    system("aplay -q /home/kali/Desktop/DuneII-jogo/musica.wav &");
+
     while (1) {
         menu_principal();
     }
