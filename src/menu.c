@@ -77,7 +77,7 @@ void cutsceneArrakis(Music music) {
         DrawTextureEx(cutsceneImage2, (Vector2){scrollX2 + cutsceneImage2.width * scale, 0}, 0.0f, scale, WHITE);
 
         // Desenha o texto na borda inferior da tela
-        DrawText(text2, GetScreenWidth() / 2 - MeasureText(text2, 20) / 2, GetScreenHeight() - 40, 20, RAYWHITE);
+        DrawText(text2, GetScreenWidth() / 2 - MeasureText(text2, 20) / 2, GetScreenHeight() - 40, 20, BLACK);
 
         EndDrawing();
     }
