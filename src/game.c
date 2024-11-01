@@ -202,8 +202,6 @@ void drawGame() {
 }
 
 void playGame(int dificuldade) {
-    Music gameMusic = LoadMusicStream("static/music/musica.wav");
-    PlayMusicStream(gameMusic);
 
     custom_srand(1234);
     initializeItems();
@@ -218,7 +216,6 @@ void playGame(int dificuldade) {
     memset(historico, 0, sizeof(historico));
 
     while (!WindowShouldClose()) {
-        UpdateMusicStream(gameMusic);
 
         int dx = 0, dy = 0;
         char movimento = '\0';
@@ -269,7 +266,5 @@ void playGame(int dificuldade) {
         if (itemsCollected == NUM_ITEMS) break;
     }
 
-    StopMusicStream(gameMusic);
-    UnloadMusicStream(gameMusic);
 }
 
