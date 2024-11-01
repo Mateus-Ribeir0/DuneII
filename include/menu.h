@@ -4,8 +4,7 @@
 
 #include "raylib.h"
 
-// Enumeração para as telas do jogo
-typedef enum GameScreen { TITLE, RANKINGS, GAME } GameScreen;
+typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, GAME } GameScreen;
 
 // Funções do menu
 void iniciarMenu(GameScreen *currentScreen, int *dificuldade);

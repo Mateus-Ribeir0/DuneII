@@ -11,6 +11,45 @@ static Texture2D background, logo;
 static Music titleMusic;
 static float backgroundPosX;
 
+void cutsceneArrakis() {
+    Texture2D cutsceneImage = LoadTexture("static/image/cutscene1.png"); // Carrega a imagem da cutscene
+    float scrollX = 0.0f; // Posição de rolagem horizontal
+    const char* text = "Arrakis. Um vasto deserto, onde a areia carrega cicatrizes das guerras travadas pela especiaria.";
+    float speed = 30.0f; // Velocidade de rolagem
+
+    // Define a escala para que a imagem seja maior que a tela
+    float scale = 0.7f;  // 1.5 vezes o tamanho da tela
+    float timer = 0.0f;  // Timer para controlar a duração da cutscene
+    const float duration = 5.0f;  // Duração da cutscene em segundos
+
+    // Cutscene loop
+    while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        // Atualiza o temporizador
+        timer += GetFrameTime();
+        UpdateMusicStream(titleMusic);
+
+        // Atualiza a posição horizontal da imagem
+        scrollX -= speed * GetFrameTime();
+        if (scrollX <= -cutsceneImage.width * scale) {
+            scrollX = 0.0f;  // Reinicia a posição da imagem para criar um loop
+        }
+
+        // Desenha a imagem duas vezes para dar efeito de movimento contínuo
+        DrawTextureEx(cutsceneImage, (Vector2){scrollX, 0}, 0.0f, scale, WHITE);
+        DrawTextureEx(cutsceneImage, (Vector2){scrollX + cutsceneImage.width * scale, 0}, 0.0f, scale, WHITE);
+
+        // Desenha o texto na parte superior da tela
+        DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 20) / 2, 20, 20, RAYWHITE);
+
+        EndDrawing();
+    }
+
+    UnloadTexture(cutsceneImage); // Libera a memória da imagem após o uso
+}
+
 // Inicializa o menu com música e texturas
 void iniciarMenu(GameScreen *currentScreen, int *dificuldade) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "DuneII");
