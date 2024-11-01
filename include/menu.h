@@ -11,5 +11,6 @@ void iniciarMenu(GameScreen *currentScreen, int *dificuldade);
 void atualizarMenu(GameScreen *currentScreen, int *dificuldade);
 void desenharMenu(GameScreen currentScreen);
 void finalizarMenu();
+void cutsceneArrakis();
 
 #endif
