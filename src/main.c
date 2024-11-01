@@ -34,7 +34,7 @@ int main() {
         } 
         else if (currentScreen == CUTSCENE) {
             // Chama a cutscene e aguarda a conclusão para iniciar o jogo
-            cutsceneArrakis();
+            cutsceneArrakis(titleMusic);
             currentScreen = GAME;  // Transição para o modo de jogo após a cutscene
         }
         else if (currentScreen == GAME) {
