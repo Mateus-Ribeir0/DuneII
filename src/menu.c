@@ -132,7 +132,7 @@ void cutsceneArrakis(Music titleMusic) {
         DrawTextureEx(cutsceneImage4, (Vector2){scrollX4 + cutsceneImage4.width * scale, 0}, 0.0f, scale, WHITE);
 
         // Desenha o texto na borda inferior da tela
-        DrawText(text4, GetScreenWidth() / 2 - MeasureText(text4, 20) / 2, GetScreenHeight() - 40, 20, RAYWHITE);
+        DrawText(text4, GetScreenWidth() / 2 - MeasureText(text4, 20) / 2, GetScreenHeight() - 40, 20, BLACK);
 
         EndDrawing();
     }
@@ -172,7 +172,7 @@ void cutsceneArrakis(Music titleMusic) {
         UpdateMusicStream(titleMusic);  // Mantém a música tocando durante a cutscene
 
         // Atualiza a posição horizontal da imagem
-        scrollX1 -= speed * GetFrameTime();
+        scrollX6 -= speed * GetFrameTime();
         if (scrollX6 <= -cutsceneImage6.width * scale) {
             scrollX6 = 0.0f;  // Reinicia a posição da imagem para criar um loop
         }
@@ -182,7 +182,7 @@ void cutsceneArrakis(Music titleMusic) {
         DrawTextureEx(cutsceneImage6, (Vector2){scrollX6 + cutsceneImage6.width * scale, 0}, 0.0f, scale, WHITE);
 
         // Desenha o texto na parte superior da tela
-        DrawText(text6, GetScreenWidth() / 2 - MeasureText(text6, 20) / 2, 20, 20, RAYWHITE);
+        DrawText(text6, GetScreenWidth() / 2 - MeasureText(text6, 20) / 2, 20, 20, BLACK);
 
         EndDrawing();
     }
