@@ -11,43 +11,105 @@ static Texture2D background, logo;
 static Music titleMusic;
 static float backgroundPosX;
 
-void cutsceneArrakis() {
-    Texture2D cutsceneImage = LoadTexture("static/image/cutscene1.png"); // Carrega a imagem da cutscene
-    float scrollX = 0.0f; // Posição de rolagem horizontal
-    const char* text = "Arrakis. Um vasto deserto, onde a areia carrega cicatrizes das guerras travadas pela especiaria.";
+void cutsceneArrakis(Music music) {
+    SetMusicVolume(music, 1.0f);  // Define o volume para garantir que esteja no máximo
+
+    // Carrega as imagens da cutscene
+    Texture2D cutsceneImage1 = LoadTexture("static/image/cutscene2.png");
+    Texture2D cutsceneImage2 = LoadTexture("static/image/cutscene1.png");
+    Texture2D cutsceneImage3 = LoadTexture("static/image/cutscene3.png");
+
+    const char* text1 = "Arrakis. Um vasto deserto, onde a areia carrega cicatrizes das guerras travadas pela especiaria.";
+    const char* text2 = "Eu vim em busca desse tesouro raro, mas cada passo é uma batalha. A especiaria não é fácil de conquistar.";
+    const char* text3 = "Ela nasce em profundezas traiçoeiras, onde os vermes gigantes,\nprotetores implacáveis do deserto, emergem ao menor sinal de vibração.";
+
     float speed = 30.0f; // Velocidade de rolagem
+    float scale = 0.6f;  // Escala das imagens
+    float timer = 0.0f;  // Timer para controlar a duração das partes
+    const float duration = 5.0f;  // Duração de cada parte em segundos
 
-    // Define a escala para que a imagem seja maior que a tela
-    float scale = 0.7f;  // 1.5 vezes o tamanho da tela
-    float timer = 0.0f;  // Timer para controlar a duração da cutscene
-    const float duration = 5.0f;  // Duração da cutscene em segundos
-
-    // Cutscene loop
+    // Primeira parte da cutscene (movimento da esquerda para a direita)
+    timer = 0.0f;  // Reinicia o timer para a primeira parte
+    float scrollX1 = 0.0f;
     while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
         BeginDrawing();
         ClearBackground(BLACK);
 
-        // Atualiza o temporizador
         timer += GetFrameTime();
-        UpdateMusicStream(titleMusic);
+        UpdateMusicStream(music);  // Mantém a música tocando durante a cutscene
 
         // Atualiza a posição horizontal da imagem
-        scrollX -= speed * GetFrameTime();
-        if (scrollX <= -cutsceneImage.width * scale) {
-            scrollX = 0.0f;  // Reinicia a posição da imagem para criar um loop
+        scrollX1 -= speed * GetFrameTime();
+        if (scrollX1 <= -cutsceneImage1.width * scale) {
+            scrollX1 = 0.0f;  // Reinicia a posição da imagem para criar um loop
         }
 
         // Desenha a imagem duas vezes para dar efeito de movimento contínuo
-        DrawTextureEx(cutsceneImage, (Vector2){scrollX, 0}, 0.0f, scale, WHITE);
-        DrawTextureEx(cutsceneImage, (Vector2){scrollX + cutsceneImage.width * scale, 0}, 0.0f, scale, WHITE);
+        DrawTextureEx(cutsceneImage1, (Vector2){scrollX1, 0}, 0.0f, scale, WHITE);
+        DrawTextureEx(cutsceneImage1, (Vector2){scrollX1 + cutsceneImage1.width * scale, 0}, 0.0f, scale, WHITE);
 
         // Desenha o texto na parte superior da tela
-        DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 20) / 2, 20, 20, RAYWHITE);
+        DrawText(text1, GetScreenWidth() / 2 - MeasureText(text1, 20) / 2, 20, 20, RAYWHITE);
 
         EndDrawing();
     }
 
-    UnloadTexture(cutsceneImage); // Libera a memória da imagem após o uso
+    // Segunda parte da cutscene (movimento da direita para a esquerda)
+    timer = 0.0f;  // Reinicia o timer para a segunda parte
+    float scrollX2 = 0.0f;
+    while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        timer += GetFrameTime();
+        UpdateMusicStream(music);  // Mantém a música tocando durante a cutscene
+
+        // Atualiza a posição horizontal da imagem
+        scrollX2 -= speed * GetFrameTime();
+        if (scrollX2 <= -cutsceneImage2.width * scale) {
+            scrollX2 = GetScreenWidth();  // Reinicia a posição para começar novamente da direita
+        }
+
+        // Desenha a imagem duas vezes para dar efeito de movimento contínuo
+        DrawTextureEx(cutsceneImage2, (Vector2){scrollX2, 0}, 0.0f, scale, WHITE);
+        DrawTextureEx(cutsceneImage2, (Vector2){scrollX2 + cutsceneImage2.width * scale, 0}, 0.0f, scale, WHITE);
+
+        // Desenha o texto na borda inferior da tela
+        DrawText(text2, GetScreenWidth() / 2 - MeasureText(text2, 20) / 2, GetScreenHeight() - 40, 20, RAYWHITE);
+
+        EndDrawing();
+    }
+
+    // Terceira parte da cutscene (movimento da esquerda para a direita)
+    timer = 0.0f;  // Reinicia o timer para a terceira parte
+    float scrollX3 = 0.0f;
+    while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        timer += GetFrameTime();
+        UpdateMusicStream(music);  // Mantém a música tocando durante a cutscene
+
+        // Atualiza a posição horizontal da imagem
+        scrollX3 -= speed * GetFrameTime();
+        if (scrollX3 <= -cutsceneImage3.width * scale) {
+            scrollX3 = 0.0f;  // Reinicia a posição da imagem para criar um loop
+        }
+
+        // Desenha a imagem duas vezes para dar efeito de movimento contínuo
+        DrawTextureEx(cutsceneImage3, (Vector2){scrollX3, 0}, 0.0f, scale, WHITE);
+        DrawTextureEx(cutsceneImage3, (Vector2){scrollX3 + cutsceneImage3.width * scale, 0}, 0.0f, scale, WHITE);
+
+        // Desenha o texto na parte superior da tela
+        DrawText(text3, GetScreenWidth() / 2 - MeasureText(text3, 20) / 2, 20, 20, RAYWHITE);
+
+        EndDrawing();
+    }
+
+    // Libera a memória das imagens após o uso
+    UnloadTexture(cutsceneImage1);
+    UnloadTexture(cutsceneImage2);
+    UnloadTexture(cutsceneImage3);
 }
 
 // Inicializa o menu com música e texturas
