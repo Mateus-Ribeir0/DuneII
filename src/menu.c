@@ -38,6 +38,7 @@ void cutsceneArrakis(Music music) {
         ClearBackground(BLACK);
 
         timer += GetFrameTime();
+        UpdateMusicStream(music);  // Mantém a música tocando durante a cutscene
 
         // Atualiza a posição horizontal da imagem
         scrollX1 -= speed * GetFrameTime();
@@ -63,6 +64,7 @@ void cutsceneArrakis(Music music) {
         ClearBackground(BLACK);
 
         timer += GetFrameTime();
+        UpdateMusicStream(music);  // Mantém a música tocando durante a cutscene
 
         // Atualiza a posição horizontal da imagem
         scrollX2 -= speed * GetFrameTime();
@@ -87,6 +89,9 @@ void cutsceneArrakis(Music music) {
         BeginDrawing();
         ClearBackground(BLACK);
 
+        timer += GetFrameTime();
+        UpdateMusicStream(music);  // Mantém a música tocando durante a cutscene
+
         // Atualiza a posição horizontal da imagem
         scrollX3 -= speed * GetFrameTime();
         if (scrollX3 <= -cutsceneImage3.width * scale) {
@@ -110,6 +115,7 @@ void cutsceneArrakis(Music music) {
         ClearBackground(BLACK);
 
         timer += GetFrameTime();
+        UpdateMusicStream(music);  // Mantém a música tocando durante a cutscene
 
         // Atualiza a posição horizontal da imagem (movimento da direita para a esquerda)
         scrollX4 -= speed * GetFrameTime();
