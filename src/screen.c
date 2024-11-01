@@ -85,15 +85,4 @@ void screenGotoxy(int x, int y)
     printf("%s[f%s[%dB%s[%dC", ESC, ESC, y, ESC, x);
 }
 
-void screenSetColor( screenColor fg, screenColor bg)
-{
-    char atr[] = "[0;";
 
-    if ( fg > LIGHTGRAY )
-    {
-        atr[1] = '1';
-		fg -= 8;
-    }
-
-    printf("%s%s%d;%dm", ESC, atr, fg+30, bg+40);
-}

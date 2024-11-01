@@ -55,10 +55,7 @@
 
 /**
  * Screen Colors type
-*/
-typedef enum {BLACK, RED, GREEN, BROWN, BLUE, MAGENTA, CYAN, LIGHTGRAY,
-        DARKGRAY, LIGHTRED, LIGHTGREEN, YELLOW, LIGHTBLUE, 
-        LIGHTMAGENTA, LIGHTCYAN, WHITE} screenColor; 
+ */
 
 /**
  * Move the cursor to position (0,0)
@@ -174,7 +171,7 @@ void screenGotoxy(int x, int y);
  * @param fg foreground color, can assume values from BLACK to WHITE
  * @param bg background color, can assume values from BLACK to LIGHTGRAY
 */
-void screenSetColor(screenColor fg, screenColor bg);
+
 
 /**
  * Get terminal dimensions dynamically
