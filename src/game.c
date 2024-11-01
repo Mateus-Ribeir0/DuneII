@@ -202,22 +202,22 @@ void drawGame() {
 }
 
 void playGame(int dificuldade) {
-    // Carrega a música do jogo
     Music gameMusic = LoadMusicStream("static/music/musica.wav");
     PlayMusicStream(gameMusic);
 
     custom_srand(1234);
     initializeItems();
     inicializar_zonas();
-    passosRepetidosMax = dificuldade;
-    itemsCollected = 0;  // Resetando o número de itens coletados
+    itemsCollected = 0;
 
-    char ultimoPasso = '\0';
-    int passosRepetidos = 0;
-    memset(historico, 0, sizeof(historico));  // Limpa o histórico de movimentos
+    // Define a posição inicial padrão do jogador (por exemplo, centro do mapa)
+    player_x = MAPA_LARGURA / 2;
+    player_y = MAPA_ALTURA / 2;
+
+    char historico[MAX_HISTORICO] = "";
+    memset(historico, 0, sizeof(historico));
 
     while (!WindowShouldClose()) {
-        // Atualiza a música para garantir a reprodução contínua
         UpdateMusicStream(gameMusic);
 
         int dx = 0, dy = 0;
@@ -229,34 +229,36 @@ void playGame(int dificuldade) {
         if (IsKeyPressed(KEY_D)) { dx = 1; movimento = 'd'; }
 
         if (movimento != '\0') {
-            // Verificação de movimento repetido
-            if (movimento == ultimoPasso) {
-                passosRepetidos++;
-            } else {
-                passosRepetidos = 1;
-                ultimoPasso = movimento;
-            }
-
-            // Fim de jogo ao exceder o limite de passos repetidos
-            if (passosRepetidos >= passosRepetidosMax) {
-                for (int i = 0; i < 180; i++) {  // Exibe mensagem por alguns frames
-                    BeginDrawing();
-                    ClearBackground(RAYWHITE);
-                    DrawText("Movimento repetido detectado! Fim de jogo.", 10, 40, 20, RED);
-                    EndDrawing();
-                }
-                break;
-            }
-
-            // Movimenta o jogador e verifica a coleta de itens
             movePlayer(dx, dy);
             checkItemCollection();
 
-            // Atualiza o histórico
             size_t len = strlen(historico);
             if (len < MAX_HISTORICO - 1) {
                 historico[len] = movimento;
                 historico[len + 1] = '\0';
+            }
+
+            char padrao_encontrado[MAX_PADRAO + 1] = "";
+            int encontrou_padrao = 0;
+            if ((dificuldade == 5 && strlen(historico) >= 5 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 5, padrao_encontrado))) ||
+                (dificuldade == 4 && strlen(historico) >= 4 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 4, padrao_encontrado))) ||
+                (dificuldade == 3 && strlen(historico) >= 3 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 3, padrao_encontrado))) ||
+                (dificuldade == 9)) {
+                for (size_t i = 3; i <= 9 && dificuldade == 9; i++) {
+                    if (strlen(historico) >= i && (encontrou_padrao = identificar_padrao_mais_frequente(historico, i, padrao_encontrado))) {
+                        break;
+                    }
+                }
+            }
+
+            if (encontrou_padrao) {
+                for (int i = 0; i < 180; i++) {
+                    BeginDrawing();
+                    ClearBackground(RAYWHITE);
+                    DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
+                    EndDrawing();
+                }
+                break;
             }
         }
 
@@ -264,9 +266,10 @@ void playGame(int dificuldade) {
         drawGame();
         EndDrawing();
 
-        if (itemsCollected == NUM_ITEMS) break;  // Condição de vitória
+        if (itemsCollected == NUM_ITEMS) break;
     }
 
-    StopMusicStream(gameMusic);  // Para a música ao sair do loop do jogo
-    UnloadMusicStream(gameMusic);  // Libera a música da memória
+    StopMusicStream(gameMusic);
+    UnloadMusicStream(gameMusic);
 }
+
