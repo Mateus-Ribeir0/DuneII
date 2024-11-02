@@ -1,8 +1,10 @@
-// include/game.h
 #ifndef GAME_H
 #define GAME_H
 
-// Declaração de funções para serem usadas em main.c
-void playGame(int dificuldade);  // Função principal do jogo, que aceita a dificuldade
+#include "raylib.h"
 
+void playGame(int dificuldade);  // Função principal do jogo
+void movePlayer(int dx, int dy); // Declaração da função para mover o jogador
+void initializeLobby();          // Função para inicializar o lobby
+void drawLobby();     
 #endif

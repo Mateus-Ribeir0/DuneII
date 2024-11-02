@@ -1,53 +1,67 @@
-// src/main.c
 #include "raylib.h"
 #include "menu.h"
 #include "game.h"
 
-// Declaração da nova função para a cutscene
-void cutsceneArrakis();
-
 int main() {
     GameScreen currentScreen = TITLE;
     int dificuldade = 5;  // Valor padrão para a dificuldade
+    bool lobbyInitialized = false;  // Variável para controle de inicialização do lobby
 
-    InitAudioDevice();  // Inicializa o dispositivo de áudio
-
-    Music titleMusic = LoadMusicStream("static/music/epicversion3.wav"); // Carrega a música do menu
-    SetMusicVolume(titleMusic, 1.0f);
+    InitAudioDevice();
+    Music titleMusic = LoadMusicStream("static/music/epicversion3.wav");
     PlayMusicStream(titleMusic);
 
     iniciarMenu(&currentScreen, &dificuldade);
 
-    // Loop principal do programa
     while (!WindowShouldClose()) {
-
         UpdateMusicStream(titleMusic);
 
-        if (currentScreen == TITLE || currentScreen == RANKINGS) {
-            atualizarMenu(&currentScreen, &dificuldade);
-            desenharMenu(currentScreen);
+        switch (currentScreen) {
+            case TITLE:
+            case RANKINGS:
+                atualizarMenu(&currentScreen, &dificuldade);
+                desenharMenu(currentScreen);
+                if (IsKeyPressed(KEY_ENTER) && currentScreen == TITLE) {
+                    currentScreen = CUTSCENE;
+                }
+                break;
+            case CUTSCENE:
+                cutsceneArrakis(titleMusic);
+                currentScreen = LOBBY;  // Transição para o lobby após a cutscene
+                break;
+            case LOBBY:
+                if (!lobbyInitialized) {
+                    initializeLobby();
+                    lobbyInitialized = true;  // Marca que o lobby foi inicializado
+                }
 
-            // Verifica se a tecla Enter foi pressionada para iniciar a cutscene
-            if (currentScreen == TITLE && IsKeyPressed(KEY_ENTER)) {
-                currentScreen = CUTSCENE;  // Transição para o estado de cutscene
-            }
-        } 
-        else if (currentScreen == CUTSCENE) {
-            // Chama a cutscene e aguarda a conclusão para iniciar o jogo
-            cutsceneArrakis(titleMusic);
-            currentScreen = GAME;  // Transição para o modo de jogo após a cutscene
-        }
-        else if (currentScreen == GAME) {
-            // Chama a função principal do jogo com a dificuldade escolhida
-            playGame(dificuldade);
+                BeginDrawing();
+                drawLobby();
+                EndDrawing();
 
-            // Retorna ao menu após o término do jogo
-            currentScreen = TITLE;
+                // Processamento da entrada do usuário para movimentação baseada em tile
+                int dx = 0, dy = 0;
+                if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) dx = 1;
+                if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) dx = -1;
+                if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) dy = -1;
+                if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) dy = 1;
+
+                movePlayer(dx, dy);  // Assumindo que esta função aceita movimentação baseada em tile
+
+                if (IsKeyPressed(KEY_ENTER)) {
+                    currentScreen = GAME;  // Transição para o estado do jogo
+                    lobbyInitialized = false;  // Reseta para garantir re-inicialização na próxima visita ao lobby
+                }
+                break;
+            case GAME:
+                playGame(dificuldade);
+                currentScreen = TITLE;  // Retorna ao título após o jogo
+                break;
         }
     }
 
-    StopMusicStream(titleMusic);   // Para a música ao sair do programa
-    UnloadMusicStream(titleMusic); // Descarrega a música
+    StopMusicStream(titleMusic);
+    UnloadMusicStream(titleMusic);
     CloseAudioDevice();
 
     finalizarMenu();

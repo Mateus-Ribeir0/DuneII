@@ -120,6 +120,15 @@ void movePlayer(int dx, int dy) {
     }
 }
 
+void initializeLobby() {
+    // Define a posição inicial do jogador no centro do mapa do lobby
+    player_x = MAPA_LARGURA / 2;
+    player_y = MAPA_ALTURA / 2;
+
+    // Aqui você poderia definir outras propriedades, como iluminação, NPCs, etc., se necessário
+}
+
+
 // Verifica a coleta de itens
 void checkItemCollection() {
     for (int i = 0; i < NUM_ITEMS; i++) {
@@ -173,6 +182,18 @@ int identificar_padrao_mais_frequente(const char *historico, size_t tamanho_padr
     }
     
     return max_ocorrencias > 1 ? max_ocorrencias : 0;
+}
+void drawLobby() {
+    ClearBackground(LIGHTGRAY);  // Define um fundo claro para o lobby
+
+    for (int y = 0; y < MAPA_ALTURA; y++) {
+        for (int x = 0; x < MAPA_LARGURA; x++) {
+            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, DARKGRAY);
+        }
+    }
+
+    // Desenha o jogador no mapa do lobby
+    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
 }
 
 // Função de desenho do jogo
