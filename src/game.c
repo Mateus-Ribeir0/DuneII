@@ -200,9 +200,7 @@ void drawGame() {
 
     DrawText(TextFormat("Itens coletados: %d", itemsCollected), 10, 10, 20, BLACK);
 }
-
 void playGame(int dificuldade) {
-
     custom_srand(1234);
     initializeItems();
     inicializar_zonas();
@@ -216,7 +214,6 @@ void playGame(int dificuldade) {
     memset(historico, 0, sizeof(historico));
 
     while (!WindowShouldClose()) {
-
         int dx = 0, dy = 0;
         char movimento = '\0';
 
@@ -229,10 +226,16 @@ void playGame(int dificuldade) {
             movePlayer(dx, dy);
             checkItemCollection();
 
-            size_t len = strlen(historico);
-            if (len < MAX_HISTORICO - 1) {
-                historico[len] = movimento;
-                historico[len + 1] = '\0';
+            // Verifica se o jogador está em uma zona segura antes de registrar o movimento
+            if (!is_in_irregular_zone(player_x, player_y, safe_zones, NUM_SAFE_ZONES)) {
+                size_t len = strlen(historico);
+                if (len < MAX_HISTORICO - 1) {
+                    historico[len] = movimento;
+                    historico[len + 1] = '\0';
+                }
+            } else {
+                // Zera o histórico quando entra em uma safe zone
+                memset(historico, 0, sizeof(historico));
             }
 
             char padrao_encontrado[MAX_PADRAO + 1] = "";
@@ -265,6 +268,6 @@ void playGame(int dificuldade) {
 
         if (itemsCollected == NUM_ITEMS) break;
     }
-
 }
+
 
