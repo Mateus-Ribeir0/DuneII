@@ -8,7 +8,7 @@
 
 #define TILE_SIZE 32
 #define MAPA_LARGURA 40
-#define MAPA_ALTURA 30
+#define MAPA_ALTURA 22
 #define NUM_SAFE_ZONES 5
 #define NUM_COLLISION_ZONES 6
 #define MAX_POINTS_PER_ZONE 60
@@ -31,14 +31,16 @@ typedef struct {
 } Item;
 
 static unsigned long seed = 1234;
-IrregularZone safe_zones[NUM_SAFE_ZONES];
-IrregularZone collision_zones[NUM_COLLISION_ZONES];
+IrregularZone safe_zones[3][NUM_SAFE_ZONES];  // Array para diferentes mapas
+IrregularZone collision_zones[3][NUM_COLLISION_ZONES];  // Array para diferentes mapas
 Item items[NUM_ITEMS];
 int player_x = MAPA_LARGURA / 2;
 int player_y = MAPA_ALTURA / 2;
 int itemsCollected = 0;
 char historico[MAX_HISTORICO] = "";
 int passosRepetidosMax = 3;
+int mapaAtual = 0;  // 0 para mapa1, 1 para mapa2, 2 para mapa3
+// Definição das variáveis
 
 // Funções de randomização
 void custom_srand(unsigned long s) {
@@ -50,7 +52,7 @@ int custom_rand() {
     return (int)(seed % 32768); 
 }
 
-// Inicializa as zonas seguras e de colisão
+// Inicializa as zonas seguras e de colisão para cada mapa
 void gerar_zona_irregular(IrregularZone *zone, int centro_x, int centro_y, int num_pontos) {
     zone->num_points = num_pontos;
     for (int i = 0; i < num_pontos; i++) {
@@ -61,29 +63,74 @@ void gerar_zona_irregular(IrregularZone *zone, int centro_x, int centro_y, int n
     }
 }
 
-void inicializar_zonas() {
-    gerar_zona_irregular(&safe_zones[0], 10, 10, 20);
-    gerar_zona_irregular(&safe_zones[1], 35, 5, 30);
-    gerar_zona_irregular(&safe_zones[2], 60, 15, 25);
-    gerar_zona_irregular(&safe_zones[3], 20, 25, 30);
-    gerar_zona_irregular(&safe_zones[4], 45, 30, 25);
+void inicializar_zonas(int mapa) {
+    if (mapa == 0) {  // Configuração do mapa 1
+        gerar_zona_irregular(&safe_zones[0][0], 10, 10, 20);
+        gerar_zona_irregular(&safe_zones[0][1], 35, 5, 30);
+        gerar_zona_irregular(&safe_zones[0][2], 60, 15, 25);
+        gerar_zona_irregular(&safe_zones[0][3], 20, 25, 30);
+        gerar_zona_irregular(&safe_zones[0][4], 45, 30, 25);
 
-    gerar_zona_irregular(&collision_zones[0], 25, 8, 15);
-    gerar_zona_irregular(&collision_zones[1], 50, 20, 20);
+        gerar_zona_irregular(&collision_zones[0][0], 25, 8, 15);
+        gerar_zona_irregular(&collision_zones[0][1], 50, 20, 20);
+        // Bordas
+        for (int i = 0; i < MAPA_LARGURA; i++) {
+            collision_zones[0][2].points[i] = (Point){i, 0};
+            collision_zones[0][3].points[i] = (Point){i, MAPA_ALTURA - 1};
+        }
+        for (int i = 0; i < MAPA_ALTURA; i++) {
+            collision_zones[0][4].points[i] = (Point){0, i};
+            collision_zones[0][5].points[i] = (Point){MAPA_LARGURA - 1, i};
+        }
+        collision_zones[0][2].num_points = MAPA_LARGURA;
+        collision_zones[0][3].num_points = MAPA_LARGURA;
+        collision_zones[0][4].num_points = MAPA_ALTURA;
+        collision_zones[0][5].num_points = MAPA_ALTURA;
+    } else if (mapa == 1) {  // Configuração do mapa 2
+        gerar_zona_irregular(&safe_zones[1][0], 5, 5, 25);
+        gerar_zona_irregular(&safe_zones[1][1], 30, 10, 20);
+        gerar_zona_irregular(&safe_zones[1][2], 50, 20, 15);
+        gerar_zona_irregular(&safe_zones[1][3], 15, 27, 20);
+        gerar_zona_irregular(&safe_zones[1][4], 60, 25, 30);
 
-    int idx = 2;
-    for (int i = 0; i < MAPA_LARGURA; i++) {
-        collision_zones[idx].points[i] = (Point){i, 0};
-        collision_zones[idx + 1].points[i] = (Point){i, MAPA_ALTURA - 1};
+        gerar_zona_irregular(&collision_zones[1][0], 20, 5, 10);
+        gerar_zona_irregular(&collision_zones[1][1], 55, 18, 25);
+        // Bordas
+        for (int i = 0; i < MAPA_LARGURA; i++) {
+            collision_zones[1][2].points[i] = (Point){i, 0};
+            collision_zones[1][3].points[i] = (Point){i, MAPA_ALTURA - 1};
+        }
+        for (int i = 0; i < MAPA_ALTURA; i++) {
+            collision_zones[1][4].points[i] = (Point){0, i};
+            collision_zones[1][5].points[i] = (Point){MAPA_LARGURA - 1, i};
+        }
+        collision_zones[1][2].num_points = MAPA_LARGURA;
+        collision_zones[1][3].num_points = MAPA_LARGURA;
+        collision_zones[1][4].num_points = MAPA_ALTURA;
+        collision_zones[1][5].num_points = MAPA_ALTURA;
+    } else if (mapa == 2) {  // Configuração do mapa 3
+        gerar_zona_irregular(&safe_zones[2][0], 8, 8, 30);
+        gerar_zona_irregular(&safe_zones[2][1], 25, 15, 25);
+        gerar_zona_irregular(&safe_zones[2][2], 40, 5, 15);
+        gerar_zona_irregular(&safe_zones[2][3], 35, 28, 30);
+        gerar_zona_irregular(&safe_zones[2][4], 55, 20, 20);
+
+        gerar_zona_irregular(&collision_zones[2][0], 18, 10, 18);
+        gerar_zona_irregular(&collision_zones[2][1], 45, 22, 30);
+        // Bordas
+        for (int i = 0; i < MAPA_LARGURA; i++) {
+            collision_zones[2][2].points[i] = (Point){i, 0};
+            collision_zones[2][3].points[i] = (Point){i, MAPA_ALTURA - 1};
+        }
+        for (int i = 0; i < MAPA_ALTURA; i++) {
+            collision_zones[2][4].points[i] = (Point){0, i};
+            collision_zones[2][5].points[i] = (Point){MAPA_LARGURA - 1, i};
+        }
+        collision_zones[2][2].num_points = MAPA_LARGURA;
+        collision_zones[2][3].num_points = MAPA_LARGURA;
+        collision_zones[2][4].num_points = MAPA_ALTURA;
+        collision_zones[2][5].num_points = MAPA_ALTURA;
     }
-    for (int i = 0; i < MAPA_ALTURA; i++) {
-        collision_zones[idx + 2].points[i] = (Point){0, i};
-        collision_zones[idx + 3].points[i] = (Point){MAPA_LARGURA - 1, i};
-    }
-    collision_zones[2].num_points = MAPA_LARGURA;
-    collision_zones[3].num_points = MAPA_LARGURA;
-    collision_zones[4].num_points = MAPA_ALTURA;
-    collision_zones[5].num_points = MAPA_ALTURA;
 }
 
 // Checa se o jogador está dentro de uma zona
@@ -113,21 +160,12 @@ void movePlayer(int dx, int dy) {
     int new_y = player_y + dy;
 
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
-        if (!is_in_irregular_zone(new_x, new_y, collision_zones, NUM_COLLISION_ZONES)) {
+        if (!is_in_irregular_zone(new_x, new_y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
             player_x = new_x;
             player_y = new_y;
         }
     }
 }
-
-void initializeLobby() {
-    // Define a posição inicial do jogador no centro do mapa do lobby
-    player_x = MAPA_LARGURA / 2;
-    player_y = MAPA_ALTURA / 2;
-
-    // Aqui você poderia definir outras propriedades, como iluminação, NPCs, etc., se necessário
-}
-
 
 // Verifica a coleta de itens
 void checkItemCollection() {
@@ -137,6 +175,32 @@ void checkItemCollection() {
             itemsCollected++;
         }
     }
+}
+
+// Função de desenho do jogo
+void drawGame() {
+    ClearBackground(RAYWHITE);
+
+    for (int y = 0; y < MAPA_ALTURA; y++) {
+        for (int x = 0; x < MAPA_LARGURA; x++) {
+            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, WHITE);
+
+            if (is_in_irregular_zone(x, y, safe_zones[mapaAtual], NUM_SAFE_ZONES)) {
+                DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, GREEN);
+            } else if (is_in_irregular_zone(x, y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
+                DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, RED);
+            }
+        }
+    }
+
+    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
+    for (int i = 0; i < NUM_ITEMS; i++) {
+        if (!items[i].collected) {
+            DrawCircle(items[i].position.x * TILE_SIZE + TILE_SIZE / 2, items[i].position.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 4, GOLD);
+        }
+    }
+
+    DrawText(TextFormat("Itens coletados: %d", itemsCollected), 10, 10, 20, BLACK);
 }
 
 // Contador de ocorrências consecutivas
@@ -183,48 +247,26 @@ int identificar_padrao_mais_frequente(const char *historico, size_t tamanho_padr
     
     return max_ocorrencias > 1 ? max_ocorrencias : 0;
 }
-void drawLobby() {
-    ClearBackground(LIGHTGRAY);  // Define um fundo claro para o lobby
 
-    for (int y = 0; y < MAPA_ALTURA; y++) {
-        for (int x = 0; x < MAPA_LARGURA; x++) {
-            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, DARKGRAY);
-        }
+void playGame() {
+    int dificuldade;
+    
+    // Define a dificuldade com base no mapa atual
+    switch (mapaAtual) {
+        case 0:  // Mapa 1
+            dificuldade = 5;
+            break;
+        case 1:  // Mapa 2
+            dificuldade = 4;
+            break;
+        case 2:  // Mapa 3
+            dificuldade = 3;
+            break;
     }
 
-    // Desenha o jogador no mapa do lobby
-    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
-}
-
-// Função de desenho do jogo
-void drawGame() {
-    ClearBackground(RAYWHITE);
-
-    for (int y = 0; y < MAPA_ALTURA; y++) {
-        for (int x = 0; x < MAPA_LARGURA; x++) {
-            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, LIGHTGRAY);
-
-            if (is_in_irregular_zone(x, y, safe_zones, NUM_SAFE_ZONES)) {
-                DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, GREEN);
-            } else if (is_in_irregular_zone(x, y, collision_zones, NUM_COLLISION_ZONES)) {
-                DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, RED);
-            }
-        }
-    }
-
-    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
-    for (int i = 0; i < NUM_ITEMS; i++) {
-        if (!items[i].collected) {
-            DrawCircle(items[i].position.x * TILE_SIZE + TILE_SIZE / 2, items[i].position.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 4, GOLD);
-        }
-    }
-
-    DrawText(TextFormat("Itens coletados: %d", itemsCollected), 10, 10, 20, BLACK);
-}
-void playGame(int dificuldade) {
     custom_srand(1234);
     initializeItems();
-    inicializar_zonas();
+    inicializar_zonas(mapaAtual);  // Inicializa as zonas do mapa atual
     itemsCollected = 0;
 
     // Define a posição inicial padrão do jogador (por exemplo, centro do mapa)
@@ -248,7 +290,7 @@ void playGame(int dificuldade) {
             checkItemCollection();
 
             // Verifica se o jogador está em uma zona segura antes de registrar o movimento
-            if (!is_in_irregular_zone(player_x, player_y, safe_zones, NUM_SAFE_ZONES)) {
+            if (!is_in_irregular_zone(player_x, player_y, safe_zones[mapaAtual], NUM_SAFE_ZONES)) {
                 size_t len = strlen(historico);
                 if (len < MAX_HISTORICO - 1) {
                     historico[len] = movimento;
@@ -263,9 +305,10 @@ void playGame(int dificuldade) {
             int encontrou_padrao = 0;
             if ((dificuldade == 5 && strlen(historico) >= 5 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 5, padrao_encontrado))) ||
                 (dificuldade == 4 && strlen(historico) >= 4 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 4, padrao_encontrado))) ||
-                (dificuldade == 3 && strlen(historico) >= 3 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 3, padrao_encontrado))) ||
-                (dificuldade == 9)) {
-                for (size_t i = 3; i <= 9 && dificuldade == 9; i++) {
+                (dificuldade == 3 && strlen(historico) >= 3 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 3, padrao_encontrado)))) 
+                {
+                
+                for (size_t i = 3; i <= dificuldade; i++) {
                     if (strlen(historico) >= i && (encontrou_padrao = identificar_padrao_mais_frequente(historico, i, padrao_encontrado))) {
                         break;
                     }
@@ -290,5 +333,3 @@ void playGame(int dificuldade) {
         if (itemsCollected == NUM_ITEMS) break;
     }
 }
-
-

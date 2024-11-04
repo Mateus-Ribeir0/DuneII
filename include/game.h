@@ -3,8 +3,14 @@
 
 #include "raylib.h"
 
-void playGame(int dificuldade);  // Função principal do jogo
-void movePlayer(int dx, int dy); // Declaração da função para mover o jogador
-void initializeLobby();          // Função para inicializar o lobby
-void drawLobby();     
+extern int player_x;
+extern int player_y;
+extern int mapaAtual;
+
+void playGame();
+void movePlayer(int dx, int dy);
+void drawGame();
+void inicializar_zonas(int mapa);
+void initializeItems();
+
 #endif

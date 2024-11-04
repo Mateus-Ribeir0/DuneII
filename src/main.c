@@ -1,17 +1,18 @@
 #include "raylib.h"
 #include "menu.h"
 #include "game.h"
+#include "lobby.h"
 
 int main() {
     GameScreen currentScreen = TITLE;
-    int dificuldade = 5;  // Valor padrão para a dificuldade
-    bool lobbyInitialized = false;  // Variável para controle de inicialização do lobby
+    bool lobbyInitialized = false;
 
     InitAudioDevice();
     Music titleMusic = LoadMusicStream("static/music/epicversion3.wav");
     PlayMusicStream(titleMusic);
+    SetMusicVolume(titleMusic, 1.0f);
 
-    iniciarMenu(&currentScreen, &dificuldade);
+    iniciarMenu(&currentScreen);
 
     while (!WindowShouldClose()) {
         UpdateMusicStream(titleMusic);
@@ -19,7 +20,7 @@ int main() {
         switch (currentScreen) {
             case TITLE:
             case RANKINGS:
-                atualizarMenu(&currentScreen, &dificuldade);
+                atualizarMenu(&currentScreen);
                 desenharMenu(currentScreen);
                 if (IsKeyPressed(KEY_ENTER) && currentScreen == TITLE) {
                     currentScreen = CUTSCENE;
@@ -27,35 +28,17 @@ int main() {
                 break;
             case CUTSCENE:
                 cutsceneArrakis(titleMusic);
-                currentScreen = LOBBY;  // Transição para o lobby após a cutscene
+                currentScreen = LOBBY;
                 break;
             case LOBBY:
-                if (!lobbyInitialized) {
-                    initializeLobby();
-                    lobbyInitialized = true;  // Marca que o lobby foi inicializado
-                }
-
+                processarEntradaLobby(&currentScreen, &lobbyInitialized);
                 BeginDrawing();
-                drawLobby();
+                desenharLobbyDetalhado();
                 EndDrawing();
-
-                // Processamento da entrada do usuário para movimentação baseada em tile
-                int dx = 0, dy = 0;
-                if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) dx = 1;
-                if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) dx = -1;
-                if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) dy = -1;
-                if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) dy = 1;
-
-                movePlayer(dx, dy);  // Assumindo que esta função aceita movimentação baseada em tile
-
-                if (IsKeyPressed(KEY_ENTER)) {
-                    currentScreen = GAME;  // Transição para o estado do jogo
-                    lobbyInitialized = false;  // Reseta para garantir re-inicialização na próxima visita ao lobby
-                }
                 break;
             case GAME:
-                playGame(dificuldade);
-                currentScreen = TITLE;  // Retorna ao título após o jogo
+                playGame();
+                currentScreen = TITLE;
                 break;
         }
     }

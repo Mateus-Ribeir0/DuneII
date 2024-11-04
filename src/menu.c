@@ -12,7 +12,7 @@ static Music titleMusic;
 static float backgroundPosX;
 
 void cutsceneArrakis(Music titleMusic) {
-    SetMusicVolume(titleMusic, 1.0f);  // Define o volume para garantir que esteja no máximo
+    SetMusicVolume(titleMusic, 1.0f);
 
     // Carrega as imagens da cutscene
     Texture2D cutsceneImage1 = LoadTexture("static/image/cutscene2.png");
@@ -39,7 +39,7 @@ void cutsceneArrakis(Music titleMusic) {
     float speed = 30.0f; // Velocidade de rolagem
     float scale = 0.6f;  // Escala das imagens
     float timer = 0.0f;  // Timer para controlar a duração das partes
-    const float duration = 7.0f;  // Duração de cada parte em segundos
+    const float duration = 0.1f;  // Duração de cada parte em segundos (7 é o padrão)
 
     // Primeira parte da cutscene (movimento da esquerda para a direita)
     timer = 0.0f;  // Reinicia o timer para a primeira parte
@@ -284,7 +284,7 @@ void cutsceneArrakis(Music titleMusic) {
 }
 
 // Inicializa o menu com música e texturas
-void iniciarMenu(GameScreen *currentScreen, int *dificuldade) {
+void iniciarMenu(GameScreen *currentScreen) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "DuneII");
     InitAudioDevice();
 
@@ -299,7 +299,7 @@ void iniciarMenu(GameScreen *currentScreen, int *dificuldade) {
 }
 
 // Atualiza a lógica do menu, incluindo a seleção de dificuldade
-void atualizarMenu(GameScreen *currentScreen, int *dificuldade) {
+void atualizarMenu(GameScreen *currentScreen) {
     UpdateMusicStream(titleMusic);
 
     if (*currentScreen == TITLE) {
@@ -309,22 +309,15 @@ void atualizarMenu(GameScreen *currentScreen, int *dificuldade) {
             backgroundPosX = 0;
         }
 
-        // Seleção de dificuldade
-        if (IsKeyPressed(KEY_ONE)) *dificuldade = 5;
-        if (IsKeyPressed(KEY_TWO)) *dificuldade = 4;
-        if (IsKeyPressed(KEY_THREE)) *dificuldade = 3;
-        if (IsKeyPressed(KEY_FOUR)) *dificuldade = 9;
-
         // Iniciar o jogo ao pressionar ENTER
         if (IsKeyPressed(KEY_ENTER)) {
             *currentScreen = GAME;  // Muda para a tela do jogo
         }
         else if (IsKeyPressed(KEY_R)) {
             *currentScreen = RANKINGS;  // Muda para a tela de rankings ao pressionar R
-            PauseMusicStream(titleMusic);
         }
     }
-    else if (*currentScreen == RANKINGS && IsKeyPressed(KEY_ESCAPE)) {
+    else if (*currentScreen == RANKINGS && IsKeyPressed(KEY_Q)) {
         *currentScreen = TITLE;
         ResumeMusicStream(titleMusic);
     }
@@ -354,21 +347,13 @@ void desenharMenu(GameScreen currentScreen) {
         }
 
         // Desenha a logo e o texto do menu
-
-        // Atualmente a dificuldade não esta sendo escolhida! ps: Carlos
-
         DrawTexture(logo, SCREEN_WIDTH / 2 - logo.width / 2, 150, WHITE);
         DrawText("Pressione ENTER para Jogar", SCREEN_WIDTH / 2 - 150, 400, 20, WHITE);
-        //DrawText("Escolha o nível de dificuldade:", SCREEN_WIDTH / 2 - 150, 450, 20, WHITE);
-        //DrawText("1 - Fácil (5 letras)", SCREEN_WIDTH / 2 - 150, 500, 20, WHITE);
-        //DrawText("2 - Médio (4 letras)", SCREEN_WIDTH / 2 - 150, 550, 20, WHITE);
-        //DrawText("3 - Difícil (3 letras)", SCREEN_WIDTH / 2 - 150, 600, 20, WHITE);
-        //DrawText("4 - Impossível (3 a 9 letras)", SCREEN_WIDTH / 2 - 150, 650, 20, WHITE);
-        //DrawText("Pressione R para Rankings", SCREEN_WIDTH / 2 - 150, 700, 20, WHITE);
+        DrawText("Pressione R para Rankings", SCREEN_WIDTH / 2 - 150, 650, 20, WHITE);
     } 
     else if (currentScreen == RANKINGS) {
-        DrawText("Tela de Rankings", SCREEN_WIDTH / 2 - 100, 200, 30, WHITE);
-        DrawText("Pressione ESC para voltar", SCREEN_WIDTH / 2 - 150, 400, 20, WHITE);
+        DrawText("Tela de Rankings", SCREEN_WIDTH / 2 - 100, 200, 30, BLACK);
+        DrawText("Pressione Q para voltar", SCREEN_WIDTH / 2 - 150, 400, 20, BLACK);
     }
 
     EndDrawing();
