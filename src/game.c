@@ -1,6 +1,7 @@
 // src/game.c
 #include "raylib.h"
 #include "game.h"
+#include "menu.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -317,7 +318,15 @@ void playGame() {
 
             if (encontrou_padrao) {
                 Sound gameOverSound = LoadSound("static/music/deathsound.wav");
+                Sound barulhoMonstro = LoadSound("static/music/monster.mp3");
+                Texture2D characterBack = LoadTexture("static/image/characterback.png");
+                Texture2D sandworm = LoadTexture("static/image/sandworm.png");
+
+                // Toca o deathsound imediatamente
                 PlaySound(gameOverSound);
+
+                sleep(1);
+
                 for (int i = 0; i < 180; i++) {
                     BeginDrawing();
                     ClearBackground(BLACK);
@@ -325,8 +334,44 @@ void playGame() {
                     DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
                     EndDrawing();
                 }
+
+                // Pausa de 2 segundos antes de tocar o som do monstro
+                sleep(2);
+
+                // Toca o barulho do monstro uma única vez
+                PlaySound(barulhoMonstro);
+
+                // Define a posição inicial da sandworm no centro da tela
+                int sandwormPosY = GetScreenHeight() / 2 - sandworm.height / 2;
+                int startTime = GetTime(); // Marca o tempo inicial
+
+                // Mostra a nova tela com characterback sobreposta à animação da sandworm subindo
+                while ((GetTime() - startTime < 5) && !WindowShouldClose()) {
+                    sandwormPosY -= 1; // Move a sandworm para cima lentamente
+
+                    BeginDrawing();
+                    ClearBackground(BLACK);
+
+                    // Desenha sandworm no centro da tela e move-a para cima
+                    DrawTexture(sandworm, GetScreenWidth() / 2 - sandworm.width / 2, sandwormPosY + 40, WHITE);
+
+                    // Desenha characterback acima da sandworm, na borda inferior da tela
+                    DrawTexture(characterBack, 0, GetScreenHeight() - characterBack.height, WHITE);
+
+                    EndDrawing();
+
+                    sleep(1); // Controla a velocidade de subida
+                }
+
+                // Libera os recursos de áudio e texturas
+                UnloadSound(gameOverSound);
+                UnloadSound(barulhoMonstro);
+                UnloadTexture(characterBack);
+                UnloadTexture(sandworm);
+
                 break;
             }
+
         }
 
         BeginDrawing();
