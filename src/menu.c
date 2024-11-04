@@ -24,6 +24,7 @@ void cutsceneArrakis(Music titleMusic) {
     Texture2D cutsceneImage7 = LoadTexture("static/image/cutscene7.png");
     Texture2D cutsceneImage8 = LoadTexture("static/image/cutscene8.png");
     Texture2D cutsceneImage9 = LoadTexture("static/image/cutscene9.png");
+    Texture2D cutsceneImage10 = LoadTexture("static/image/cutscene10.png");
 
     const char* text1 = "Arrakis. Um vasto deserto, onde a areia carrega cicatrizes das guerras travadas pela especiaria.";
     const char* text2 = "Eu vim em busca desse tesouro raro, mas cada passo é uma batalha. A especiaria não é fácil de conquistar.";
@@ -34,12 +35,13 @@ void cutsceneArrakis(Music titleMusic) {
     const char* text7 = "Cada pedaço de especiaria que eu consigo arrancar da areia é uma vitória pequena, mas essencial.";
     const char* text8 = "Minha missão é sobreviver, extrair o que posso e sair\nde Arrakis com o que é preciso para mudar o destino de minha casa.";
     const char* text9 = "Mas neste deserto, cada erro é fatal, e os vermes estão sempre à espreita.";
+    const char* text10 = "Minha missão começa AGORA";
 
 
     float speed = 30.0f; // Velocidade de rolagem
     float scale = 0.6f;  // Escala das imagens
     float timer = 0.0f;  // Timer para controlar a duração das partes
-    const float duration = 0.1f;  // Duração de cada parte em segundos (7 é o padrão)
+    const float duration = 7.0f;  // Duração de cada parte em segundos (7 é o padrão)
 
     // Primeira parte da cutscene (movimento da esquerda para a direita)
     timer = 0.0f;  // Reinicia o timer para a primeira parte
@@ -269,6 +271,31 @@ void cutsceneArrakis(Music titleMusic) {
         EndDrawing();
     }
 
+    timer = 0.0f;  // Reinicia o timer para a segunda parte
+    float scrollX10 = 0.0f;
+    while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        timer += GetFrameTime();
+        UpdateMusicStream(titleMusic);  // Mantém a música tocando durante a cutscene
+
+        // Atualiza a posição horizontal da imagem
+        scrollX10 -= speed * GetFrameTime();
+        if (scrollX10 <= -cutsceneImage10.width * scale) {
+            scrollX10 = 0.0f;  // Reinicia a posição para começar novamente da direita
+        }
+
+        // Desenha a imagem duas vezes para dar efeito de movimento contínuo
+        DrawTextureEx(cutsceneImage10, (Vector2){scrollX10, 0}, 0.0f, scale, WHITE);
+        DrawTextureEx(cutsceneImage10, (Vector2){scrollX10 + cutsceneImage10.width * scale, 0}, 0.0f, scale, WHITE);
+
+        // Desenha o texto na borda inferior da tela
+        DrawText(text10, GetScreenWidth() / 2 - MeasureText(text10, 20) / 2, GetScreenHeight() - 40, 20, WHITE);
+
+        EndDrawing();
+    }
+
 
     // Libera a memória das imagens após o uso
     UnloadTexture(cutsceneImage1);
@@ -280,6 +307,7 @@ void cutsceneArrakis(Music titleMusic) {
     UnloadTexture(cutsceneImage7);
     UnloadTexture(cutsceneImage8);
     UnloadTexture(cutsceneImage9);
+    UnloadTexture(cutsceneImage10);
 
 }
 

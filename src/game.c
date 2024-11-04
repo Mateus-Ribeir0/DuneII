@@ -316,9 +316,12 @@ void playGame() {
             }
 
             if (encontrou_padrao) {
+                Sound gameOverSound = LoadSound("static/music/deathsound.wav");
+                PlaySound(gameOverSound);
                 for (int i = 0; i < 180; i++) {
                     BeginDrawing();
-                    ClearBackground(RAYWHITE);
+                    ClearBackground(BLACK);
+                    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE); // Desenha apenas o personagem
                     DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
                     EndDrawing();
                 }
