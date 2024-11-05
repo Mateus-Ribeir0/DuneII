@@ -1,10 +1,4 @@
 #include "lobby.h"
-#include "game.h"
-#include "raylib.h"
-
-#define MAPA_LARGURA 40
-#define MAPA_ALTURA 22
-#define TILE_SIZE 32
 
 void initializeLobby() {
     // Adicione outras inicializações, como NPCs e interações

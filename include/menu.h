@@ -2,10 +2,7 @@
 #ifndef MENU_H
 #define MENU_H
 
-#include "raylib.h"
-
-typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
-
+#include "config.h"
 
 // Funções do menu
 void iniciarMenu(GameScreen *currentScreen);

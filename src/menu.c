@@ -1,10 +1,4 @@
-// src/menu.c
-#include "raylib.h"
 #include "menu.h"
-#include "game.h"
-
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
 
 // Variáveis para elementos visuais e música
 static Texture2D background, logo;

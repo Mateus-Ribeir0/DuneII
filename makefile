@@ -18,8 +18,7 @@ LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 # Regra para gerar o executável principal
 $(TARGET): $(SOURCES) $(HEADERS)
-	@echo "Iniciando a compilação..."
-	$(CC) $(CFLAGS) $(SOURCES) -I$(INCLUDE_DIR) -o $(TARGET) $(LIBS)
+	$(CC) $(CFLAGS) $(SOURCES) -I$(INCLUDE_DIR) -o $(TARGET) $(LIBS) || ($(MAKE) clean && $(MAKE))
 
 # Limpeza dos arquivos temporários e executáveis
 clean:

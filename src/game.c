@@ -1,15 +1,5 @@
-// src/game.c
-#include "raylib.h"
 #include "game.h"
-#include "menu.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
-#define TILE_SIZE 32
-#define MAPA_LARGURA 40
-#define MAPA_ALTURA 22
 #define NUM_SAFE_ZONES 5
 #define NUM_COLLISION_ZONES 6
 #define MAX_POINTS_PER_ZONE 60
@@ -31,17 +21,12 @@ typedef struct {
     bool collected;
 } Item;
 
-static unsigned long seed = 1234;
-IrregularZone safe_zones[3][NUM_SAFE_ZONES];  // Array para diferentes mapas
-IrregularZone collision_zones[3][NUM_COLLISION_ZONES];  // Array para diferentes mapas
+IrregularZone safe_zones[3][NUM_SAFE_ZONES];
+IrregularZone collision_zones[3][NUM_COLLISION_ZONES];
 Item items[NUM_ITEMS];
-int player_x = MAPA_LARGURA / 2;
-int player_y = MAPA_ALTURA / 2;
-int itemsCollected = 0;
 char historico[MAX_HISTORICO] = "";
 int passosRepetidosMax = 3;
-int mapaAtual = 0;  // 0 para mapa1, 1 para mapa2, 2 para mapa3
-// Definição das variáveis
+static unsigned long seed = 22135234;
 
 // Funções de randomização
 void custom_srand(unsigned long s) {
