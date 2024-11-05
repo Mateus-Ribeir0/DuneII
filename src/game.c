@@ -139,19 +139,22 @@ void initializeItems() {
         items[i].collected = false;
     }
 }
-
 // Movimenta o jogador
+
 void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;
 
+    // Verifica se a nova posição não é o mercador e não é uma zona de colisão
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
-        if (!is_in_irregular_zone(new_x, new_y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
+        if (!is_in_irregular_zone(new_x, new_y, collision_zones[mapaAtual], NUM_COLLISION_ZONES) &&
+            !(new_x == MERCHANT_X && new_y == MERCHANT_Y)) {
             player_x = new_x;
             player_y = new_y;
         }
     }
 }
+
 
 // Verifica a coleta de itens
 void checkItemCollection() {

@@ -16,6 +16,10 @@ typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 704
 
+// Definição da posição do mercador
+#define MERCHANT_X 5
+#define MERCHANT_Y 5
+
 // Variáveis globais mutáveis
 extern int player_x;
 extern int player_y;
