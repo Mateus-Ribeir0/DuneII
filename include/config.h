@@ -20,6 +20,9 @@ typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
 #define MERCHANT_X 5
 #define MERCHANT_Y 5
 
+#define MAX_ESPECIARIAS 2
+
+
 // Variáveis globais mutáveis
 extern int player_x;
 extern int player_y;

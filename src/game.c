@@ -160,11 +160,18 @@ void movePlayer(int dx, int dy) {
 void checkItemCollection() {
     for (int i = 0; i < NUM_ITEMS; i++) {
         if (!items[i].collected && items[i].position.x == player_x && items[i].position.y == player_y) {
-            items[i].collected = true;
-            itemsCollected++;
+            // Só permite a coleta se não tiver atingido o máximo de especiarias
+            if (itemsCollected < MAX_ESPECIARIAS) {
+                items[i].collected = true;
+                itemsCollected++;
+            } else {
+                // Opcional: mensagem ao jogador caso o limite tenha sido atingido
+                DrawText("Bolsa cheia! Não é possível coletar mais especiarias.", 10, 30, 20, RED);
+            }
         }
     }
 }
+
 
 // Função de desenho do jogo
 void drawGame() {
@@ -183,14 +190,17 @@ void drawGame() {
     }
 
     DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
+
     for (int i = 0; i < NUM_ITEMS; i++) {
         if (!items[i].collected) {
             DrawCircle(items[i].position.x * TILE_SIZE + TILE_SIZE / 2, items[i].position.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 4, GOLD);
         }
     }
 
-    DrawText(TextFormat("Itens coletados: %d", itemsCollected), 10, 10, 20, BLACK);
+    // Mostra a quantidade de especiarias coletadas na "bolsa"
+    DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
 }
+
 
 // Contador de ocorrências consecutivas
 int contar_ocorrencias_consecutivas(const char *historico, const char *padrao, size_t padrao_len) {
@@ -295,14 +305,22 @@ void playGame() {
             if ((dificuldade == 5 && strlen(historico) >= 5 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 5, padrao_encontrado))) ||
                 (dificuldade == 4 && strlen(historico) >= 4 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 4, padrao_encontrado))) ||
                 (dificuldade == 3 && strlen(historico) >= 3 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 3, padrao_encontrado)))) 
-                {
-                
-                for (size_t i = 3; i <= dificuldade; i++) {
-                    if (strlen(historico) >= i && (encontrou_padrao = identificar_padrao_mais_frequente(historico, i, padrao_encontrado))) {
-                        break;
-                    }
+            {
+                char padrao_completo[MAX_PADRAO + 1];
+                for (int i = 0; i < dificuldade; i++) {
+                    padrao_completo[i] = padrao_encontrado[0];
+                }
+                padrao_completo[dificuldade] = '\0';
+
+                for (int i = 0; i < 180; i++) {
+                    BeginDrawing();
+                    ClearBackground(BLACK);
+                    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
+                    DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_completo), 10, 40, 20, RED);
+                    EndDrawing();
                 }
             }
+
 
             if (encontrou_padrao) {
                 Sound gameOverSound = LoadSound("static/music/deathsound.wav");
