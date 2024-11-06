@@ -148,17 +148,49 @@ void movePlayer(int dx, int dy) {
     // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         // Verifica se o jogador está em um mapa ou no lobby
-        bool emLobby = (mapaAtual == -1);  // Defina -1 ou uma constante para indicar o lobby
+        bool emLobby = (mapaAtual == -1);  // -1 indica que está no lobby
 
-        if (!is_in_irregular_zone(new_x, new_y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
-            // Se estiver no lobby, verificar colisão com o mercador
-            if (!(emLobby && new_x == MERCHANT_X && new_y == MERCHANT_Y)) {
-                player_x = new_x;
-                player_y = new_y;
+        // Verifica colisão com os portais no lobby
+        if (emLobby) {
+            if (
+                // Portal 1 (Horizontal)
+                (new_x >= PORTAL_LOBBY_MAPA1_X && new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
+                 new_y >= PORTAL_LOBBY_MAPA1_Y && new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) ||
+                // Portal 2 (Vertical)
+                (new_x >= PORTAL_LOBBY_MAPA2_X && new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
+                 new_y >= PORTAL_LOBBY_MAPA2_Y && new_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) ||
+                // Portal 3 (Horizontal)
+                (new_x >= PORTAL_LOBBY_MAPA3_X && new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
+                 new_y >= PORTAL_LOBBY_MAPA3_Y && new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA)
+            ) {
+                return;  // Impede a movimentação para dentro dos portais
             }
         }
+
+        // Impede o jogador de entrar no portal de retorno no mapa
+        if (!emLobby) {
+            if (new_x >= PORTAL_RETORNO_X && new_x < PORTAL_RETORNO_X + PORTAL_VERTICAL_LARGURA &&
+                new_y >= PORTAL_RETORNO_Y && new_y < PORTAL_RETORNO_Y + PORTAL_VERTICAL_ALTURA) {
+                return;  // Impede a movimentação para dentro do portal de retorno
+            }
+        }
+
+        // Verifica colisão com o mercador no lobby
+        if (emLobby && new_x == MERCHANT_X && new_y == MERCHANT_Y) {
+            return;  // Impede a movimentação para a posição do mercador
+        }
+
+        // Verifica colisão com zonas irregulares (colisão) nos mapas
+        if (!emLobby && is_in_irregular_zone(new_x, new_y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
+            return;  // Impede a movimentação para zonas de colisão
+        }
+
+        // Se todas as verificações passarem, atualiza a posição do jogador
+        player_x = new_x;
+        player_y = new_y;
     }
 }
+
 
 
 // Verifica a coleta de itens
@@ -176,7 +208,6 @@ void checkItemCollection() {
         }
     }
 }
-
 
 // Função de desenho do jogo
 void drawGame() {
@@ -206,8 +237,16 @@ void drawGame() {
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
 
     // Desenha o portal de retorno ao lobby
-    DrawRectangle(PORTAL_MAPA_X * TILE_SIZE, PORTAL_MAPA_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
+   DrawRectangle(PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE,
+              TILE_SIZE * PORTAL_RETORNO_LARGURA, TILE_SIZE * PORTAL_RETORNO_ALTURA, ORANGE);
 
+    // Exibe a mensagem no centro da tela, se o jogador estiver em volta do portal
+    if (mensagem != NULL) {
+        int screenWidth = GetScreenWidth();
+        int textWidth = MeasureText(mensagem, 20);
+        int xPosition = (screenWidth - textWidth) / 2;
+        DrawText(mensagem, xPosition, GetScreenHeight() / 2, 20, BLACK);
+    }
 }
 
 
@@ -281,6 +320,22 @@ void limparColisoesEZonas() {
     }
 }
 
+bool isPlayerNearPortal() {
+    int portalMinX = PORTAL_RETORNO_X;
+    int portalMaxX = PORTAL_RETORNO_X + PORTAL_RETORNO_LARGURA - 1;
+    int portalMinY = PORTAL_RETORNO_Y;
+    int portalMaxY = PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA - 1;
+
+    // Verifica se o jogador está em uma célula adjacente ao portal
+    if ((abs(player_x - portalMinX) <= 1 && player_y >= portalMinY - 1 && player_y <= portalMaxY + 1) ||
+        (abs(player_x - portalMaxX) <= 1 && player_y >= portalMinY - 1 && player_y <= portalMaxY + 1) ||
+        (abs(player_y - portalMinY) <= 1 && player_x >= portalMinX - 1 && player_x <= portalMaxX + 1) ||
+        (abs(player_y - portalMaxY) <= 1 && player_x >= portalMinX - 1 && player_x <= portalMaxX + 1)) {
+        return true;
+    }
+    return false;
+}
+
 void playGame(GameScreen *currentScreen) {
     int dificuldade;
     
@@ -304,6 +359,8 @@ void playGame(GameScreen *currentScreen) {
     char historico[MAX_HISTORICO] = "";
     memset(historico, 0, sizeof(historico));
 
+    bool pertoDoPortal = false;
+
     while (!WindowShouldClose()) {
         int dx = 0, dy = 0;
         char movimento = '\0';
@@ -312,6 +369,26 @@ void playGame(GameScreen *currentScreen) {
         if (IsKeyPressed(KEY_S)) { dy = 1; movimento = 's'; }
         if (IsKeyPressed(KEY_A)) { dx = -1; movimento = 'a'; }
         if (IsKeyPressed(KEY_D)) { dx = 1; movimento = 'd'; }
+
+
+        // Verifica se o jogador está próximo do portal
+            if (isPlayerNearPortal()) {
+                mensagem = "Você deseja voltar para o lobby? Pressione [P]";
+                pertoDoPortal = true;
+            } else {
+                mensagem = NULL;
+                pertoDoPortal = false;
+            }
+
+            // Verifica se o jogador está perto do portal e pressionou ENTER para retornar ao lobby
+            if (pertoDoPortal && IsKeyPressed(KEY_P)) {
+                player_x = MAPA_LARGURA / 2;
+                player_y = MAPA_ALTURA / 2;
+                *currentScreen = LOBBY;
+                mapaAtual = -1;
+                mensagem = NULL;
+                break;
+            }
 
         if (movimento != '\0') {
             movePlayer(dx, dy);
@@ -411,11 +488,6 @@ void playGame(GameScreen *currentScreen) {
 
         }
 
-        // Verifica se o jogador está no portal para voltar ao lobby
-        if (player_x == PORTAL_MAPA_X && player_y == PORTAL_MAPA_Y) {
-            *currentScreen = LOBBY;
-            break;  // Sai do jogo e volta para o lobby
-        }
 
         BeginDrawing();
         drawGame();

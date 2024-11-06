@@ -19,35 +19,33 @@ typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
 // Definição da posição do mercador
 #define MERCHANT_X 5
 #define MERCHANT_Y 5
-
 #define MAX_ESPECIARIAS 2
 
-// Dimensões para os portais horizontais (4x2)
+// Dimensões para os portais
 #define PORTAL_HORIZONTAL_LARGURA 4
 #define PORTAL_HORIZONTAL_ALTURA 2
-
-// Dimensões para o portal vertical (2x4)
 #define PORTAL_VERTICAL_LARGURA 2
 #define PORTAL_VERTICAL_ALTURA 4
 
 // Coordenadas para os três portais no lobby
 #define PORTAL_LOBBY_MAPA1_X 25
 #define PORTAL_LOBBY_MAPA1_Y 1
-
 #define PORTAL_LOBBY_MAPA2_X 37
 #define PORTAL_LOBBY_MAPA2_Y 9
-
 #define PORTAL_LOBBY_MAPA3_X 25
 #define PORTAL_LOBBY_MAPA3_Y 19
 
-// Ponto de retorno para o lobby nos mapas
-#define PORTAL_MAPA_X 3
-#define PORTAL_MAPA_Y 3
+// Coordenadas para o portal de retorno ao lobby
+#define PORTAL_RETORNO_LARGURA 2
+#define PORTAL_RETORNO_ALTURA 4
+#define PORTAL_RETORNO_X 37
+#define PORTAL_RETORNO_Y 9
 
 // Variáveis globais mutáveis
 extern int player_x;
 extern int player_y;
 extern int mapaAtual;
 extern int itemsCollected;
+extern const char* mensagem;
 
 #endif

@@ -3,6 +3,8 @@
 // Variável para controlar o estado de interação com o mercador
 int isInteractingWithMerchant = 0;
 
+const char* mensagem = NULL;
+
 // Função para verificar se o jogador está próximo do mercador
 int isPlayerNearMerchant() {
     return (player_x == MERCHANT_X && (player_y == MERCHANT_Y - 1 || player_y == MERCHANT_Y + 1)) ||
@@ -27,28 +29,38 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) dy = 1;
 
     movePlayer(dx, dy);
-
-   
-    // Portal 1 - Horizontal
-    if (player_x >= PORTAL_LOBBY_MAPA1_X && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
-        player_y >= PORTAL_LOBBY_MAPA1_Y && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) {
-        mapaAtual = 0;
-        *currentScreen = GAME;
+  
+    // Verifica se o jogador está em volta do portal para o mapa 1
+    if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x <= PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
+         player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y <= PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA)) {
+        
+        mensagem = "Você deseja ir para o mapa 1? Pressione [P]";
+        if (IsKeyPressed(KEY_P)) {
+            *currentScreen = GAME;
+            mapaAtual = 0;
+        }
     }
-    // Portal 2 - Vertical
-    else if (player_x >= PORTAL_LOBBY_MAPA2_X && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
-            player_y >= PORTAL_LOBBY_MAPA2_Y && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) {
-        mapaAtual = 1;
-        *currentScreen = GAME;
+    // Verifica se o jogador está em volta do portal para o mapa 2
+    else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x <= PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
+              player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y <= PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA)) {
+        
+        mensagem = "Você deseja ir para o mapa 2? Pressione [P]";
+        if (IsKeyPressed(KEY_P)) {
+            *currentScreen = GAME;
+            mapaAtual = 1;
+        }
     }
-    // Portal 3 - Horizontal
-    else if (player_x >= PORTAL_LOBBY_MAPA3_X && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
-            player_y >= PORTAL_LOBBY_MAPA3_Y && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA) {
-        mapaAtual = 2;
-        *currentScreen = GAME;
+    // Verifica se o jogador está em volta do portal para o mapa 3
+    else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x <= PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
+              player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y <= PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA)) {
+        
+        mensagem = "Você deseja ir para o mapa 3? Pressione [P]";
+        if (IsKeyPressed(KEY_P)) {
+            *currentScreen = GAME;
+            mapaAtual = 2;
+        }
     }
-
-    
+     
 }
 
 void drawLobby() {
@@ -107,6 +119,15 @@ void drawLobby() {
         // Reseta a interação quando o jogador se afasta do mercador
         isInteractingWithMerchant = 0;
     }
+
+    // Exibe a mensagem no centro da tela, se o jogador estiver em volta de um portal
+    if (mensagem != NULL) {
+        int screenWidth = GetScreenWidth();
+        int textWidth = MeasureText(mensagem, 20);
+        int xPosition = (screenWidth - textWidth) / 2;
+        DrawText(mensagem, xPosition, GetScreenHeight() / 2, 20, BLACK);
+    }
+    mensagem = NULL;  
 }
 
 void desenharLobbyDetalhado() {
