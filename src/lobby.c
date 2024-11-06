@@ -57,6 +57,8 @@ void drawLobby() {
     DrawRectangle(PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
     DrawRectangle(PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
     DrawRectangle(PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
+    // Mostra a quantidade de especiarias coletadas no lobby
+    DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
 
     // Desenha o mercador (quadradinho roxo) na posição (5, 5)
     DrawRectangle(MERCHANT_X * TILE_SIZE, MERCHANT_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, PURPLE);
