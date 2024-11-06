@@ -28,16 +28,27 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
 
     movePlayer(dx, dy);
 
-    if (player_x == PORTAL_LOBBY_MAPA1_X && player_y == PORTAL_LOBBY_MAPA1_Y) {
+   
+    // Portal 1 - Horizontal
+    if (player_x >= PORTAL_LOBBY_MAPA1_X && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
+        player_y >= PORTAL_LOBBY_MAPA1_Y && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) {
         mapaAtual = 0;
         *currentScreen = GAME;
-    } else if (player_x == PORTAL_LOBBY_MAPA2_X && player_y == PORTAL_LOBBY_MAPA2_Y) {
+    }
+    // Portal 2 - Vertical
+    else if (player_x >= PORTAL_LOBBY_MAPA2_X && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
+            player_y >= PORTAL_LOBBY_MAPA2_Y && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) {
         mapaAtual = 1;
         *currentScreen = GAME;
-    } else if (player_x == PORTAL_LOBBY_MAPA3_X && player_y == PORTAL_LOBBY_MAPA3_Y) {
+    }
+    // Portal 3 - Horizontal
+    else if (player_x >= PORTAL_LOBBY_MAPA3_X && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
+            player_y >= PORTAL_LOBBY_MAPA3_Y && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA) {
         mapaAtual = 2;
         *currentScreen = GAME;
     }
+
+    
 }
 
 void drawLobby() {
@@ -53,12 +64,17 @@ void drawLobby() {
     // Desenha o jogador no mapa do lobby
     DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
 
-    // Desenha os portais para os mapas
-    DrawRectangle(PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
-    DrawRectangle(PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
-    DrawRectangle(PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
-    
-    // Mostra a quantidade de especiarias e o dinheiro do jogador no lobby
+    // Desenha os portais
+    DrawRectangle(PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE,
+                  TILE_SIZE * PORTAL_HORIZONTAL_LARGURA, TILE_SIZE * PORTAL_HORIZONTAL_ALTURA, ORANGE);
+
+    DrawRectangle(PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE,
+                  TILE_SIZE * PORTAL_VERTICAL_LARGURA, TILE_SIZE * PORTAL_VERTICAL_ALTURA, ORANGE);
+
+    DrawRectangle(PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE,
+                  TILE_SIZE * PORTAL_HORIZONTAL_LARGURA, TILE_SIZE * PORTAL_HORIZONTAL_ALTURA, ORANGE);
+
+    // Mostra a quantidade de especiarias coletadas no lobby
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
     DrawText(TextFormat("Dinheiro: %d", playerMoney), 10, 40, 20, BLACK);
 

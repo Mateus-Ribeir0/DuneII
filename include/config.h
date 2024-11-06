@@ -22,13 +22,23 @@ typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
 
 #define MAX_ESPECIARIAS 2
 
-// Posicionamento dos portais no lobby para os mapas
-#define PORTAL_LOBBY_MAPA1_X 22
-#define PORTAL_LOBBY_MAPA1_Y 2
-#define PORTAL_LOBBY_MAPA2_X 25
-#define PORTAL_LOBBY_MAPA2_Y 2
-#define PORTAL_LOBBY_MAPA3_X 28
-#define PORTAL_LOBBY_MAPA3_Y 2
+// Dimensões para os portais horizontais (4x2)
+#define PORTAL_HORIZONTAL_LARGURA 4
+#define PORTAL_HORIZONTAL_ALTURA 2
+
+// Dimensões para o portal vertical (2x4)
+#define PORTAL_VERTICAL_LARGURA 2
+#define PORTAL_VERTICAL_ALTURA 4
+
+// Coordenadas para os três portais no lobby
+#define PORTAL_LOBBY_MAPA1_X 25
+#define PORTAL_LOBBY_MAPA1_Y 1
+
+#define PORTAL_LOBBY_MAPA2_X 37
+#define PORTAL_LOBBY_MAPA2_Y 9
+
+#define PORTAL_LOBBY_MAPA3_X 25
+#define PORTAL_LOBBY_MAPA3_Y 19
 
 // Ponto de retorno para o lobby nos mapas
 #define PORTAL_MAPA_X 3
