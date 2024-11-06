@@ -6,6 +6,7 @@
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
 #define MAX_PADRAO 9
+int playerMoney = 0;  // Definição
 
 typedef struct {
     int x, y;
@@ -272,18 +273,23 @@ void resetarJogo() {
 }
 
 void limparColisoesEZonas() {
-    // Limpa todas as colisões e zonas ao trocar de ambiente
+    // Limpa todas as colisões e zonas ao trocar decl ambiente
     for (int i = 0; i < NUM_COLLISION_ZONES; i++) {
         collision_zones[mapaAtual][i].num_points = 0;  // Zera o número de pontos de colisão
     }
     for (int i = 0; i < NUM_SAFE_ZONES; i++) {
         safe_zones[mapaAtual][i].num_points = 0;  // Zera o número de pontos nas zonas seguras
     }
+}   
+
+void zerarMonetaria() {
+    itemsCollected = 0;  // Zera o número de especiarias (itens) coletadas
+    playerMoney = 0;
 }
 
 void playGame(GameScreen *currentScreen) {
     int dificuldade;
-    
+
     // Define a dificuldade com base no mapa atual
     switch (mapaAtual) {
         case 0: dificuldade = 5; break;
@@ -341,6 +347,21 @@ void playGame(GameScreen *currentScreen) {
                 }
                 padrao_completo[dificuldade] = '\0';
 
+                // Realiza a animação do game over
+                Sound gameOverSound = LoadSound("static/music/deathsound.wav");
+                Sound barulhoMonstro = LoadSound("static/music/monster.mp3");
+                Texture2D characterBack = LoadTexture("static/image/characterback.png");
+                Texture2D sandworm = LoadTexture("static/image/sandworm.png");
+
+                // Zera a quantidade de especiarias coletadas no game over
+                zerarMonetaria();  // Zera a quantidade de especiarias coletadas
+
+                // Toca o deathsound imediatamente
+                PlaySound(gameOverSound);
+
+                sleep(1);
+
+                // Mostra o game over
                 for (int i = 0; i < 180; i++) {
                     BeginDrawing();
                     ClearBackground(BLACK);
@@ -348,57 +369,29 @@ void playGame(GameScreen *currentScreen) {
                     DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_completo), 10, 40, 20, RED);
                     EndDrawing();
                 }
-            }
 
-
-            if (encontrou_padrao) {
-                Sound gameOverSound = LoadSound("static/music/deathsound.wav");
-                Sound barulhoMonstro = LoadSound("static/music/monster.mp3");
-                Texture2D characterBack = LoadTexture("static/image/characterback.png");
-                Texture2D sandworm = LoadTexture("static/image/sandworm.png");
-
-                // Toca o deathsound imediatamente
-                PlaySound(gameOverSound);
-
-                sleep(1);
-
-                for (int i = 0; i < 180; i++) {
-                    BeginDrawing();
-                    ClearBackground(BLACK);
-                    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE); // Desenha apenas o personagem
-                    DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
-                    EndDrawing();
-                }
-
-                // Pausa de 2 segundos antes de tocar o som do monstro
+                // Pausa antes de tocar o som do monstro
                 sleep(2);
 
                 // Toca o barulho do monstro uma única vez
                 PlaySound(barulhoMonstro);
 
-                // Define a posição inicial da sandworm no centro da tela
+                // Exibe a animação da sandworm
                 int sandwormPosY = GetScreenHeight() / 2 - sandworm.height / 2;
-                int startTime = GetTime(); // Marca o tempo inicial
+                int startTime = GetTime();
 
-                // Mostra a nova tela com characterback sobreposta à animação da sandworm subindo
                 while ((GetTime() - startTime < 5) && !WindowShouldClose()) {
-                    sandwormPosY -= 1; // Move a sandworm para cima lentamente
+                    sandwormPosY -= 1;
 
                     BeginDrawing();
                     ClearBackground(BLACK);
-
-                    // Desenha sandworm no centro da tela e move-a para cima
                     DrawTexture(sandworm, GetScreenWidth() / 2 - sandworm.width / 2, sandwormPosY + 40, WHITE);
-
-                    // Desenha characterback acima da sandworm, na borda inferior da tela
                     DrawTexture(characterBack, 0, GetScreenHeight() - characterBack.height, WHITE);
-
                     EndDrawing();
 
-                    sleep(1); // Controla a velocidade de subida
+                    sleep(1);
                 }
 
-                // Libera os recursos de áudio e texturas
                 UnloadSound(gameOverSound);
                 UnloadSound(barulhoMonstro);
                 UnloadTexture(characterBack);
@@ -408,13 +401,11 @@ void playGame(GameScreen *currentScreen) {
                 *currentScreen = RANKINGS;
                 break;
             }
-
         }
 
-        // Verifica se o jogador está no portal para voltar ao lobby
         if (player_x == PORTAL_MAPA_X && player_y == PORTAL_MAPA_Y) {
             *currentScreen = LOBBY;
-            break;  // Sai do jogo e volta para o lobby
+            break;
         }
 
         BeginDrawing();
