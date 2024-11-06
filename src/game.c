@@ -261,7 +261,6 @@ void limparHistoricoPassos() {
 }
 
 void resetarJogo() {
-    itemsCollected = 0;
     player_x = MAPA_LARGURA / 2;
     player_y = MAPA_ALTURA / 2;
     limparHistoricoPassos();  // Limpa o histórico de passos
@@ -297,8 +296,6 @@ void playGame(GameScreen *currentScreen) {
         resetarJogo();
         inicializar_zonas(mapaAtual);
     }
-
-    itemsCollected = 0;
 
     // Define a posição inicial padrão do jogador (por exemplo, centro do mapa)
     player_x = MAPA_LARGURA / 2;
