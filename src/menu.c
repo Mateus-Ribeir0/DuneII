@@ -10,15 +10,15 @@ void cutsceneArrakis(Music titleMusic) {
 
     // Carrega as imagens da cutscene
     Texture2D cutsceneImage1 = LoadTexture("static/image/cutscene2.png");
-    Texture2D cutsceneImage2 = LoadTexture("static/image/cutscene1.png");
-    Texture2D cutsceneImage3 = LoadTexture("static/image/cutscene3.png");
-    Texture2D cutsceneImage4 = LoadTexture("static/image/cutscene4.png");
-    Texture2D cutsceneImage5 = LoadTexture("static/image/cutscene5.png");
-    Texture2D cutsceneImage6 = LoadTexture("static/image/cutscene6.png");
-    Texture2D cutsceneImage7 = LoadTexture("static/image/cutscene7.png");
-    Texture2D cutsceneImage8 = LoadTexture("static/image/cutscene8.png");
-    Texture2D cutsceneImage9 = LoadTexture("static/image/cutscene9.png");
-    Texture2D cutsceneImage10 = LoadTexture("static/image/cutscene10.png");
+
+
+
+
+
+
+
+
+
 
     const char* text1 = "Arrakis. Um vasto deserto, onde a areia carrega cicatrizes das guerras travadas pela especiaria.";
     const char* text2 = "Eu vim em busca desse tesouro raro, mas cada passo é uma batalha. A especiaria não é fácil de conquistar.";
@@ -63,6 +63,7 @@ void cutsceneArrakis(Music titleMusic) {
         EndDrawing();
     }
 
+    Texture2D cutsceneImage2 = LoadTexture("static/image/cutscene1.png");
     // Segunda parte da cutscene (movimento da direita para a esquerda)
     timer = 0.0f;  // Reinicia o timer para a segunda parte
     float scrollX2 = 0.0f;
@@ -89,6 +90,7 @@ void cutsceneArrakis(Music titleMusic) {
         EndDrawing();
     }
 
+    Texture2D cutsceneImage3 = LoadTexture("static/image/cutscene3.png");
     // Terceira parte da cutscene (movimento da esquerda para a direita)
     timer = 0.0f;  // Reinicia o timer para a terceira parte
     float scrollX3 = 0.0f;
@@ -115,6 +117,7 @@ void cutsceneArrakis(Music titleMusic) {
         EndDrawing();
     }
 
+    Texture2D cutsceneImage4 = LoadTexture("static/image/cutscene4.png");
     timer = 0.0f;  // Reinicia o timer para a quarta parte
     float scrollX4 = 0.0f;  // Inicia a posição da imagem à direita
     while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
@@ -140,6 +143,7 @@ void cutsceneArrakis(Music titleMusic) {
         EndDrawing();
     }
 
+    Texture2D cutsceneImage5 = LoadTexture("static/image/cutscene5.png");
     timer = 0.0f;  // Reinicia o timer para a terceira parte
     float scrollX5 = 0.0f;
     while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
@@ -164,6 +168,8 @@ void cutsceneArrakis(Music titleMusic) {
 
         EndDrawing();
     }
+
+    Texture2D cutsceneImage6 = LoadTexture("static/image/cutscene6.png");
 
     timer = 0.0f;  // Reinicia o timer para a primeira parte
     float scrollX6 = 0.0f;
@@ -190,6 +196,7 @@ void cutsceneArrakis(Music titleMusic) {
         EndDrawing();
     }
 
+    Texture2D cutsceneImage7 = LoadTexture("static/image/cutscene7.png");
     timer = 0.0f;  // Reinicia o timer para a terceira parte
     float scrollX7 = 0.0f;
     while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
@@ -215,6 +222,7 @@ void cutsceneArrakis(Music titleMusic) {
         EndDrawing();
     }
 
+    Texture2D cutsceneImage8 = LoadTexture("static/image/cutscene8.png");
     timer = 0.0f;  // Reinicia o timer para a primeira parte
     float scrollX8 = 0.0f;
     while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
@@ -240,6 +248,7 @@ void cutsceneArrakis(Music titleMusic) {
         EndDrawing();
     }
 
+    Texture2D cutsceneImage9 = LoadTexture("static/image/cutscene9.png");
     timer = 0.0f;  // Reinicia o timer para a segunda parte
     float scrollX9 = 0.0f;
     while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
@@ -265,6 +274,7 @@ void cutsceneArrakis(Music titleMusic) {
         EndDrawing();
     }
 
+    Texture2D cutsceneImage10 = LoadTexture("static/image/cutscene10.png");
     timer = 0.0f;  // Reinicia o timer para a segunda parte
     float scrollX10 = 0.0f;
     while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
