@@ -18,6 +18,8 @@ void atualizarLobby() {
 }
 
 void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
+    mapaAtual = -1;  // Identifica que o jogador está no lobby
+    limparColisoesEZonas();
     int dx = 0, dy = 0;
     if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) dx = 1;
     if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) dx = -1;

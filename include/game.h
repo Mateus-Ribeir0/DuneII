@@ -9,5 +9,6 @@ void drawGame();
 void inicializar_zonas(int mapa);
 void initializeItems();
 void limparHistoricoPassos();
+void limparColisoesEZonas();
 
 #endif

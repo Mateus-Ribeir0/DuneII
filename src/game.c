@@ -145,12 +145,17 @@ void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;
 
-    // Verifica se a nova posição não é o mercador e não é uma zona de colisão
+    // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
-        if (!is_in_irregular_zone(new_x, new_y, collision_zones[mapaAtual], NUM_COLLISION_ZONES) &&
-            !(new_x == MERCHANT_X && new_y == MERCHANT_Y)) {
-            player_x = new_x;
-            player_y = new_y;
+        // Verifica se o jogador está em um mapa ou no lobby
+        bool emLobby = (mapaAtual == -1);  // Defina -1 ou uma constante para indicar o lobby
+
+        if (!is_in_irregular_zone(new_x, new_y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
+            // Se estiver no lobby, verificar colisão com o mercador
+            if (!(emLobby && new_x == MERCHANT_X && new_y == MERCHANT_Y)) {
+                player_x = new_x;
+                player_y = new_y;
+            }
         }
     }
 }
@@ -267,6 +272,16 @@ void resetarJogo() {
     inicializar_zonas(mapaAtual);  // Inicializa zonas para o mapa atual
 }
 
+void limparColisoesEZonas() {
+    // Limpa todas as colisões e zonas ao trocar de ambiente
+    for (int i = 0; i < NUM_COLLISION_ZONES; i++) {
+        collision_zones[mapaAtual][i].num_points = 0;  // Zera o número de pontos de colisão
+    }
+    for (int i = 0; i < NUM_SAFE_ZONES; i++) {
+        safe_zones[mapaAtual][i].num_points = 0;  // Zera o número de pontos nas zonas seguras
+    }
+}
+
 void playGame(GameScreen *currentScreen) {
     int dificuldade;
     
@@ -277,7 +292,12 @@ void playGame(GameScreen *currentScreen) {
         case 2: dificuldade = 3; break;
     }
 
-    resetarJogo();
+    if (mapaAtual != -1) {  // Somente inicializa se estiver em um mapa
+        limparColisoesEZonas();
+        resetarJogo();
+        inicializar_zonas(mapaAtual);
+    }
+
     itemsCollected = 0;
 
     // Define a posição inicial padrão do jogador (por exemplo, centro do mapa)
