@@ -7,6 +7,7 @@
 #define MAX_HISTORICO 1000
 #define MAX_PADRAO 9
 int playerMoney = 0;  // Definição
+Texture2D personagem;
 
 typedef struct {
     int x, y;
@@ -180,6 +181,12 @@ void checkItemCollection() {
 
 
 // Função de desenho do jogo
+// Função de desenho do jogo
+int frameAtual = 0;
+float tempoAnimacao = 0;
+const float duracaoFrame = 0.2f;  // Duração de cada quadro em segundos
+
+// Função de desenho do jogo
 void drawGame() {
     ClearBackground(RAYWHITE);
 
@@ -195,7 +202,21 @@ void drawGame() {
         }
     }
 
-    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
+    personagem = LoadTexture("static/image/spritesheet-character.png");
+
+    // Atualiza o quadro de animação com base no tempo
+    tempoAnimacao += GetFrameTime();
+    if (tempoAnimacao >= duracaoFrame) {
+        frameAtual = (frameAtual + 1) % 2;  // Alterna entre os quadros 0 e 1
+        tempoAnimacao = 0;
+    }
+
+    // Define o retângulo de origem com base no quadro atual
+    Rectangle sourceRec = { frameAtual * 32, 0, 32, 64 };
+    Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
+
+    // Desenha a textura animada na posição do jogador
+    DrawTextureRec(personagem, sourceRec, position, WHITE);
 
     for (int i = 0; i < NUM_ITEMS; i++) {
         if (!items[i].collected) {
@@ -208,8 +229,8 @@ void drawGame() {
 
     // Desenha o portal de retorno ao lobby
     DrawRectangle(PORTAL_MAPA_X * TILE_SIZE, PORTAL_MAPA_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
-
 }
+
 
 
 // Contador de ocorrências consecutivas

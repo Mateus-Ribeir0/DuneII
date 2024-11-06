@@ -11,15 +11,6 @@ void cutsceneArrakis(Music titleMusic) {
     // Carrega as imagens da cutscene
     Texture2D cutsceneImage1 = LoadTexture("static/image/cutscene2.png");
 
-
-
-
-
-
-
-
-
-
     const char* text1 = "Arrakis. Um vasto deserto, onde a areia carrega cicatrizes das guerras travadas pela especiaria.";
     const char* text2 = "Eu vim em busca desse tesouro raro, mas cada passo é uma batalha. A especiaria não é fácil de conquistar.";
     const char* text3 = "Ela nasce em profundezas traiçoeiras, onde os vermes gigantes,\nprotetores implacáveis do deserto, emergem ao menor sinal de vibração.";
