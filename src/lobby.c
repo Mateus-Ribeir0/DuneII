@@ -24,16 +24,17 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) dy = -1;
     if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) dy = 1;
 
-    // Seleção de mapa no lobby
-    if (IsKeyPressed(KEY_SEVEN)) mapaAtual = 0;
-    if (IsKeyPressed(KEY_EIGHT)) mapaAtual = 1;
-    if (IsKeyPressed(KEY_NINE)) mapaAtual = 2;
-
     movePlayer(dx, dy);
 
-    if (IsKeyPressed(KEY_ENTER)) {
+    if (player_x == PORTAL_LOBBY_MAPA1_X && player_y == PORTAL_LOBBY_MAPA1_Y) {
+        mapaAtual = 0;
         *currentScreen = GAME;
-        *lobbyInitialized = false;
+    } else if (player_x == PORTAL_LOBBY_MAPA2_X && player_y == PORTAL_LOBBY_MAPA2_Y) {
+        mapaAtual = 1;
+        *currentScreen = GAME;
+    } else if (player_x == PORTAL_LOBBY_MAPA3_X && player_y == PORTAL_LOBBY_MAPA3_Y) {
+        mapaAtual = 2;
+        *currentScreen = GAME;
     }
 }
 
@@ -49,6 +50,11 @@ void drawLobby() {
 
     // Desenha o jogador no mapa do lobby
     DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
+
+    // Desenha os portais para os mapas
+    DrawRectangle(PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
+    DrawRectangle(PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
+    DrawRectangle(PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
 
     // Desenha o mercador (quadradinho roxo) na posição (5, 5)
     DrawRectangle(MERCHANT_X * TILE_SIZE, MERCHANT_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, PURPLE);
@@ -84,11 +90,4 @@ void drawLobby() {
 void desenharLobbyDetalhado() {
     drawLobby();
 
-    // Calcula a posição X para alinhar o texto à direita
-    int screenWidth = GetScreenWidth();
-    int textWidth = MeasureText("Pressione 7, 8 ou 9 para selecionar o mapa", 20);
-    int xPosition = screenWidth - textWidth - 10;  // Alinha à direita com margem de 10 pixels
-
-    // Desenha o texto na posição calculada à direita da tela
-    DrawText("Pressione 7, 8 ou 9 para selecionar o mapa", xPosition, 10, 20, BLACK);
 }

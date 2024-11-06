@@ -3,10 +3,11 @@
 
 #include "config.h"
 
-void playGame();
+void playGame(GameScreen *currentScreen);
 void movePlayer(int dx, int dy);
 void drawGame();
 void inicializar_zonas(int mapa);
 void initializeItems();
+void limparHistoricoPassos();
 
 #endif

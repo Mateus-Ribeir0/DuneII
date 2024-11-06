@@ -199,6 +199,10 @@ void drawGame() {
 
     // Mostra a quantidade de especiarias coletadas na "bolsa"
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
+
+    // Desenha o portal de retorno ao lobby
+    DrawRectangle(PORTAL_MAPA_X * TILE_SIZE, PORTAL_MAPA_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, ORANGE);
+
 }
 
 
@@ -247,25 +251,33 @@ int identificar_padrao_mais_frequente(const char *historico, size_t tamanho_padr
     return max_ocorrencias > 1 ? max_ocorrencias : 0;
 }
 
-void playGame() {
+void limparHistoricoPassos() {
+    memset(historico, 0, sizeof(historico));
+}
+
+void resetarJogo() {
+    itemsCollected = 0;
+    player_x = MAPA_LARGURA / 2;
+    player_y = MAPA_ALTURA / 2;
+    limparHistoricoPassos();  // Limpa o histórico de passos
+
+    // Reconfigura o jogo como se fosse uma nova partida
+    custom_srand(1322);  // Semente para a randomização
+    initializeItems();
+    inicializar_zonas(mapaAtual);  // Inicializa zonas para o mapa atual
+}
+
+void playGame(GameScreen *currentScreen) {
     int dificuldade;
     
     // Define a dificuldade com base no mapa atual
     switch (mapaAtual) {
-        case 0:  // Mapa 1
-            dificuldade = 5;
-            break;
-        case 1:  // Mapa 2
-            dificuldade = 4;
-            break;
-        case 2:  // Mapa 3
-            dificuldade = 3;
-            break;
+        case 0: dificuldade = 5; break;
+        case 1: dificuldade = 4; break;
+        case 2: dificuldade = 3; break;
     }
 
-    custom_srand(1234);
-    initializeItems();
-    inicializar_zonas(mapaAtual);  // Inicializa as zonas do mapa atual
+    resetarJogo();
     itemsCollected = 0;
 
     // Define a posição inicial padrão do jogador (por exemplo, centro do mapa)
@@ -375,9 +387,17 @@ void playGame() {
                 UnloadTexture(characterBack);
                 UnloadTexture(sandworm);
 
+                resetarJogo();
+                *currentScreen = RANKINGS;
                 break;
             }
 
+        }
+
+        // Verifica se o jogador está no portal para voltar ao lobby
+        if (player_x == PORTAL_MAPA_X && player_y == PORTAL_MAPA_Y) {
+            *currentScreen = LOBBY;
+            break;  // Sai do jogo e volta para o lobby
         }
 
         BeginDrawing();

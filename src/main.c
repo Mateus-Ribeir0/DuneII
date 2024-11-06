@@ -36,8 +36,7 @@ int main() {
                 EndDrawing();
                 break;
             case GAME:
-                playGame();
-                currentScreen = TITLE;
+                playGame(&currentScreen);
                 break;
         }
     }
