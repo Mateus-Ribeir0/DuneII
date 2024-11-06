@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "lobby.h": "c"
+        "lobby.h": "c",
+        "config.h": "c"
     }
 }

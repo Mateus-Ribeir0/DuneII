@@ -88,18 +88,18 @@ void drawLobby() {
 
     // Mostra a quantidade de especiarias coletadas no lobby
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
-
+    DrawText(TextFormat("Dinheiro: %d", playerMoney), 10, 40, 20, BLACK);
 
     // Desenha o mercador (quadradinho roxo) na posição (5, 5)
     DrawRectangle(MERCHANT_X * TILE_SIZE, MERCHANT_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, PURPLE);
 
     // Verifica se o jogador está próximo do mercador
-    if (isPlayerNearMerchant() == 1) {
+    if (isPlayerNearMerchant()) {
         // Exibe a mensagem inicial de interação se o jogador não tiver iniciado a interação
         if (!isInteractingWithMerchant) {
-            DrawText("Deseja vender suas especiarias?", 10, 10, 20, BLACK);
-            DrawText("1- Sim", 10, 40, 20, BLACK);
-            DrawText("2- Nao", 10, 70, 20, BLACK);
+            DrawText("Deseja vender suas especiarias?", 10, 100, 20, BLACK);
+            DrawText("1- Sim", 10, 130, 20, BLACK);
+            DrawText("2- Nao", 10, 160, 20, BLACK);
 
             // Detecta a entrada do jogador
             if (IsKeyPressed(KEY_ONE)) {
@@ -110,9 +110,12 @@ void drawLobby() {
         } else {
             // Exibe a resposta do mercador dependendo da escolha do jogador
             if (isInteractingWithMerchant == 1) {
-                DrawText("Obrigado, ate a proxima.", 10, 100, 20, BLACK);
+                // Calcula o valor da venda e atualiza o dinheiro do jogador
+                playerMoney += itemsCollected * 300;  // Multiplica o valor por 3
+                itemsCollected = 0;  // Zera as especiarias na bolsa
+                DrawText("Obrigado, até a próxima.", 10, 190, 20, BLACK);
             } else if (isInteractingWithMerchant == 2) {
-                DrawText("Volte quando precisar de mim.", 10, 100, 20, BLACK);
+                DrawText("Volte quando precisar de mim.", 10, 190, 20, BLACK);
             }
         }
     } else {
@@ -132,5 +135,4 @@ void drawLobby() {
 
 void desenharLobbyDetalhado() {
     drawLobby();
-
 }

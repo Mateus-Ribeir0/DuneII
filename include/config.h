@@ -46,6 +46,7 @@ extern int player_x;
 extern int player_y;
 extern int mapaAtual;
 extern int itemsCollected;
+extern int playerMoney;
 extern const char* mensagem;
 
 #endif
