@@ -196,13 +196,31 @@ void movePlayer(int dx, int dy) {
 
 
 // Verifica a coleta de itens
+// Verifica a coleta de itens
 void checkItemCollection() {
     for (int i = 0; i < NUM_ITEMS; i++) {
         if (!items[i].collected && items[i].position.x == player_x && items[i].position.y == player_y) {
             // Só permite a coleta se não tiver atingido o máximo de especiarias
             if (itemsCollected < MAX_ESPECIARIAS) {
                 items[i].collected = true;
-                itemsCollected++;
+
+                // Aplica o valor da especiaria baseado no mapa atual
+                switch (mapaAtual) {
+                    case 0:
+                        itemsCollected += 1;  // Mapa 1: Cada especiaria vale 1
+                        break;
+                    case 1:
+                        itemsCollected += 2;  // Mapa 2: Cada especiaria vale 2
+                        break;
+                    case 2:
+                        itemsCollected += 4;  // Mapa 3: Cada especiaria vale 4
+                        break;
+                }
+
+                // Limita o número de especiarias ao máximo permitido
+                if (itemsCollected > MAX_ESPECIARIAS) {
+                    itemsCollected = MAX_ESPECIARIAS;
+                }
             } else {
                 // Opcional: mensagem ao jogador caso o limite tenha sido atingido
                 DrawText("Bolsa cheia! Não é possível coletar mais especiarias.", 10, 30, 20, RED);
@@ -210,6 +228,7 @@ void checkItemCollection() {
         }
     }
 }
+
 
 
 // Função de desenho do jogo

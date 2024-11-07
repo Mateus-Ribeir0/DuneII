@@ -19,7 +19,7 @@ typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
 // Definição da posição do mercador
 #define MERCHANT_X 5
 #define MERCHANT_Y 5
-#define MAX_ESPECIARIAS 2
+#define MAX_ESPECIARIAS 6
 
 // Dimensões para os portais
 #define PORTAL_HORIZONTAL_LARGURA 4
