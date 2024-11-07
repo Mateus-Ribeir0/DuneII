@@ -14,17 +14,18 @@ typedef struct {
 } Point;
 
 typedef struct {
-    Point points[MAX_POINTS_PER_ZONE];
-    int num_points;
-} IrregularZone;
+    int x, y;         // Coordenadas do canto superior esquerdo
+    int width, height; // Largura e altura do retângulo
+} RectangularZone;
 
 typedef struct {
     Point position;
     bool collected;
 } Item;
 
-IrregularZone safe_zones[3][NUM_SAFE_ZONES];
-IrregularZone collision_zones[3][NUM_COLLISION_ZONES];
+RectangularZone safe_zones[3][NUM_SAFE_ZONES];
+RectangularZone collision_zones[3][NUM_COLLISION_ZONES];
+
 Item items[NUM_ITEMS];
 char historico[MAX_HISTORICO] = "";
 int passosRepetidosMax = 3;
@@ -41,93 +42,55 @@ int custom_rand() {
 }
 
 // Inicializa as zonas seguras e de colisão para cada mapa
-void gerar_zona_irregular(IrregularZone *zone, int centro_x, int centro_y, int num_pontos) {
-    zone->num_points = num_pontos;
-    for (int i = 0; i < num_pontos; i++) {
-        int offset_x = (custom_rand() % 5) - 2;
-        int offset_y = (custom_rand() % 5) - 2;
-        zone->points[i].x = centro_x + offset_x;
-        zone->points[i].y = centro_y + offset_y;
-    }
+void gerar_zona_retangular(RectangularZone *zone, int x, int y, int width, int height) {
+    zone->x = x;
+    zone->y = y;
+    zone->width = width;
+    zone->height = height;
 }
+
 
 void inicializar_zonas(int mapa) {
     if (mapa == 0) {  // Configuração do mapa 1
-        gerar_zona_irregular(&safe_zones[0][0], 10, 10, 20);
-        gerar_zona_irregular(&safe_zones[0][1], 35, 5, 30);
-        gerar_zona_irregular(&safe_zones[0][2], 60, 15, 25);
-        gerar_zona_irregular(&safe_zones[0][3], 20, 25, 30);
-        gerar_zona_irregular(&safe_zones[0][4], 45, 30, 25);
+        gerar_zona_retangular(&safe_zones[0][0], 8, 8, 3, 2);      
+        gerar_zona_retangular(&safe_zones[0][1], 40, 12, 4, 3);    
+        gerar_zona_retangular(&safe_zones[0][2], 55, 8, 3, 2);     
+        gerar_zona_retangular(&safe_zones[0][3], 18, 30, 4, 3);  
+        gerar_zona_retangular(&safe_zones[0][4], 50, 35, 4, 3);    
 
-        gerar_zona_irregular(&collision_zones[0][0], 25, 8, 15);
-        gerar_zona_irregular(&collision_zones[0][1], 50, 20, 20);
-        // Bordas
-        for (int i = 0; i < MAPA_LARGURA; i++) {
-            collision_zones[0][2].points[i] = (Point){i, 0};
-            collision_zones[0][3].points[i] = (Point){i, MAPA_ALTURA - 1};
-        }
-        for (int i = 0; i < MAPA_ALTURA; i++) {
-            collision_zones[0][4].points[i] = (Point){0, i};
-            collision_zones[0][5].points[i] = (Point){MAPA_LARGURA - 1, i};
-        }
-        collision_zones[0][2].num_points = MAPA_LARGURA;
-        collision_zones[0][3].num_points = MAPA_LARGURA;
-        collision_zones[0][4].num_points = MAPA_ALTURA;
-        collision_zones[0][5].num_points = MAPA_ALTURA;
+        // Zonas de colisão afastadas do centro
+        gerar_zona_retangular(&collision_zones[0][0], 5, 15, 3, 2); 
+        gerar_zona_retangular(&collision_zones[0][1], 60, 28, 3, 2);
+
     } else if (mapa == 1) {  // Configuração do mapa 2
-        gerar_zona_irregular(&safe_zones[1][0], 5, 5, 25);
-        gerar_zona_irregular(&safe_zones[1][1], 30, 10, 20);
-        gerar_zona_irregular(&safe_zones[1][2], 50, 20, 15);
-        gerar_zona_irregular(&safe_zones[1][3], 15, 27, 20);
-        gerar_zona_irregular(&safe_zones[1][4], 60, 25, 30);
+        gerar_zona_retangular(&safe_zones[1][0], 5, 8, 4, 3);
+        gerar_zona_retangular(&safe_zones[1][1], 30, 5, 5, 4);
+        gerar_zona_retangular(&safe_zones[1][2], 55, 18, 4, 3);
+        gerar_zona_retangular(&safe_zones[1][3], 18, 30, 5, 3);
+        gerar_zona_retangular(&safe_zones[1][4], 48, 28, 5, 3);
 
-        gerar_zona_irregular(&collision_zones[1][0], 20, 5, 10);
-        gerar_zona_irregular(&collision_zones[1][1], 55, 18, 25);
-        // Bordas
-        for (int i = 0; i < MAPA_LARGURA; i++) {
-            collision_zones[1][2].points[i] = (Point){i, 0};
-            collision_zones[1][3].points[i] = (Point){i, MAPA_ALTURA - 1};
-        }
-        for (int i = 0; i < MAPA_ALTURA; i++) {
-            collision_zones[1][4].points[i] = (Point){0, i};
-            collision_zones[1][5].points[i] = (Point){MAPA_LARGURA - 1, i};
-        }
-        collision_zones[1][2].num_points = MAPA_LARGURA;
-        collision_zones[1][3].num_points = MAPA_LARGURA;
-        collision_zones[1][4].num_points = MAPA_ALTURA;
-        collision_zones[1][5].num_points = MAPA_ALTURA;
+        gerar_zona_retangular(&collision_zones[1][0], 22, 15, 4, 3);
+        gerar_zona_retangular(&collision_zones[1][1], 52, 20, 5, 3);
+
     } else if (mapa == 2) {  // Configuração do mapa 3
-        gerar_zona_irregular(&safe_zones[2][0], 8, 8, 30);
-        gerar_zona_irregular(&safe_zones[2][1], 25, 15, 25);
-        gerar_zona_irregular(&safe_zones[2][2], 40, 5, 15);
-        gerar_zona_irregular(&safe_zones[2][3], 35, 28, 30);
-        gerar_zona_irregular(&safe_zones[2][4], 55, 20, 20);
+        gerar_zona_retangular(&safe_zones[2][0], 10, 5, 4, 3);
+        gerar_zona_retangular(&safe_zones[2][1], 32, 12, 5, 3);
+        gerar_zona_retangular(&safe_zones[2][2], 45, 5, 4, 3);
+        gerar_zona_retangular(&safe_zones[2][3], 18, 35, 5, 3);
+        gerar_zona_retangular(&safe_zones[2][4], 52, 28, 4, 3);
 
-        gerar_zona_irregular(&collision_zones[2][0], 18, 10, 18);
-        gerar_zona_irregular(&collision_zones[2][1], 45, 22, 30);
-        // Bordas
-        for (int i = 0; i < MAPA_LARGURA; i++) {
-            collision_zones[2][2].points[i] = (Point){i, 0};
-            collision_zones[2][3].points[i] = (Point){i, MAPA_ALTURA - 1};
-        }
-        for (int i = 0; i < MAPA_ALTURA; i++) {
-            collision_zones[2][4].points[i] = (Point){0, i};
-            collision_zones[2][5].points[i] = (Point){MAPA_LARGURA - 1, i};
-        }
-        collision_zones[2][2].num_points = MAPA_LARGURA;
-        collision_zones[2][3].num_points = MAPA_LARGURA;
-        collision_zones[2][4].num_points = MAPA_ALTURA;
-        collision_zones[2][5].num_points = MAPA_ALTURA;
+        gerar_zona_retangular(&collision_zones[2][0], 12, 18, 4, 3);
+        gerar_zona_retangular(&collision_zones[2][1], 47, 22, 5, 3);
     }
 }
 
-// Checa se o jogador está dentro de uma zona
-bool is_in_irregular_zone(int x, int y, IrregularZone *zones, int num_zones) {
+
+// Checa se o jogador está dentro de uma zona retangular
+bool is_in_zone(int x, int y, RectangularZone *zones, int num_zones) {
     for (int i = 0; i < num_zones; i++) {
-        for (int j = 0; j < zones[i].num_points; j++) {
-            if (x == zones[i].points[j].x && y == zones[i].points[j].y) {
-                return true;
-            }
+        if (x >= zones[i].x && x < zones[i].x + zones[i].width &&
+            y >= zones[i].y && y < zones[i].y + zones[i].height) {
+            return true;
         }
     }
     return false;
@@ -183,7 +146,7 @@ void movePlayer(int dx, int dy) {
         }
 
         // Verifica colisão com zonas irregulares (colisão) nos mapas
-        if (!emLobby && is_in_irregular_zone(new_x, new_y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
+        if (!emLobby && is_in_zone(new_x, new_y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
             return;  // Impede a movimentação para zonas de colisão
         }
 
@@ -242,9 +205,9 @@ void drawGame() {
         for (int x = 0; x < MAPA_LARGURA; x++) {
             DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, WHITE);
 
-            if (is_in_irregular_zone(x, y, safe_zones[mapaAtual], NUM_SAFE_ZONES)) {
+            if (is_in_zone(x, y, safe_zones[mapaAtual], NUM_SAFE_ZONES)) {
                 DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, GREEN);
-            } else if (is_in_irregular_zone(x, y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
+            } else if (is_in_zone(x, y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
                 DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, RED);
             }
         }
@@ -351,14 +314,19 @@ void resetarJogo() {
 }
 
 void limparColisoesEZonas() {
-    // Limpa todas as colisões e zonas ao trocar decl ambiente
+    // Limpa todas as zonas de colisão ao redefinir suas dimensões para zero
     for (int i = 0; i < NUM_COLLISION_ZONES; i++) {
-        collision_zones[mapaAtual][i].num_points = 0;  // Zera o número de pontos de colisão
+        collision_zones[mapaAtual][i].width = 0;
+        collision_zones[mapaAtual][i].height = 0;
     }
+
+    // Limpa todas as zonas seguras ao redefinir suas dimensões para zero
     for (int i = 0; i < NUM_SAFE_ZONES; i++) {
-        safe_zones[mapaAtual][i].num_points = 0;  // Zera o número de pontos nas zonas seguras
+        safe_zones[mapaAtual][i].width = 0;
+        safe_zones[mapaAtual][i].height = 0;
     }
-}   
+}
+
 
 void zerarMonetaria() {
     itemsCollected = 0;  // Zera o número de especiarias (itens) coletadas
@@ -440,7 +408,7 @@ void playGame(GameScreen *currentScreen) {
             checkItemCollection();
 
             // Verifica se o jogador está em uma zona segura antes de registrar o movimento
-            if (!is_in_irregular_zone(player_x, player_y, safe_zones[mapaAtual], NUM_SAFE_ZONES)) {
+            if (!is_in_zone(player_x, player_y, safe_zones[mapaAtual], NUM_SAFE_ZONES)) {
                 size_t len = strlen(historico);
                 if (len < MAX_HISTORICO - 1) {
                     historico[len] = movimento;
