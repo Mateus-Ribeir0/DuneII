@@ -1,5 +1,7 @@
 #include "lobby.h"
 
+int MAX_ESPECIARIAS = BOLSA_CAPACIDADE_PEQUENA;
+
 // Variável para controlar o estado de interação com o mercador
 int isInteractingWithMerchant = 0;
 
@@ -95,27 +97,54 @@ void drawLobby() {
 
     // Verifica se o jogador está próximo do mercador
     if (isPlayerNearMerchant()) {
-        // Exibe a mensagem inicial de interação se o jogador não tiver iniciado a interação
         if (!isInteractingWithMerchant) {
-            DrawText("Deseja vender suas especiarias?", 10, 100, 20, BLACK);
-            DrawText("1- Sim", 10, 130, 20, BLACK);
-            DrawText("2- Nao", 10, 160, 20, BLACK);
+            // Exibe as opções de interação com o mercador
+            DrawText("Deseja:", 10, 100, 20, BLACK);
+            DrawText("1- Vender especiarias", 10, 130, 20, BLACK);
+            DrawText("2- Comprar bolsa maior", 10, 160, 20, BLACK);
+            DrawText("3- Sair", 10, 190, 20, BLACK);
 
             // Detecta a entrada do jogador
             if (IsKeyPressed(KEY_ONE)) {
-                isInteractingWithMerchant = 1;  // Estado para a resposta "Sim"
+                isInteractingWithMerchant = 1;  // Opção de venda
             } else if (IsKeyPressed(KEY_TWO)) {
-                isInteractingWithMerchant = 2;  // Estado para a resposta "Não"
+                isInteractingWithMerchant = 2;  // Opção de compra
+            } else if (IsKeyPressed(KEY_THREE)) {
+                isInteractingWithMerchant = 3;  // Sair
             }
         } else {
-            // Exibe a resposta do mercador dependendo da escolha do jogador
+            // Realiza ações com base na escolha do jogador
             if (isInteractingWithMerchant == 1) {
-                // Calcula o valor da venda e atualiza o dinheiro do jogador
-                playerMoney += itemsCollected * 300;  // Multiplica o valor por 3
-                itemsCollected = 0;  // Zera as especiarias na bolsa
-                DrawText("Obrigado, até a próxima.", 10, 190, 20, BLACK);
+                // Venda de especiarias
+                playerMoney += itemsCollected * 300;
+                itemsCollected = 0;
+                DrawText("Especiarias vendidas!", 10, 220, 20, BLACK);
             } else if (isInteractingWithMerchant == 2) {
-                DrawText("Volte quando precisar de mim.", 10, 190, 20, BLACK);
+                // Exibe opções de compra de bolsas
+                DrawText("Escolha a bolsa:", 10, 220, 20, BLACK);
+                DrawText("1- Média (12 especiarias) - 5000", 10, 250, 20, BLACK);
+                DrawText("2- Grande (24 especiarias) - 8000", 10, 280, 20, BLACK);
+                DrawText("3- Super (32 especiarias) - 12000", 10, 310, 20, BLACK);
+
+                // Processa a escolha do jogador para compra de bolsa
+                if (IsKeyPressed(KEY_ONE) && playerMoney >= PRECO_BOLSA_MEDIA) {
+                    MAX_ESPECIARIAS = BOLSA_CAPACIDADE_MEDIA;
+                    playerMoney -= PRECO_BOLSA_MEDIA;
+                    DrawText("Bolsa média adquirida!", 10, 340, 20, BLACK);
+                } else if (IsKeyPressed(KEY_TWO) && playerMoney >= PRECO_BOLSA_GRANDE) {
+                    MAX_ESPECIARIAS = BOLSA_CAPACIDADE_GRANDE;
+                    playerMoney -= PRECO_BOLSA_GRANDE;
+                    DrawText("Bolsa grande adquirida!", 10, 340, 20, BLACK);
+                } else if (IsKeyPressed(KEY_THREE) && playerMoney >= PRECO_BOLSA_SUPER) {
+                    MAX_ESPECIARIAS = BOLSA_CAPACIDADE_SUPER;
+                    playerMoney -= PRECO_BOLSA_SUPER;
+                    DrawText("Bolsa super adquirida!", 10, 340, 20, BLACK);
+                } else if ((IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO) || IsKeyPressed(KEY_THREE)) && playerMoney < PRECO_BOLSA_MEDIA) {
+                    DrawText("Dinheiro insuficiente!", 10, 340, 20, RED);
+                }
+            } else if (isInteractingWithMerchant == 3) {
+                // Finaliza a interação com o mercador
+                DrawText("Até a próxima!", 10, 220, 20, BLACK);
             }
         }
     } else {

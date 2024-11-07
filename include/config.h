@@ -19,7 +19,16 @@ typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
 // Definição da posição do mercador
 #define MERCHANT_X 5
 #define MERCHANT_Y 5
-#define MAX_ESPECIARIAS 6
+
+// Capacidades e preços das bolsas
+#define BOLSA_CAPACIDADE_PEQUENA 6
+#define BOLSA_CAPACIDADE_MEDIA 12
+#define BOLSA_CAPACIDADE_GRANDE 24
+#define BOLSA_CAPACIDADE_SUPER 32
+
+#define PRECO_BOLSA_MEDIA 5000
+#define PRECO_BOLSA_GRANDE 8000
+#define PRECO_BOLSA_SUPER 12000
 
 // Dimensões para os portais
 #define PORTAL_HORIZONTAL_LARGURA 4
@@ -48,5 +57,6 @@ extern int mapaAtual;
 extern int itemsCollected;
 extern int playerMoney;
 extern const char* mensagem;
+extern int MAX_ESPECIARIAS; // Capacidade atual da bolsa, que começará com a bolsa pequena
 
 #endif

@@ -193,9 +193,6 @@ void movePlayer(int dx, int dy) {
     }
 }
 
-
-
-// Verifica a coleta de itens
 // Verifica a coleta de itens
 void checkItemCollection() {
     for (int i = 0; i < NUM_ITEMS; i++) {
@@ -205,24 +202,26 @@ void checkItemCollection() {
                 items[i].collected = true;
 
                 // Aplica o valor da especiaria baseado no mapa atual
+                int especiariasGanhas = 0;
                 switch (mapaAtual) {
                     case 0:
-                        itemsCollected += 1;  // Mapa 1: Cada especiaria vale 1
+                        especiariasGanhas = 1;  // Mapa 1: Cada especiaria vale 1
                         break;
                     case 1:
-                        itemsCollected += 2;  // Mapa 2: Cada especiaria vale 2
+                        especiariasGanhas = 2;  // Mapa 2: Cada especiaria vale 2
                         break;
                     case 2:
-                        itemsCollected += 4;  // Mapa 3: Cada especiaria vale 4
+                        especiariasGanhas = 4;  // Mapa 3: Cada especiaria vale 4
                         break;
                 }
 
-                // Limita o número de especiarias ao máximo permitido
+                // Adiciona as especiarias coletadas, respeitando a capacidade máxima
+                itemsCollected += especiariasGanhas;
                 if (itemsCollected > MAX_ESPECIARIAS) {
-                    itemsCollected = MAX_ESPECIARIAS;
+                    itemsCollected = MAX_ESPECIARIAS;  // Limita ao máximo permitido
                 }
             } else {
-                // Opcional: mensagem ao jogador caso o limite tenha sido atingido
+                // Mensagem ao jogador caso o limite tenha sido atingido
                 DrawText("Bolsa cheia! Não é possível coletar mais especiarias.", 10, 30, 20, RED);
             }
         }
@@ -230,8 +229,6 @@ void checkItemCollection() {
 }
 
 
-
-// Função de desenho do jogo
 // Função de desenho do jogo
 int frameAtual = 0;
 float tempoAnimacao = 0;
