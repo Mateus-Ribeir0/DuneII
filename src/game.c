@@ -1,30 +1,20 @@
 #include "game.h"
 
-#define NUM_SAFE_ZONES 5
-#define NUM_COLLISION_ZONES 6
-#define MAX_POINTS_PER_ZONE 60
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
 #define MAX_PADRAO 9
 int playerMoney = 0;  // Definição
 Texture2D personagem;
+Texture2D environment;
 
 typedef struct {
     int x, y;
 } Point;
 
 typedef struct {
-    int x, y;         // Coordenadas do canto superior esquerdo
-    int width, height; // Largura e altura do retângulo
-} RectangularZone;
-
-typedef struct {
     Point position;
     bool collected;
 } Item;
-
-RectangularZone safe_zones[3][NUM_SAFE_ZONES];
-RectangularZone collision_zones[3][NUM_COLLISION_ZONES];
 
 Item items[NUM_ITEMS];
 char historico[MAX_HISTORICO] = "";
@@ -41,61 +31,6 @@ int custom_rand() {
     return (int)(seed % 32768); 
 }
 
-// Inicializa as zonas seguras e de colisão para cada mapa
-void gerar_zona_retangular(RectangularZone *zone, int x, int y, int width, int height) {
-    zone->x = x;
-    zone->y = y;
-    zone->width = width;
-    zone->height = height;
-}
-
-
-void inicializar_zonas(int mapa) {
-    if (mapa == 0) {  // Configuração do mapa 1
-        gerar_zona_retangular(&safe_zones[0][0], 8, 8, 3, 2);      
-        gerar_zona_retangular(&safe_zones[0][1], 40, 12, 4, 3);    
-        gerar_zona_retangular(&safe_zones[0][2], 55, 8, 3, 2);     
-        gerar_zona_retangular(&safe_zones[0][3], 18, 30, 4, 3);  
-        gerar_zona_retangular(&safe_zones[0][4], 50, 35, 4, 3);    
-
-        // Zonas de colisão afastadas do centro
-        gerar_zona_retangular(&collision_zones[0][0], 5, 15, 3, 2); 
-        gerar_zona_retangular(&collision_zones[0][1], 60, 28, 3, 2);
-
-    } else if (mapa == 1) {  // Configuração do mapa 2
-        gerar_zona_retangular(&safe_zones[1][0], 5, 8, 4, 3);
-        gerar_zona_retangular(&safe_zones[1][1], 30, 5, 5, 4);
-        gerar_zona_retangular(&safe_zones[1][2], 55, 18, 4, 3);
-        gerar_zona_retangular(&safe_zones[1][3], 18, 30, 5, 3);
-        gerar_zona_retangular(&safe_zones[1][4], 48, 28, 5, 3);
-
-        gerar_zona_retangular(&collision_zones[1][0], 22, 15, 4, 3);
-        gerar_zona_retangular(&collision_zones[1][1], 52, 20, 5, 3);
-
-    } else if (mapa == 2) {  // Configuração do mapa 3
-        gerar_zona_retangular(&safe_zones[2][0], 10, 5, 4, 3);
-        gerar_zona_retangular(&safe_zones[2][1], 32, 12, 5, 3);
-        gerar_zona_retangular(&safe_zones[2][2], 45, 5, 4, 3);
-        gerar_zona_retangular(&safe_zones[2][3], 18, 35, 5, 3);
-        gerar_zona_retangular(&safe_zones[2][4], 52, 28, 4, 3);
-
-        gerar_zona_retangular(&collision_zones[2][0], 12, 18, 4, 3);
-        gerar_zona_retangular(&collision_zones[2][1], 47, 22, 5, 3);
-    }
-}
-
-
-// Checa se o jogador está dentro de uma zona retangular
-bool is_in_zone(int x, int y, RectangularZone *zones, int num_zones) {
-    for (int i = 0; i < num_zones; i++) {
-        if (x >= zones[i].x && x < zones[i].x + zones[i].width &&
-            y >= zones[i].y && y < zones[i].y + zones[i].height) {
-            return true;
-        }
-    }
-    return false;
-}
-
 // Inicializa itens colecionáveis
 void initializeItems() {
     for (int i = 0; i < NUM_ITEMS; i++) {
@@ -104,31 +39,31 @@ void initializeItems() {
         items[i].collected = false;
     }
 }
-// Movimenta o jogador
 
+// Movimenta o jogador
 void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;
 
+    // Ajuste a posição e tamanho de acordo com o `environment`
+    Rectangle hitboxDuna = {5 * TILE_SIZE, 5 * TILE_SIZE, 96, 96};
+    Rectangle hitboxPersonagem = {new_x * TILE_SIZE, new_y * TILE_SIZE, 32, 64};  // Posição futura do jogador em pixels
+
     // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
-        // Verifica se o jogador está em um mapa ou no lobby
         bool emLobby = (mapaAtual == -1);  // -1 indica que está no lobby
 
         // Verifica colisão com os portais no lobby
         if (emLobby) {
             if (
-                // Portal 1 (Horizontal)
                 (new_x >= PORTAL_LOBBY_MAPA1_X && new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
                  new_y >= PORTAL_LOBBY_MAPA1_Y && new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) ||
-                // Portal 2 (Vertical)
                 (new_x >= PORTAL_LOBBY_MAPA2_X && new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
                  new_y >= PORTAL_LOBBY_MAPA2_Y && new_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) ||
-                // Portal 3 (Horizontal)
                 (new_x >= PORTAL_LOBBY_MAPA3_X && new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
                  new_y >= PORTAL_LOBBY_MAPA3_Y && new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA)
             ) {
-                return;  // Impede a movimentação para dentro dos portais
+                return;
             }
         }
 
@@ -136,18 +71,18 @@ void movePlayer(int dx, int dy) {
         if (!emLobby) {
             if (new_x >= PORTAL_RETORNO_X && new_x < PORTAL_RETORNO_X + PORTAL_VERTICAL_LARGURA &&
                 new_y >= PORTAL_RETORNO_Y && new_y < PORTAL_RETORNO_Y + PORTAL_VERTICAL_ALTURA) {
-                return;  // Impede a movimentação para dentro do portal de retorno
+                return;
             }
         }
 
         // Verifica colisão com o mercador no lobby
         if (emLobby && new_x == MERCHANT_X && new_y == MERCHANT_Y) {
-            return;  // Impede a movimentação para a posição do mercador
+            return;
         }
 
-        // Verifica colisão com zonas irregulares (colisão) nos mapas
-        if (!emLobby && is_in_zone(new_x, new_y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
-            return;  // Impede a movimentação para zonas de colisão
+        // Verifica colisão com o `environment`
+        if (CheckCollisionRecs(hitboxPersonagem, hitboxDuna)) {
+            return;  // Impede o movimento ao colidir com o environment
         }
 
         // Se todas as verificações passarem, atualiza a posição do jogador
@@ -155,6 +90,7 @@ void movePlayer(int dx, int dy) {
         player_y = new_y;
     }
 }
+
 
 // Verifica a coleta de itens
 void checkItemCollection() {
@@ -191,7 +127,6 @@ void checkItemCollection() {
     }
 }
 
-
 // Função de desenho do jogo
 int frameAtual = 0;
 float tempoAnimacao = 0;
@@ -203,15 +138,14 @@ void drawGame() {
 
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
-            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, WHITE);
-
-            if (is_in_zone(x, y, safe_zones[mapaAtual], NUM_SAFE_ZONES)) {
-                DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, GREEN);
-            } else if (is_in_zone(x, y, collision_zones[mapaAtual], NUM_COLLISION_ZONES)) {
-                DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, RED);
-            }
+            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){195, 160, 81, 255});
         }
     }
+
+    environment = LoadTexture("static/image/environment.png");
+
+    Rectangle hitboxDuna = {96, 96, 96, 96};
+    Vector2 posicaoDuna = {20, 20};
 
     personagem = LoadTexture("static/image/spritesheet-character.png");
 
@@ -227,6 +161,8 @@ void drawGame() {
     Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
 
     // Desenha a textura animada na posição do jogador
+    
+    DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
     DrawTextureRec(personagem, sourceRec, position, WHITE);
 
     for (int i = 0; i < NUM_ITEMS; i++) {
@@ -239,8 +175,8 @@ void drawGame() {
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
 
     // Desenha o portal de retorno ao lobby
-   DrawRectangle(PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE,
-              TILE_SIZE * PORTAL_RETORNO_LARGURA, TILE_SIZE * PORTAL_RETORNO_ALTURA, ORANGE);
+    DrawRectangle(PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE,
+                  TILE_SIZE * PORTAL_RETORNO_LARGURA, TILE_SIZE * PORTAL_RETORNO_ALTURA, ORANGE);
 
     // Exibe a mensagem no centro da tela, se o jogador estiver em volta do portal
     if (mensagem != NULL) {
@@ -250,8 +186,6 @@ void drawGame() {
         DrawText(mensagem, xPosition, GetScreenHeight() / 2, 20, BLACK);
     }
 }
-
-
 
 // Contador de ocorrências consecutivas
 int contar_ocorrencias_consecutivas(const char *historico, const char *padrao, size_t padrao_len) {
@@ -310,23 +244,7 @@ void resetarJogo() {
     // Reconfigura o jogo como se fosse uma nova partida
     custom_srand(1322);  // Semente para a randomização
     initializeItems();
-    inicializar_zonas(mapaAtual);  // Inicializa zonas para o mapa atual
 }
-
-void limparColisoesEZonas() {
-    // Limpa todas as zonas de colisão ao redefinir suas dimensões para zero
-    for (int i = 0; i < NUM_COLLISION_ZONES; i++) {
-        collision_zones[mapaAtual][i].width = 0;
-        collision_zones[mapaAtual][i].height = 0;
-    }
-
-    // Limpa todas as zonas seguras ao redefinir suas dimensões para zero
-    for (int i = 0; i < NUM_SAFE_ZONES; i++) {
-        safe_zones[mapaAtual][i].width = 0;
-        safe_zones[mapaAtual][i].height = 0;
-    }
-}
-
 
 void zerarMonetaria() {
     itemsCollected = 0;  // Zera o número de especiarias (itens) coletadas
@@ -360,9 +278,7 @@ void playGame(GameScreen *currentScreen) {
     }
 
     if (mapaAtual != -1) {  // Somente inicializa se estiver em um mapa
-        limparColisoesEZonas();
         resetarJogo();
-        inicializar_zonas(mapaAtual);
     }
 
     // Define a posição inicial padrão do jogador (por exemplo, centro do mapa)
@@ -383,40 +299,34 @@ void playGame(GameScreen *currentScreen) {
         if (IsKeyPressed(KEY_A)) { dx = -1; movimento = 'a'; }
         if (IsKeyPressed(KEY_D)) { dx = 1; movimento = 'd'; }
 
-
         // Verifica se o jogador está próximo do portal
-            if (isPlayerNearPortal()) {
-                mensagem = "Você deseja voltar para o lobby? Pressione [P]";
-                pertoDoPortal = true;
-            } else {
-                mensagem = NULL;
-                pertoDoPortal = false;
-            }
+        if (isPlayerNearPortal()) {
+            mensagem = "Você deseja voltar para o lobby? Pressione [P]";
+            pertoDoPortal = true;
+        } else {
+            mensagem = NULL;
+            pertoDoPortal = false;
+        }
 
-            // Verifica se o jogador está perto do portal e pressionou ENTER para retornar ao lobby
-            if (pertoDoPortal && IsKeyPressed(KEY_P)) {
-                player_x = MAPA_LARGURA / 2;
-                player_y = MAPA_ALTURA / 2;
-                *currentScreen = LOBBY;
-                mapaAtual = -1;
-                mensagem = NULL;
-                break;
-            }
+        // Verifica se o jogador está perto do portal e pressionou ENTER para retornar ao lobby
+        if (pertoDoPortal && IsKeyPressed(KEY_P)) {
+            player_x = MAPA_LARGURA / 2;
+            player_y = MAPA_ALTURA / 2;
+            *currentScreen = LOBBY;
+            mapaAtual = -1;
+            mensagem = NULL;
+            break;
+        }
 
         if (movimento != '\0') {
             movePlayer(dx, dy);
             checkItemCollection();
 
-            // Verifica se o jogador está em uma zona segura antes de registrar o movimento
-            if (!is_in_zone(player_x, player_y, safe_zones[mapaAtual], NUM_SAFE_ZONES)) {
-                size_t len = strlen(historico);
-                if (len < MAX_HISTORICO - 1) {
-                    historico[len] = movimento;
-                    historico[len + 1] = '\0';
-                }
-            } else {
-                // Zera o histórico quando entra em uma safe zone
-                memset(historico, 0, sizeof(historico));
+            // Armazena o movimento no histórico
+            size_t len = strlen(historico);
+            if (len < MAX_HISTORICO - 1) {
+                historico[len] = movimento;
+                historico[len + 1] = '\0';
             }
 
             char padrao_encontrado[MAX_PADRAO + 1] = "";
@@ -486,7 +396,6 @@ void playGame(GameScreen *currentScreen) {
                 break;
             }
         }
-
 
         BeginDrawing();
         drawGame();

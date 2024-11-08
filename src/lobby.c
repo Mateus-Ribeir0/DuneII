@@ -1,6 +1,7 @@
 #include "lobby.h"
 
 int MAX_ESPECIARIAS = BOLSA_CAPACIDADE_PEQUENA;
+Texture2D vendinha;
 
 // Variável para controlar o estado de interação com o mercador
 int isInteractingWithMerchant = 0;
@@ -23,7 +24,6 @@ void atualizarLobby() {
 
 void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     mapaAtual = -1;  // Identifica que o jogador está no lobby
-    limparColisoesEZonas();
     int dx = 0, dy = 0;
     if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) dx = 1;
     if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) dx = -1;
@@ -97,18 +97,26 @@ void DrawDialogBox(const char *text, int posX, int posY, int width, int height, 
 
 
 void drawLobby() {
-    ClearBackground(LIGHTGRAY);  // Define um fundo claro para o lobby
+    ClearBackground((Color){195, 160, 81, 255});  // Define um fundo claro para o lobby
+
+    vendinha = LoadTexture("static/image/market_assets.png");
+
+    Rectangle hitboxVendinha = {96, 0, 90, 96};
+    Vector2 posicaoVendinha = {20, 20};
 
     // Desenha o mapa do lobby
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
-            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, DARKGRAY);
+            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){195, 160, 81, 255});
         }
     }
+
+    DrawTextureRec(vendinha, hitboxVendinha, posicaoVendinha, WHITE);
 
     // Desenha o jogador no mapa do lobby
     DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
 
+    
     // Desenha os portais
     DrawRectangle(PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE,
                   TILE_SIZE * PORTAL_HORIZONTAL_LARGURA, TILE_SIZE * PORTAL_HORIZONTAL_ALTURA, ORANGE);
