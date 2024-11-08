@@ -15,6 +15,7 @@ Texture2D loadingImagesMap2[4];
 
 // Tempos de exibição de cada imagem
 const float loadingImageDisplayTimes[4] = {0.5f, 1.0f, 1.5f, 2.0f};  
+Sound spellCastSound;  // Som para a tela de carregamento
 
 typedef struct {
     int x, y;
@@ -331,6 +332,18 @@ bool isPlayerNearPortal() {
 void playGame(GameScreen *currentScreen) {
     // Inicializa a tela de carregamento antes de iniciar o jogo
     initializeLoadingScreen();
+
+    // Tela preta antes de mostrar as imagens de carregamento
+    ClearBackground(BLACK);
+    BeginDrawing();
+    EndDrawing();
+    
+    // Toca o som de spellcast
+    spellCastSound = LoadSound("static/music/spellcast.mp3");
+    PlaySound(spellCastSound);
+    
+    // Espera 2 segundos
+    sleep(2);
 
     // Exibe a sequência de telas de carregamento com base no mapa atual
     if (mapaAtual == 0) {
