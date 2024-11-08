@@ -3,9 +3,18 @@
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
 #define MAX_PADRAO 9
+
 int playerMoney = 0;  // Definição
 Texture2D personagem;
 Texture2D environment;
+
+// Arrays para armazenar as imagens de carregamento
+Texture2D loadingImagesMap0[4];
+Texture2D loadingImagesMap1[4];
+Texture2D loadingImagesMap2[4];
+
+// Tempos de exibição de cada imagem
+const float loadingImageDisplayTimes[4] = {0.5f, 1.0f, 1.5f, 2.0f};  
 
 typedef struct {
     int x, y;
@@ -29,6 +38,60 @@ void custom_srand(unsigned long s) {
 int custom_rand() {
     seed = (seed * 1103515245 + 12345) & 0x7fffffff;
     return (int)(seed % 32768); 
+}
+
+// Funções para inicializar as imagens de carregamento para cada mapa
+void initializeLoadingScreen() {
+    // Carregamento para mapa 0
+    loadingImagesMap0[0] = LoadTexture("static/image/mapa0.1.png");
+    loadingImagesMap0[1] = LoadTexture("static/image/mapa0.2.png");
+    loadingImagesMap0[2] = LoadTexture("static/image/mapa0.3.png");
+    loadingImagesMap0[3] = LoadTexture("static/image/mapa0.4.png");
+
+    // Carregamento para mapa 1
+    loadingImagesMap1[0] = LoadTexture("static/image/mapa1.1.png");
+    loadingImagesMap1[1] = LoadTexture("static/image/mapa1.2.png");
+    loadingImagesMap1[2] = LoadTexture("static/image/mapa1.3.png");
+    loadingImagesMap1[3] = LoadTexture("static/image/mapa1.4.png");
+
+    // Carregamento para mapa 2
+    loadingImagesMap2[0] = LoadTexture("static/image/mapa2.1.png");
+    loadingImagesMap2[1] = LoadTexture("static/image/mapa2.2.png");
+    loadingImagesMap2[2] = LoadTexture("static/image/mapa2.3.png");
+    loadingImagesMap2[3] = LoadTexture("static/image/mapa2.4.png");
+
+    // Verifica se as texturas foram carregadas corretamente
+    for (int i = 0; i < 4; i++) {
+        if (loadingImagesMap0[i].id == 0) {
+            printf("Erro ao carregar a imagem de carregamento mapa 0 %d.\n", i + 1);
+        }
+        if (loadingImagesMap1[i].id == 0) {
+            printf("Erro ao carregar a imagem de carregamento mapa 1 %d.\n", i + 1);
+        }
+        if (loadingImagesMap2[i].id == 0) {
+            printf("Erro ao carregar a imagem de carregamento mapa 2 %d.\n", i + 1);
+        }
+    }
+}
+
+// Função para exibir a sequência de telas de carregamento
+void showLoadingScreen(Texture2D* loadingImages) {
+    for (int i = 0; i < 4; i++) {
+        ClearBackground(BLACK);
+        DrawTexture(loadingImages[i], 0, 0, WHITE);  // Desenha a imagem de carregamento
+        EndDrawing();
+
+        // Espera o tempo especificado antes de passar para a próxima imagem
+        float waitTime = loadingImageDisplayTimes[i];
+        float startTime = GetTime();
+
+        while (GetTime() - startTime < waitTime) {
+            // Mantém a tela visível pelo tempo especificado
+            BeginDrawing();
+            DrawTexture(loadingImages[i], 0, 0, WHITE);
+            EndDrawing();
+        }
+    }
 }
 
 // Inicializa itens colecionáveis
@@ -90,7 +153,6 @@ void movePlayer(int dx, int dy) {
         player_y = new_y;
     }
 }
-
 
 // Verifica a coleta de itens
 void checkItemCollection() {
@@ -161,7 +223,6 @@ void drawGame() {
     Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
 
     // Desenha a textura animada na posição do jogador
-    
     DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
     DrawTextureRec(personagem, sourceRec, position, WHITE);
 
@@ -268,6 +329,18 @@ bool isPlayerNearPortal() {
 }
 
 void playGame(GameScreen *currentScreen) {
+    // Inicializa a tela de carregamento antes de iniciar o jogo
+    initializeLoadingScreen();
+
+    // Exibe a sequência de telas de carregamento com base no mapa atual
+    if (mapaAtual == 0) {
+        showLoadingScreen(loadingImagesMap0);
+    } else if (mapaAtual == 1) {
+        showLoadingScreen(loadingImagesMap1);
+    } else if (mapaAtual == 2) {
+        showLoadingScreen(loadingImagesMap2);
+    }
+
     int dificuldade;
 
     // Define a dificuldade com base no mapa atual
