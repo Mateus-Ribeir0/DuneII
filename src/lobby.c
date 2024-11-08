@@ -65,6 +65,37 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
      
 }
 
+void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor) {
+    // Ajusta a largura para evitar que o texto escape
+    width = 800;  // Ajuste o valor conforme necessário para uma largura maior
+
+    DrawRectangleRounded((Rectangle){ posX, posY, width, height }, 0.1f, 16, boxColor);
+    
+    static int frameCount = 0;
+    static int charactersToShow = 0;
+
+    // Verifica se a tecla de espaço foi pressionada
+    if (IsKeyPressed(KEY_SPACE)) {
+        charactersToShow = strlen(text);  // Mostra o texto completo
+    } else if (charactersToShow < strlen(text)) {
+        frameCount++;
+        charactersToShow = frameCount / 5;  // Velocidade do texto
+        if (charactersToShow > strlen(text)) charactersToShow = strlen(text);
+    }
+
+    // Calcular o máximo de caracteres que cabem na caixa
+    int maxCharsPerLine = (width - 20) / MeasureText("A", 20);  // Ajuste para cada linha
+    int maxLines = (height - 20) / 20;                          // Ajuste para a altura da caixa
+    int maxCharsInBox = maxCharsPerLine * maxLines;
+
+    // Limita o texto ao máximo que cabe na caixa
+    if (charactersToShow > maxCharsInBox) charactersToShow = maxCharsInBox;
+
+    // Desenha o texto até o número atual de caracteres a serem mostrados
+    DrawText(TextSubtext(text, 0, charactersToShow), posX + 10, posY + 10, 20, textColor);
+}
+
+
 void drawLobby() {
     ClearBackground(LIGHTGRAY);  // Define um fundo claro para o lobby
 
@@ -95,56 +126,48 @@ void drawLobby() {
     // Desenha o mercador (quadradinho roxo) na posição (5, 5)
     DrawRectangle(MERCHANT_X * TILE_SIZE, MERCHANT_Y * TILE_SIZE, TILE_SIZE, TILE_SIZE, PURPLE);
 
-    // Verifica se o jogador está próximo do mercador
+    // Verifica se o jogador está próximo do mercador e exibe a interação
     if (isPlayerNearMerchant()) {
         if (!isInteractingWithMerchant) {
-            // Exibe as opções de interação com o mercador
-            DrawText("Deseja:", 10, 100, 20, BLACK);
-            DrawText("1- Vender especiarias", 10, 130, 20, BLACK);
-            DrawText("2- Comprar bolsa maior", 10, 160, 20, BLACK);
-            DrawText("3- Sair", 10, 190, 20, BLACK);
-
-            // Detecta a entrada do jogador
+            DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1] para vender especiarias\n[2] para comprar uma bolsa nova", 100, 500, 600, 120, WHITE, BLACK);
             if (IsKeyPressed(KEY_ONE)) {
                 isInteractingWithMerchant = 1;  // Opção de venda
             } else if (IsKeyPressed(KEY_TWO)) {
                 isInteractingWithMerchant = 2;  // Opção de compra
-            } else if (IsKeyPressed(KEY_THREE)) {
-                isInteractingWithMerchant = 3;  // Sair
             }
         } else {
             // Realiza ações com base na escolha do jogador
             if (isInteractingWithMerchant == 1) {
-                // Venda de especiarias
-                playerMoney += itemsCollected * 300;
-                itemsCollected = 0;
-                DrawText("Especiarias vendidas!", 10, 220, 20, BLACK);
+                if (itemsCollected > 0) {
+                    // Venda de especiarias
+                    playerMoney += itemsCollected * 300;
+                    itemsCollected = 0;
+                    DrawDialogBox("Especiarias vendidas com sucesso!", 100, 500, 400, 120, WHITE, BLACK);
+                } else {
+                    // Mensagem caso não haja especiarias
+                    DrawDialogBox("Saia daqui, você não tem nenhuma especiaria para negociar!", 100, 500, 600, 120, WHITE, RED);
+                }
+                if (IsKeyPressed(KEY_ENTER)) isInteractingWithMerchant = 0;  // Finaliza interação ao pressionar ENTER
             } else if (isInteractingWithMerchant == 2) {
                 // Exibe opções de compra de bolsas
-                DrawText("Escolha a bolsa:", 10, 220, 20, BLACK);
-                DrawText("1- Média (12 especiarias) - 5000", 10, 250, 20, BLACK);
-                DrawText("2- Grande (24 especiarias) - 8000", 10, 280, 20, BLACK);
-                DrawText("3- Super (32 especiarias) - 12000", 10, 310, 20, BLACK);
+                DrawDialogBox("Qual delas deseja comprar?\n\n[1] Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 8000\n[3] Super (32 especiarias) - 12000", 100, 500, 600, 150, WHITE, BLACK);
 
                 // Processa a escolha do jogador para compra de bolsa
                 if (IsKeyPressed(KEY_ONE) && playerMoney >= PRECO_BOLSA_MEDIA) {
                     MAX_ESPECIARIAS = BOLSA_CAPACIDADE_MEDIA;
                     playerMoney -= PRECO_BOLSA_MEDIA;
-                    DrawText("Bolsa média adquirida!", 10, 340, 20, BLACK);
+                    DrawDialogBox("Bolsa média adquirida!", 100, 500, 400, 120, WHITE, BLACK);
                 } else if (IsKeyPressed(KEY_TWO) && playerMoney >= PRECO_BOLSA_GRANDE) {
                     MAX_ESPECIARIAS = BOLSA_CAPACIDADE_GRANDE;
                     playerMoney -= PRECO_BOLSA_GRANDE;
-                    DrawText("Bolsa grande adquirida!", 10, 340, 20, BLACK);
+                    DrawDialogBox("Bolsa grande adquirida!", 100, 500, 400, 120, WHITE, BLACK);
                 } else if (IsKeyPressed(KEY_THREE) && playerMoney >= PRECO_BOLSA_SUPER) {
                     MAX_ESPECIARIAS = BOLSA_CAPACIDADE_SUPER;
                     playerMoney -= PRECO_BOLSA_SUPER;
-                    DrawText("Bolsa super adquirida!", 10, 340, 20, BLACK);
+                    DrawDialogBox("Bolsa super adquirida!", 100, 500, 400, 120, WHITE, BLACK);
                 } else if ((IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO) || IsKeyPressed(KEY_THREE)) && playerMoney < PRECO_BOLSA_MEDIA) {
-                    DrawText("Dinheiro insuficiente!", 10, 340, 20, RED);
+                    DrawDialogBox("Dinheiro insuficiente!", 100, 500, 400, 120, WHITE, RED);
                 }
-            } else if (isInteractingWithMerchant == 3) {
-                // Finaliza a interação com o mercador
-                DrawText("Até a próxima!", 10, 220, 20, BLACK);
             }
         }
     } else {
@@ -161,6 +184,7 @@ void drawLobby() {
     }
     mensagem = NULL;  
 }
+
 
 void desenharLobbyDetalhado() {
     drawLobby();
