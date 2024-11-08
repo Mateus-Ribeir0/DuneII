@@ -10,5 +10,6 @@ void inicializar_zonas(int mapa);
 void initializeItems();
 void limparHistoricoPassos();
 void limparColisoesEZonas();
+void UnloadAssets();
 
 #endif

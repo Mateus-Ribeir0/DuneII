@@ -13,9 +13,11 @@ Texture2D loadingImagesMap0[4];
 Texture2D loadingImagesMap1[4];
 Texture2D loadingImagesMap2[4];
 
-// Tempos de exibição de cada imagem
-const float loadingImageDisplayTimes[4] = {0.5f, 1.0f, 1.5f, 2.0f};  
+// Tempos de exibição de cada imagem (aumentado em 2 segundos)
+const float loadingImageDisplayTimes[4] = {2.5f, 3.0f, 3.5f, 4.0f};  
 Sound spellCastSound;  // Som para a tela de carregamento
+Music mapa0Music;      // Música para o mapa 0
+bool isMapa0MusicPlaying = false;  // Controle de estado da música
 
 typedef struct {
     int x, y;
@@ -347,7 +349,11 @@ void playGame(GameScreen *currentScreen) {
 
     // Exibe a sequência de telas de carregamento com base no mapa atual
     if (mapaAtual == 0) {
+        // Toca a música do mapa 0 após o spellcast e o sleep de 2 segundos
+        mapa0Music = LoadMusicStream("static/music/mapa0musica.mp3");
+        PlayMusicStream(mapa0Music);
         showLoadingScreen(loadingImagesMap0);
+        isMapa0MusicPlaying = true; // Marca que a música do mapa 0 está tocando
     } else if (mapaAtual == 1) {
         showLoadingScreen(loadingImagesMap1);
     } else if (mapaAtual == 2) {
@@ -489,4 +495,24 @@ void playGame(GameScreen *currentScreen) {
 
         if (itemsCollected == NUM_ITEMS) break;
     }
+
+    // Para a música ao sair do mapa 0
+    if (mapaAtual == 0 && isMapa0MusicPlaying) {
+        UpdateMusicStream(mapa0Music);  // Atualiza o stream de música
+    } else {
+        StopMusicStream(mapa0Music);     // Para a música ao sair do mapa 0
+        isMapa0MusicPlaying = false;      // Atualiza o controle da música
+    }
 }
+
+// Função para liberar recursos no final do jogo
+void UnloadAssets() {
+    for (int i = 0; i < 4; i++) {
+        UnloadTexture(loadingImagesMap0[i]);  // Libera cada imagem de carregamento do mapa 0
+        UnloadTexture(loadingImagesMap1[i]);  // Libera cada imagem de carregamento do mapa 1
+        UnloadTexture(loadingImagesMap2[i]);  // Libera cada imagem de carregamento do mapa 2
+    }
+    UnloadSound(spellCastSound);  // Libera o som de spellcast
+    UnloadMusicStream(mapa0Music); // Libera a música do mapa 0
+}
+
