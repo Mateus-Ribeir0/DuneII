@@ -16,8 +16,6 @@ Texture2D loadingImagesMap2[4];
 // Tempos de exibição de cada imagem (aumentado em 2 segundos)
 const float loadingImageDisplayTimes[4] = {2.5f, 3.0f, 3.5f, 4.0f};  
 Sound spellCastSound;  // Som para a tela de carregamento
-Music mapa0Music;      // Música para o mapa 0
-bool isMapa0MusicPlaying = false;  // Controle de estado da música
 
 typedef struct {
     int x, y;
@@ -347,16 +345,19 @@ void playGame(GameScreen *currentScreen) {
     // Espera 2 segundos
     sleep(2);
 
+
     // Exibe a sequência de telas de carregamento com base no mapa atual
     if (mapaAtual == 0) {
-        // Toca a música do mapa 0 após o spellcast e o sleep de 2 segundos
-        mapa0Music = LoadMusicStream("static/music/mapa0musica.mp3");
-        PlayMusicStream(mapa0Music);
+        Sound musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
+        PlaySound(musicaMapa0);
         showLoadingScreen(loadingImagesMap0);
-        isMapa0MusicPlaying = true; // Marca que a música do mapa 0 está tocando
     } else if (mapaAtual == 1) {
+        Sound musicaMapa1 = LoadSound("static/music/mapa1musica.wav");
+        PlaySound(musicaMapa1);
         showLoadingScreen(loadingImagesMap1);
     } else if (mapaAtual == 2) {
+        Sound musicaMapa2 = LoadSound("static/music/mapa2musica.wav");
+        PlaySound(musicaMapa2);
         showLoadingScreen(loadingImagesMap2);
     }
 
@@ -495,14 +496,6 @@ void playGame(GameScreen *currentScreen) {
 
         if (itemsCollected == NUM_ITEMS) break;
     }
-
-    // Para a música ao sair do mapa 0
-    if (mapaAtual == 0 && isMapa0MusicPlaying) {
-        UpdateMusicStream(mapa0Music);  // Atualiza o stream de música
-    } else {
-        StopMusicStream(mapa0Music);     // Para a música ao sair do mapa 0
-        isMapa0MusicPlaying = false;      // Atualiza o controle da música
-    }
 }
 
 // Função para liberar recursos no final do jogo
@@ -512,7 +505,5 @@ void UnloadAssets() {
         UnloadTexture(loadingImagesMap1[i]);  // Libera cada imagem de carregamento do mapa 1
         UnloadTexture(loadingImagesMap2[i]);  // Libera cada imagem de carregamento do mapa 2
     }
-    UnloadSound(spellCastSound);  // Libera o som de spellcast
-    UnloadMusicStream(mapa0Music); // Libera a música do mapa 0
 }
 
