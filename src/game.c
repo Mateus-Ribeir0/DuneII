@@ -9,7 +9,7 @@ int playerMoney = 0;  // Definição
 Texture2D personagem;
 Texture2D environment;
 int teveUnload = 0;
-
+int deathEmotivaTocando;
 
 // Arrays para armazenar as imagens de carregamento
 Texture2D loadingImagesMap0[4];
@@ -332,7 +332,7 @@ void playGame(GameScreen *currentScreen) {
     BeginDrawing();
     EndDrawing();
 
-    teveUnload=1;
+    teveUnload = 1;
 
     Sound musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
     Sound musicaMapa1 = LoadSound("static/music/mapa1musica.wav");
@@ -343,15 +343,12 @@ void playGame(GameScreen *currentScreen) {
     sleep(2);
 
     if (mapaAtual == 0) {
-        
         PlaySound(musicaMapa0);
         showLoadingScreen(loadingImagesMap0);
     } else if (mapaAtual == 1) {
-
         PlaySound(musicaMapa1);
         showLoadingScreen(loadingImagesMap1);
     } else if (mapaAtual == 2) {
-
         PlaySound(musicaMapa2);
         showLoadingScreen(loadingImagesMap2);
     }
@@ -448,6 +445,9 @@ void playGame(GameScreen *currentScreen) {
                 sleep(2);
 
                 PlaySound(barulhoMonstro);
+                Sound deathEmotiva = LoadSound("static/music/deathemotiva.wav");
+                deathEmotivaTocando = 1;
+                PlaySound(deathEmotiva);
 
                 int sandwormPosY = GetScreenHeight() / 2 - sandworm.height / 2;
                 int startTime = GetTime();
@@ -469,7 +469,34 @@ void playGame(GameScreen *currentScreen) {
                 UnloadTexture(characterBack);
                 UnloadTexture(sandworm);
 
+                // Exibição do texto com animação de digitação
+                const char *euFalhei = "Eu... Eu falhei minha missão...";
+                int caractereExibido = 0;
+                float tempoPorCaractere = 0.5f;  // Tempo em segundos para cada caractere aparecer
+                float timer = 0;
+
+                while (caractereExibido < strlen(euFalhei) && !WindowShouldClose()) {
+                    BeginDrawing();
+                    ClearBackground(BLACK);
+                    timer += GetFrameTime();
+
+                    // Exibe um caractere a cada intervalo de tempo
+                    if (timer >= tempoPorCaractere) {
+                        caractereExibido++;
+                        timer = 0;
+                    }
+
+                    DrawText(TextSubtext(euFalhei, 0, caractereExibido), 
+                             GetScreenWidth() / 2 - MeasureText(euFalhei, 20) / 2, 
+                             GetScreenHeight() / 2, 20, RAYWHITE);
+                    EndDrawing();
+                }
+
+                // Exibe o texto completo por mais 2 segundos antes de ir para o ranking
+                sleep(2);
+
                 resetarJogo();
+                
                 *currentScreen = RANKINGS;
                 break;
             }
@@ -480,13 +507,13 @@ void playGame(GameScreen *currentScreen) {
         EndDrawing();
     }
 
-    if(teveUnload != 0){
+    if (teveUnload != 0) {
         UnloadSound(musicaMapa0);
         UnloadSound(musicaMapa1);
         UnloadSound(musicaMapa2);
     }
-    
 }
+
 
 
 // Função para liberar recursos no final do jogo
