@@ -192,7 +192,7 @@ void drawLobby() {
                     showThankYouMessage = true; // Ativa a mensagem de agradecimento
                     errorMessageTimer = GetTime(); // Inicia o temporizador para a mensagem de agradecimento
                 } else {
-                    errorMessage = "Saia daqui, você não tem nenhuma especiaria para negociar!";
+                    errorMessage = "Saia daqui, você não tem nenhuma especiaria para\nnegociar!";
                     showErrorMessage = true;
                     errorMessageTimer = GetTime();
                 }
