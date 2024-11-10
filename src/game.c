@@ -15,6 +15,7 @@ int deathEmotivaTocando;
 Texture2D loadingImagesMap0[4];
 Texture2D loadingImagesMap1[4];
 Texture2D loadingImagesMap2[4];
+Texture2D loadingImagesLobby[4];
 
 // Tempos de exibição de cada imagem (aumentado em 2 segundos)
 const float loadingImageDisplayTimes[4] = {2.5f, 3.0f, 3.5f, 4.0f};  
@@ -78,18 +79,11 @@ void initializeLoadingScreen() {
     loadingImagesMap2[2] = LoadTexture("static/image/mapa2.3.png");
     loadingImagesMap2[3] = LoadTexture("static/image/mapa2.4.png");
 
-    // Verifica se as texturas foram carregadas corretamente
-    for (int i = 0; i < 4; i++) {
-        if (loadingImagesMap0[i].id == 0) {
-            printf("Erro ao carregar a imagem de carregamento mapa 0 %d.\n", i + 1);
-        }
-        if (loadingImagesMap1[i].id == 0) {
-            printf("Erro ao carregar a imagem de carregamento mapa 1 %d.\n", i + 1);
-        }
-        if (loadingImagesMap2[i].id == 0) {
-            printf("Erro ao carregar a imagem de carregamento mapa 2 %d.\n", i + 1);
-        }
-    }
+    loadingImagesLobby[0] = LoadTexture("static/image/cutsceneLobbyColored1.png");
+    loadingImagesLobby[1] = LoadTexture("static/image/cutsceneLobbyColored2.png");
+    loadingImagesLobby[2] = LoadTexture("static/image/cutsceneLobbyColored3.png");
+    loadingImagesLobby[3] = LoadTexture("static/image/cutsceneLobbyColored4.png");
+
 }
 
 // Função para exibir a sequência de telas de carregamento
@@ -382,6 +376,25 @@ void playGame(GameScreen *currentScreen) {
         if (pertoDoPortal && IsKeyPressed(KEY_P)) {
             player_x = MAPA_LARGURA / 2;
             player_y = MAPA_ALTURA / 2;
+            if(mapaAtual==0){
+                UnloadSound(musicaMapa0);
+                teveUnload = 0;
+            }
+            else if(mapaAtual==1){
+                UnloadSound(musicaMapa1);
+                teveUnload = 0;
+            }
+            else if(mapaAtual==2){
+                UnloadSound(musicaMapa2);
+                teveUnload = 0;
+            }
+
+            ClearBackground(BLACK);
+            PlaySound(spellCastSound);
+
+            sleep(2);
+            
+            showLoadingScreen(loadingImagesLobby);
             *currentScreen = LOBBY;
             mapaAtual = -1;
             mensagem = NULL;
@@ -522,5 +535,6 @@ void UnloadAssets() {
         UnloadTexture(loadingImagesMap0[i]);
         UnloadTexture(loadingImagesMap1[i]);
         UnloadTexture(loadingImagesMap2[i]);
+        UnloadTexture(loadingImagesLobby[i]);
     }
 }
