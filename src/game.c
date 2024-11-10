@@ -3,6 +3,7 @@
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
 #define MAX_PADRAO 9
+#define TOTAL_ESPECIARIAS 15
 
 int playerMoney = 0;  // Definição
 Texture2D personagem;
@@ -30,6 +31,20 @@ Item items[NUM_ITEMS];
 char historico[MAX_HISTORICO] = "";
 int passosRepetidosMax = 3;
 static unsigned long seed = 22135234;
+
+// Variáveis de animação do personagem
+int frameAtual = 0;
+float tempoAnimacao = 0;
+const float duracaoFrame = 0.2f;  // Duração de cada quadro em segundos
+
+// Coordenadas predefinidas para especiarias, garantindo distância entre os pontos
+Point posicoesEspeciarias[TOTAL_ESPECIARIAS] = {
+    {2, 2}, {6, 8}, {10, 4}, {14, 10}, {18, 16}, {22, 3}, {26, 15}, 
+    {30, 7}, {34, 18}, {38, 5}, {5, 14}, {15, 19}, {20, 2}, {28, 9}, {35, 13}
+};
+
+// Índice para rastrear a próxima especiaria a aparecer
+int indiceEspeciariaAtual = 0;
 
 // Funções de randomização
 void custom_srand(unsigned long s) {
@@ -95,21 +110,49 @@ void showLoadingScreen(Texture2D* loadingImages) {
     }
 }
 
-// Inicializa itens colecionáveis
-void initializeItems() {
-    for (int i = 0; i < NUM_ITEMS; i++) {
-        items[i].position.x = custom_rand() % MAPA_LARGURA;
-        items[i].position.y = custom_rand() % MAPA_ALTURA;
-        items[i].collected = false;
+// Inicializa a primeira especiaria a ser coletada
+void inicializarEspeciaria() {
+    if (indiceEspeciariaAtual < TOTAL_ESPECIARIAS) {
+        items[0].position = posicoesEspeciarias[indiceEspeciariaAtual];
+        items[0].collected = false;
     }
 }
 
-// Movimenta o jogador
+// Lógica de coleta de especiarias, com atualização para a próxima posição após a coleta
+void checkItemCollection() {
+    if (!items[0].collected && items[0].position.x == player_x && items[0].position.y == player_y) {
+        if (itemsCollected < MAX_ESPECIARIAS) {
+            items[0].collected = true;
+            int especiariasGanhas = 0;
+
+            // Define a pontuação das especiarias com base no mapa atual
+            switch (mapaAtual) {
+                case 0: especiariasGanhas = 1; break;
+                case 1: especiariasGanhas = 2; break;
+                case 2: especiariasGanhas = 4; break;
+            }
+
+            itemsCollected += especiariasGanhas;
+
+            // Atualiza para a próxima especiaria
+            indiceEspeciariaAtual++;
+            if (indiceEspeciariaAtual < TOTAL_ESPECIARIAS) {
+                items[0].position = posicoesEspeciarias[indiceEspeciariaAtual];
+                items[0].collected = false;
+            }
+        } else {
+            DrawText("Bolsa cheia! Não é possível coletar mais especiarias.", 10, 30, 20, RED);
+        }
+    }
+}
+
+
+
+// Função para mover o jogador
 void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;
 
-    
     // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool emLobby = (mapaAtual == -1);  // -1 indica que está no lobby
@@ -148,47 +191,6 @@ void movePlayer(int dx, int dy) {
     }
 }
 
-
-// Verifica a coleta de itens
-void checkItemCollection() {
-    for (int i = 0; i < NUM_ITEMS; i++) {
-        if (!items[i].collected && items[i].position.x == player_x && items[i].position.y == player_y) {
-            // Só permite a coleta se não tiver atingido o máximo de especiarias
-            if (itemsCollected < MAX_ESPECIARIAS) {
-                items[i].collected = true;
-
-                // Aplica o valor da especiaria baseado no mapa atual
-                int especiariasGanhas = 0;
-                switch (mapaAtual) {
-                    case 0:
-                        especiariasGanhas = 1;  // Mapa 1: Cada especiaria vale 1
-                        break;
-                    case 1:
-                        especiariasGanhas = 2;  // Mapa 2: Cada especiaria vale 2
-                        break;
-                    case 2:
-                        especiariasGanhas = 4;  // Mapa 3: Cada especiaria vale 4
-                        break;
-                }
-
-                // Adiciona as especiarias coletadas, respeitando a capacidade máxima
-                itemsCollected += especiariasGanhas;
-                if (itemsCollected > MAX_ESPECIARIAS) {
-                    itemsCollected = MAX_ESPECIARIAS;  // Limita ao máximo permitido
-                }
-            } else {
-                // Mensagem ao jogador caso o limite tenha sido atingido
-                DrawText("Bolsa cheia! Não é possível coletar mais especiarias.", 10, 30, 20, RED);
-            }
-        }
-    }
-}
-
-// Função de desenho do jogo
-int frameAtual = 0;
-float tempoAnimacao = 0;
-const float duracaoFrame = 0.2f;  // Duração de cada quadro em segundos
-
 // Função de desenho do jogo
 void drawGame() {
     ClearBackground(RAYWHITE);
@@ -221,10 +223,9 @@ void drawGame() {
     DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
     DrawTextureRec(personagem, sourceRec, position, WHITE);
 
-    for (int i = 0; i < NUM_ITEMS; i++) {
-        if (!items[i].collected) {
-            DrawCircle(items[i].position.x * TILE_SIZE + TILE_SIZE / 2, items[i].position.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 4, GOLD);
-        }
+    // Desenha a especiaria se não foi coletada
+    if (!items[0].collected) {
+        DrawCircle(items[0].position.x * TILE_SIZE + TILE_SIZE / 2, items[0].position.y * TILE_SIZE + TILE_SIZE / 4, TILE_SIZE / 4, GOLD);
     }
 
     // Mostra a quantidade de especiarias coletadas na "bolsa"
@@ -242,6 +243,8 @@ void drawGame() {
         DrawText(mensagem, xPosition, GetScreenHeight() / 2, 20, BLACK);
     }
 }
+// ... (restante do código, como no exemplo anterior, mantendo as funções playGame e resetarJogo conforme sua lógica e estrutura)
+
 
 // Contador de ocorrências consecutivas
 int contar_ocorrencias_consecutivas(const char *historico, const char *padrao, size_t padrao_len) {
@@ -295,15 +298,13 @@ void limparHistoricoPassos() {
 void resetarJogo() {
     player_x = MAPA_LARGURA / 2;
     player_y = MAPA_ALTURA / 2;
-    limparHistoricoPassos();  // Limpa o histórico de passos
-
-    // Reconfigura o jogo como se fosse uma nova partida
-    custom_srand(1322);  // Semente para a randomização
-    initializeItems();
+    limparHistoricoPassos();
+    custom_srand(1322);
+    inicializarEspeciaria();
 }
 
 void zerarMonetaria() {
-    itemsCollected = 0;  // Zera o número de especiarias (itens) coletadas
+    itemsCollected = 0;
     playerMoney = 0;
 }
 
@@ -313,7 +314,6 @@ bool isPlayerNearPortal() {
     int portalMinY = PORTAL_RETORNO_Y;
     int portalMaxY = PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA - 1;
 
-    // Verifica se o jogador está em uma célula adjacente ao portal
     if ((abs(player_x - portalMinX) <= 1 && player_y >= portalMinY - 1 && player_y <= portalMaxY + 1) ||
         (abs(player_x - portalMaxX) <= 1 && player_y >= portalMinY - 1 && player_y <= portalMaxY + 1) ||
         (abs(player_y - portalMinY) <= 1 && player_x >= portalMinX - 1 && player_x <= portalMaxX + 1) ||
@@ -324,23 +324,16 @@ bool isPlayerNearPortal() {
 }
 
 void playGame(GameScreen *currentScreen) {
-    // Inicializa a tela de carregamento antes de iniciar o jogo
     initializeLoadingScreen();
 
-    // Tela preta antes de mostrar as imagens de carregamento
     ClearBackground(BLACK);
     BeginDrawing();
     EndDrawing();
-    
-    // Toca o som de spellcast
+
     spellCastSound = LoadSound("static/music/spellcast.mp3");
     PlaySound(spellCastSound);
-    
-    // Espera 2 segundos
     sleep(2);
 
-
-    // Exibe a sequência de telas de carregamento com base no mapa atual
     if (mapaAtual == 0) {
         Sound musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
         PlaySound(musicaMapa0);
@@ -355,26 +348,13 @@ void playGame(GameScreen *currentScreen) {
         showLoadingScreen(loadingImagesMap2);
     }
 
-    int dificuldade;
-
-    // Define a dificuldade com base no mapa atual
-    switch (mapaAtual) {
-        case 0: dificuldade = 5; break;
-        case 1: dificuldade = 4; break;
-        case 2: dificuldade = 3; break;
+    if (mapaAtual != -1) {
+        inicializarEspeciaria();
     }
 
-    if (mapaAtual != -1) {  // Somente inicializa se estiver em um mapa
-        resetarJogo();
-    }
-
-    // Define a posição inicial padrão do jogador (por exemplo, centro do mapa)
     player_x = MAPA_LARGURA / 2;
     player_y = MAPA_ALTURA / 2;
-
-    char historico[MAX_HISTORICO] = "";
     memset(historico, 0, sizeof(historico));
-
     bool pertoDoPortal = false;
 
     while (!WindowShouldClose()) {
@@ -386,7 +366,6 @@ void playGame(GameScreen *currentScreen) {
         if (IsKeyPressed(KEY_A)) { dx = -1; movimento = 'a'; }
         if (IsKeyPressed(KEY_D)) { dx = 1; movimento = 'd'; }
 
-        // Verifica se o jogador está próximo do portal
         if (isPlayerNearPortal()) {
             mensagem = "Você deseja voltar para o lobby? Pressione [P]";
             pertoDoPortal = true;
@@ -395,7 +374,6 @@ void playGame(GameScreen *currentScreen) {
             pertoDoPortal = false;
         }
 
-        // Verifica se o jogador está perto do portal e pressionou ENTER para retornar ao lobby
         if (pertoDoPortal && IsKeyPressed(KEY_P)) {
             player_x = MAPA_LARGURA / 2;
             player_y = MAPA_ALTURA / 2;
@@ -409,7 +387,6 @@ void playGame(GameScreen *currentScreen) {
             movePlayer(dx, dy);
             checkItemCollection();
 
-            // Armazena o movimento no histórico
             size_t len = strlen(historico);
             if (len < MAX_HISTORICO - 1) {
                 historico[len] = movimento;
@@ -418,6 +395,14 @@ void playGame(GameScreen *currentScreen) {
 
             char padrao_encontrado[MAX_PADRAO + 1] = "";
             int encontrou_padrao = 0;
+            int dificuldade;
+
+            switch (mapaAtual) {
+                case 0: dificuldade = 5; break;
+                case 1: dificuldade = 4; break;
+                case 2: dificuldade = 3; break;
+            }
+
             if ((dificuldade == 5 && strlen(historico) >= 5 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 5, padrao_encontrado))) ||
                 (dificuldade == 4 && strlen(historico) >= 4 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 4, padrao_encontrado))) ||
                 (dificuldade == 3 && strlen(historico) >= 3 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 3, padrao_encontrado)))) 
@@ -428,21 +413,17 @@ void playGame(GameScreen *currentScreen) {
                 }
                 padrao_completo[dificuldade] = '\0';
 
-                // Realiza a animação do game over
                 Sound gameOverSound = LoadSound("static/music/deathsound.wav");
                 Sound barulhoMonstro = LoadSound("static/music/monster.mp3");
                 Texture2D characterBack = LoadTexture("static/image/characterback.png");
                 Texture2D sandworm = LoadTexture("static/image/sandworm.png");
 
-                // Zera a quantidade de especiarias coletadas no game over
-                zerarMonetaria();  // Zera a quantidade de especiarias coletadas
+                zerarMonetaria();
 
-                // Toca o deathsound imediatamente
                 PlaySound(gameOverSound);
 
                 sleep(1);
 
-                // Mostra o game over
                 for (int i = 0; i < 180; i++) {
                     BeginDrawing();
                     ClearBackground(BLACK);
@@ -451,13 +432,10 @@ void playGame(GameScreen *currentScreen) {
                     EndDrawing();
                 }
 
-                // Pausa antes de tocar o som do monstro
                 sleep(2);
 
-                // Toca o barulho do monstro uma única vez
                 PlaySound(barulhoMonstro);
 
-                // Exibe a animação da sandworm
                 int sandwormPosY = GetScreenHeight() / 2 - sandworm.height / 2;
                 int startTime = GetTime();
 
@@ -487,17 +465,15 @@ void playGame(GameScreen *currentScreen) {
         BeginDrawing();
         drawGame();
         EndDrawing();
-
-        if (itemsCollected == NUM_ITEMS) break;
     }
 }
+
 
 // Função para liberar recursos no final do jogo
 void UnloadAssets() {
     for (int i = 0; i < 4; i++) {
-        UnloadTexture(loadingImagesMap0[i]);  // Libera cada imagem de carregamento do mapa 0
-        UnloadTexture(loadingImagesMap1[i]);  // Libera cada imagem de carregamento do mapa 1
-        UnloadTexture(loadingImagesMap2[i]);  // Libera cada imagem de carregamento do mapa 2
+        UnloadTexture(loadingImagesMap0[i]);
+        UnloadTexture(loadingImagesMap1[i]);
+        UnloadTexture(loadingImagesMap2[i]);
     }
 }
-
