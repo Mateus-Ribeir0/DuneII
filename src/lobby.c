@@ -33,7 +33,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x <= PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
          player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y <= PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA)) {
         
-        mensagem = "Você deseja ir para o mapa 1? Pressione [P]";
+        mensagem = "Você deseja ir para o mapa 1?\nPressione [P]";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -45,7 +45,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x <= PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
               player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y <= PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA)) {
         
-        mensagem = "Você deseja ir para o mapa 2? Pressione [P]";
+        mensagem = "Você deseja ir para o mapa 2?\nPressione [P]";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -57,7 +57,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x <= PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
               player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y <= PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA)) {
         
-        mensagem = "Você deseja ir para o mapa 3? Pressione [P]";
+        mensagem = "Você deseja ir para o mapa 3?\nPressione [P]";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -76,9 +76,9 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
 void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool isPortalDialog) {
     // Ajusta a largura para 600 quando a caixa é para um portal; caso contrário, mantém 800
     if (isPortalDialog) {
-        width = 600;
+        width = 400;
     } else {
-        width = 800;
+        width = 600;
     }
 
     DrawRectangleRounded((Rectangle){ posX, posY, width, height }, 0.1f, 16, boxColor);
@@ -111,8 +111,11 @@ void DrawDialogBox(const char *text, int posX, int posY, int width, int height, 
 // Variáveis globais para controlar o temporizador e exibição da mensagem de erro
 double errorMessageTimer = 0.0;
 bool showErrorMessage = false;
-const double ERROR_MESSAGE_DURATION = 5.0;
+bool showThankYouMessage = false;
+const double MESSAGE_DURATION = 5.0;
 const char *errorMessage = "";
+const int widthMercador = 620;
+const int heigthMercador = 140;
 
 void drawLobby() {
     ClearBackground((Color){195, 160, 81, 255});  // Define um fundo claro para o lobby
@@ -146,20 +149,35 @@ void drawLobby() {
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
     DrawText(TextFormat("Dinheiro: %d", playerMoney), 10, 40, 20, BLACK);
 
-    // Exibe a mensagem de erro se ela estiver ativa e aguarda 5 segundos
+    // Verifica se o jogador ainda está próximo ao mercador para decidir sobre a mensagem de erro
+    if (!isPlayerNearMerchant() && showErrorMessage) {
+        showErrorMessage = false;  // Desativa a mensagem se o jogador se afastar do mercador
+        isInteractingWithMerchant = 0;
+    } else if (showErrorMessage && (GetTime() - errorMessageTimer >= MESSAGE_DURATION)) {
+        showErrorMessage = false;  // Desativa a mensagem após o tempo limite
+        isInteractingWithMerchant = 0;
+    }
+
+    // Exibe a mensagem de erro se ela estiver ativa
     if (showErrorMessage) {
-        DrawDialogBox(errorMessage, 100, 500, 600, 120, WHITE, RED, false);
-        if (GetTime() - errorMessageTimer >= ERROR_MESSAGE_DURATION) {
-            showErrorMessage = false;  // Desativa a exibição da mensagem de erro após 5 segundos
-            isInteractingWithMerchant = 0;  // Reseta a interação para permitir novas opções
+        DrawDialogBox(errorMessage, 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+        return;
+    }
+
+    // Exibe a mensagem de agradecimento temporizada após a venda
+    if (showThankYouMessage) {
+        DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+        if (GetTime() - errorMessageTimer >= MESSAGE_DURATION) {
+            showThankYouMessage = false;
+            isInteractingWithMerchant = 0;
         }
-        return;  // Sai da função para manter a mensagem de erro na tela
+        return;
     }
 
     // Verifica se o jogador está próximo do mercador e exibe a interação
     if (isPlayerNearMerchant()) {
         if (!isInteractingWithMerchant) {
-            DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1] para vender especiarias\n[2] para comprar uma bolsa nova", 100, 500, 800, 120, WHITE, BLACK, false);
+            DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1] para vender especiarias\n[2] para comprar uma bolsa nova", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
             if (IsKeyPressed(KEY_ONE)) {
                 isInteractingWithMerchant = 1;  // Opção de venda
             } else if (IsKeyPressed(KEY_TWO)) {
@@ -171,24 +189,24 @@ void drawLobby() {
                 if (itemsCollected > 0) {
                     playerMoney += itemsCollected * 300;
                     itemsCollected = 0;
-                    DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 500, 800, 120, WHITE, BLACK, false);
-                    if (IsKeyPressed(KEY_ENTER)) isInteractingWithMerchant = 0;
+                    showThankYouMessage = true; // Ativa a mensagem de agradecimento
+                    errorMessageTimer = GetTime(); // Inicia o temporizador para a mensagem de agradecimento
                 } else {
                     errorMessage = "Saia daqui, você não tem nenhuma especiaria para negociar!";
                     showErrorMessage = true;
                     errorMessageTimer = GetTime();
                 }
             } else if (isInteractingWithMerchant == 2) {
-                DrawDialogBox("Qual delas deseja comprar?\n\n[1] Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000", 100, 500, 800, 150, WHITE, BLACK, false);
+                DrawDialogBox("Qual delas deseja comprar?\n\n[1] Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
 
                 if (IsKeyPressed(KEY_ONE)) {
                     if (playerMoney >= 5000) {
                         MAX_ESPECIARIAS = 12;
                         playerMoney -= 5000;
-                        DrawDialogBox("Bolsa média adquirida!", 100, 500, 800, 120, WHITE, BLACK, false);
+                        DrawDialogBox("Bolsa média adquirida!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
                         if (IsKeyPressed(KEY_ENTER)) isInteractingWithMerchant = 0;
                     } else {
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra. Busque mais especiarias e vamos negociar...";
+                        errorMessage = "Você não tem dinheiro suficiente para essa compra.\nBusque mais especiarias e vamos negociar...";
                         showErrorMessage = true;
                         errorMessageTimer = GetTime();
                     }
@@ -196,10 +214,10 @@ void drawLobby() {
                     if (playerMoney >= 10000) {
                         MAX_ESPECIARIAS = 24;
                         playerMoney -= 10000;
-                        DrawDialogBox("Bolsa grande adquirida!", 100, 500, 800, 120, WHITE, BLACK, false);
+                        DrawDialogBox("Bolsa grande adquirida!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
                         if (IsKeyPressed(KEY_ENTER)) isInteractingWithMerchant = 0;
                     } else {
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra. Busque mais especiarias e vamos negociar...";
+                        errorMessage = "Você não tem dinheiro suficiente para essa compra.\nBusque mais especiarias e vamos negociar...";
                         showErrorMessage = true;
                         errorMessageTimer = GetTime();
                     }
@@ -207,7 +225,7 @@ void drawLobby() {
                     if (playerMoney >= 15000) {
                         MAX_ESPECIARIAS = 32;
                         playerMoney -= 15000;
-                        DrawDialogBox("Bolsa super adquirida!", 100, 500, 800, 120, WHITE, BLACK, false);
+                        DrawDialogBox("Bolsa super adquirida!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
                         if (IsKeyPressed(KEY_ENTER)) isInteractingWithMerchant = 0;
                     } else {
                         errorMessage = "Você não tem dinheiro suficiente para essa compra.\nBusque mais especiarias e vamos negociar...";
@@ -218,7 +236,7 @@ void drawLobby() {
             }
         }
     } else if (mensagem != NULL) {
-        DrawDialogBox(mensagem, 100, 500, 600, 120, WHITE, BLACK, true);
+        DrawDialogBox(mensagem, 70, 600, 400, 80, WHITE, BLACK, true);
     } else {
         isInteractingWithMerchant = 0;
     }
