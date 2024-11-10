@@ -8,6 +8,8 @@
 int playerMoney = 0;  // Definição
 Texture2D personagem;
 Texture2D environment;
+int teveUnload = 0;
+
 
 // Arrays para armazenar as imagens de carregamento
 Texture2D loadingImagesMap0[4];
@@ -330,20 +332,26 @@ void playGame(GameScreen *currentScreen) {
     BeginDrawing();
     EndDrawing();
 
+    teveUnload=1;
+
+    Sound musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
+    Sound musicaMapa1 = LoadSound("static/music/mapa1musica.wav");
+    Sound musicaMapa2 = LoadSound("static/music/mapa2musica.wav");
+
     spellCastSound = LoadSound("static/music/spellcast.mp3");
     PlaySound(spellCastSound);
     sleep(2);
 
     if (mapaAtual == 0) {
-        Sound musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
+        
         PlaySound(musicaMapa0);
         showLoadingScreen(loadingImagesMap0);
     } else if (mapaAtual == 1) {
-        Sound musicaMapa1 = LoadSound("static/music/mapa1musica.wav");
+
         PlaySound(musicaMapa1);
         showLoadingScreen(loadingImagesMap1);
     } else if (mapaAtual == 2) {
-        Sound musicaMapa2 = LoadSound("static/music/mapa2musica.wav");
+
         PlaySound(musicaMapa2);
         showLoadingScreen(loadingImagesMap2);
     }
@@ -420,6 +428,11 @@ void playGame(GameScreen *currentScreen) {
 
                 zerarMonetaria();
 
+                teveUnload = 0;
+                UnloadSound(musicaMapa0);
+                UnloadSound(musicaMapa1);
+                UnloadSound(musicaMapa2);
+
                 PlaySound(gameOverSound);
 
                 sleep(1);
@@ -466,6 +479,13 @@ void playGame(GameScreen *currentScreen) {
         drawGame();
         EndDrawing();
     }
+
+    if(teveUnload != 0){
+        UnloadSound(musicaMapa0);
+        UnloadSound(musicaMapa1);
+        UnloadSound(musicaMapa2);
+    }
+    
 }
 
 
