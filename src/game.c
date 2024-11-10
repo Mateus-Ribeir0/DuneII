@@ -109,10 +109,7 @@ void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;
 
-    // Ajuste a posição e tamanho de acordo com o `environment`
-    Rectangle hitboxDuna = {5 * TILE_SIZE, 5 * TILE_SIZE, 96, 96};
-    Rectangle hitboxPersonagem = {new_x * TILE_SIZE, new_y * TILE_SIZE, 32, 64};  // Posição futura do jogador em pixels
-
+    
     // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool emLobby = (mapaAtual == -1);  // -1 indica que está no lobby
@@ -140,20 +137,17 @@ void movePlayer(int dx, int dy) {
         }
 
         // Verifica colisão com o mercador no lobby
-        if (emLobby && new_x == MERCHANT_X && new_y == MERCHANT_Y) {
+        if (emLobby && ((new_x == MERCHANT_X && new_y == MERCHANT_Y) || 
+                        (new_x == MERCHANT_X_LEFT && new_y == MERCHANT_Y))) {
             return;
         }
 
-        // Verifica colisão com o `environment`
-        if (CheckCollisionRecs(hitboxPersonagem, hitboxDuna)) {
-            return;  // Impede o movimento ao colidir com o environment
-        }
-
-        // Se todas as verificações passarem, atualiza a posição do jogador
+        // Atualiza a posição do jogador
         player_x = new_x;
         player_y = new_y;
     }
 }
+
 
 // Verifica a coleta de itens
 void checkItemCollection() {

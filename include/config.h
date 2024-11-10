@@ -17,8 +17,9 @@ typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
 #define SCREEN_HEIGHT 704
 
 // Definição da posição do mercador
-#define MERCHANT_X 5
-#define MERCHANT_Y 5
+#define MERCHANT_X 2
+#define MERCHANT_Y 2
+#define MERCHANT_X_LEFT (MERCHANT_X - 1)
 
 // Capacidades e preços das bolsas
 #define BOLSA_CAPACIDADE_PEQUENA 6
