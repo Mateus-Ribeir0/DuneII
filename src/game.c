@@ -284,6 +284,7 @@ void drawGame() {
 
     // Desenha o HUD do jogo
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
+    DrawText(TextFormat("Dinheiro: %d", playerMoney), 10, 40, 20, BLACK);  // Exibe o dinheiro do jogador
     DrawText(TextFormat("Nível de Água: %.0f%%", playerWater), 10, 60, 20, BLUE);
 
     // Desenha o portal de retorno ao lobby
