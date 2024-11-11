@@ -121,25 +121,31 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
 
 
 void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool isPortalDialog) {
-    // Ajusta a largura para 600 quando a caixa é para um portal; caso contrário, mantém 800
+    // Ajusta a largura para 400 quando a caixa é para um portal; caso contrário, mantém 600
     if (isPortalDialog) {
-        width = 400;
+        width = 420;
     } else {
         width = 600;
     }
 
     DrawRectangleRounded((Rectangle){ posX, posY, width, height }, 0.1f, 16, boxColor);
-    
+
     static int frameCount = 0;
     static int charactersToShow = 0;
 
-    // Verifica se a tecla de espaço foi pressionada
-    if (IsKeyPressed(KEY_SPACE)) {
-        charactersToShow = strlen(text);  // Mostra o texto completo
-    } else if (charactersToShow < strlen(text)) {
-        frameCount++;
-        charactersToShow = frameCount / 5;  // Velocidade do texto
-        if (charactersToShow > strlen(text)) charactersToShow = strlen(text);
+    // Verifica se o diálogo é de um portal
+    if (isPortalDialog) {
+        // Exibe o texto completo imediatamente
+        charactersToShow = strlen(text);
+    } else {
+        // Controle de exibição gradual para outros diálogos
+        if (IsKeyPressed(KEY_SPACE)) {
+            charactersToShow = strlen(text);  // Mostra o texto completo
+        } else if (charactersToShow < strlen(text)) {
+            frameCount++;
+            charactersToShow = frameCount / 5;  // Velocidade do texto
+            if (charactersToShow > strlen(text)) charactersToShow = strlen(text);
+        }
     }
 
     // Calcular o máximo de caracteres que cabem na caixa
