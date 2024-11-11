@@ -70,5 +70,14 @@ extern double lastWaterUpdateTime;
 #define MAP2_WATER_LOSS_INTERVAL 15.0
 #define MAP3_WATER_LOSS_INTERVAL 10.0
 
+// Capacidades e preços das garrafas de água
+#define GARRAFA_PEQUENA_CAPACIDADE 10  // Restaura 10% de água
+#define GARRAFA_MEDIA_CAPACIDADE 20    // Restaura 20% de água
+#define GARRAFA_GRANDE_CAPACIDADE 30   // Restaura 30% de água
+
+#define PRECO_GARRAFA_PEQUENA 3000
+#define PRECO_GARRAFA_MEDIA 5000
+#define PRECO_GARRAFA_GRANDE 7000
+
 
 #endif

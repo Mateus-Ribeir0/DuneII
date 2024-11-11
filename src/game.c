@@ -323,7 +323,9 @@ void resetarJogo() {
     limparHistoricoPassos();
     custom_srand(1322);
     inicializarEspeciaria();
+    playerWater = 100.0;  // Restaura o nível de água para 100%
 }
+
 
 void zerarMonetaria() {
     itemsCollected = 0;
