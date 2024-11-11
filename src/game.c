@@ -241,7 +241,7 @@ void drawGame() {
         }
     }
 
-    // Carrega a textura do ambiente
+    // Carrega a textura do ambiente e desenha dunas, personagem, e itens coletáveis
     environment = LoadTexture("static/image/environment.png");
     Rectangle hitboxDuna = {96, 96, 96, 96};
 
@@ -265,14 +265,6 @@ void drawGame() {
 
     // Desenha o personagem
     personagem = LoadTexture("static/image/spritesheet-character.png");
-
-    // Atualiza o quadro de animação do personagem com base no tempo
-    tempoAnimacao += GetFrameTime();
-    if (tempoAnimacao >= duracaoFrame) {
-        frameAtual = (frameAtual + 1) % 2;
-        tempoAnimacao = 0;
-    }
-
     Rectangle sourceRec = { frameAtual * 32, 0, 32, 64 };
     Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
     DrawTextureRec(personagem, sourceRec, position, WHITE);
@@ -282,10 +274,20 @@ void drawGame() {
         DrawCircle(items[0].position.x * TILE_SIZE + TILE_SIZE / 2, items[0].position.y * TILE_SIZE + TILE_SIZE / 4, TILE_SIZE / 4, GOLD);
     }
 
-    // Desenha o HUD do jogo
-    DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
-    DrawText(TextFormat("Dinheiro: %d", playerMoney), 10, 40, 20, BLACK);  // Exibe o dinheiro do jogador
-    DrawText(TextFormat("Nível de Água: %.0f%%", playerWater), 10, 60, 20, BLUE);
+    // Desenha o HUD do jogo no canto direito da tela
+    int infoBoxX = SCREEN_WIDTH - 230;
+    int infoBoxY = 10;
+    int infoBoxWidth = 220;
+    int infoBoxHeight = 100;
+
+    // Desenha a caixa de informações
+    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){169, 169, 169, 255});
+    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){105, 105, 105, 255});
+
+    // Exibe as informações de especiarias, dinheiro e nível de água
+    DrawText(TextFormat("Especiarias: %d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 10, infoBoxY + 10, 18, WHITE);
+    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 10, infoBoxY + 40, 18, WHITE);
+    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 10, infoBoxY + 70, 18, WHITE);
 
     // Desenha o portal de retorno ao lobby
     DrawRectangle(PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE,

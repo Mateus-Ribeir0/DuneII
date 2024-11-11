@@ -192,26 +192,32 @@ void drawLobby() {
     // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby com 3x3 tiles (96x96 pixels)
     Texture2D portal = LoadTexture("static/image/portal.png");
 
-    // Define o recorte na sprite sheet: começa em (0, 0) e tem tamanho 96x96
-    Rectangle portalSourceRec = { 0, 0, 32, 32};
-
-    // Define a área de destino onde o portal será desenhado, com escala de 3.0
+    Rectangle portalSourceRec = { 0, 0, 32, 32 };
     Rectangle portalDestRec1 = { PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 32 * 3, 32 * 3 };
     Rectangle portalDestRec2 = { PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 32 * 3, 32 * 3 };
     Rectangle portalDestRec3 = { PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 32 * 3, 32 * 3 };
-
-    // Ponto de origem (pivot) para a rotação, definindo como o canto superior esquerdo
     Vector2 origin = { 0, 0 };
 
-    // Desenha o portal recortado e escalado em 3.0 nas posições dos portais no mapa do lobby
     DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);
 
-    // Atualiza e exibe informações da bolsa e status do jogador
-    DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
-    DrawText(TextFormat("Dinheiro: %d", playerMoney), 10, 40, 20, BLACK);
-    DrawText(TextFormat("Nível de Água: %.0f%%", playerWater), 10, 70, 20, BLUE);
+    // Define a área de informações à direita da tela
+    int infoBoxX = SCREEN_WIDTH - 230;
+    int infoBoxY = 10;
+    int infoBoxWidth = 220;
+    int infoBoxHeight = 100;
+
+    // Desenha o fundo e a borda arredondada para a caixa de informações
+    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){169, 169, 169, 255}); // Fundo cinza claro
+    // Corrigindo a linha para desenhar a borda arredondada com os parâmetros corretos
+    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){105, 105, 105, 255});
+
+
+    // Exibe as informações de especiarias, dinheiro e nível de água dentro da caixa de informações
+    DrawText(TextFormat("Especiarias: %d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 10, infoBoxY + 10, 18, WHITE);
+    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 10, infoBoxY + 40, 18, WHITE);
+    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 10, infoBoxY + 70, 18, WHITE);
 
     // Verifica interações com o mercador e exibe diálogos/mensagens
     if (!isPlayerNearMerchant() && showErrorMessage) {
@@ -330,8 +336,6 @@ void drawLobby() {
         isInteractingWithMerchant = 0;
     }
 }
-
-
 
 
 
