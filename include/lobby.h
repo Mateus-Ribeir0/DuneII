@@ -8,5 +8,7 @@
 void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized);
 void desenharLobbyDetalhado();
 void drawLobby();
+// Declaração de isPlayerOnPortal com o parâmetro extra mapaAtual
+bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual);
 
 #endif

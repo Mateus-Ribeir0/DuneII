@@ -1,4 +1,5 @@
 #include "game.h"
+#include "lobby.h"
 
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
@@ -185,6 +186,11 @@ void movePlayer(int dx, int dy) {
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool colidiuComDuna = false;
 
+        // Verifica colisão com os portais no lobby e nos mapas
+        if (isPlayerOnPortal(new_x, new_y, mapaAtual)) {
+            return; // Bloqueia a movimentação se houver colisão com um portal
+        }
+
         // Verifica colisão com dunas dependendo do mapa atual
         if (mapaAtual == 0) {
             for (int i = 0; i < DUNAS_MAPA1; i++) {
@@ -212,13 +218,14 @@ void movePlayer(int dx, int dy) {
             }
         }
 
-        // Se não houver colisão com uma duna, movimenta o jogador
+        // Se não houver colisão com uma duna ou portal, movimenta o jogador
         if (!colidiuComDuna) {
             player_x = new_x;
             player_y = new_y;
         }
     }
 }
+
 
 
 

@@ -1,3 +1,4 @@
+
 #include "game.h"  // Inclui a declaração de funções de game.c
 #include "lobby.h"
 #include "game.h"  // Inclui a declaração de funções de game.c
@@ -21,6 +22,35 @@ int isPlayerNearMerchant() {
             (player_x == MERCHANT_X_LEFT && (player_y == MERCHANT_Y - 1 || player_y == MERCHANT_Y + 1)) ||
             (player_y == MERCHANT_Y && (player_x == MERCHANT_X_LEFT - 1 || player_x == MERCHANT_X_LEFT + 1));
 }
+
+// Função para verificar se o jogador está na posição de um portal, tanto no lobby quanto nos mapas
+bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
+    if (mapaAtual == -1) { // No lobby
+        // Verifica o portal do mapa 1
+        if (new_x >= PORTAL_LOBBY_MAPA1_X && new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
+            new_y >= PORTAL_LOBBY_MAPA1_Y && new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) {
+            return true;
+        }
+        // Verifica o portal do mapa 2
+        if (new_x >= PORTAL_LOBBY_MAPA2_X && new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
+            new_y >= PORTAL_LOBBY_MAPA2_Y && new_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) {
+            return true;
+        }
+        // Verifica o portal do mapa 3
+        if (new_x >= PORTAL_LOBBY_MAPA3_X && new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
+            new_y >= PORTAL_LOBBY_MAPA3_Y && new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA) {
+            return true;
+        }
+    } else { // Nos mapas, verifica o portal de retorno ao lobby
+        if (new_x >= PORTAL_RETORNO_X && new_x < PORTAL_RETORNO_X + PORTAL_RETORNO_LARGURA &&
+            new_y >= PORTAL_RETORNO_Y && new_y < PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 
 void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     mapaAtual = -1;  // Identifica que o jogador está no lobby
