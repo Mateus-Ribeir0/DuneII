@@ -50,7 +50,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x <= PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
          player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y <= PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA)) {
         
-        mensagem = "Você deseja ir para o mapa 1?\nPressione [P]";
+        mensagem = "Você deseja viajar para o Zamirat?\nPressione [P]\n\nDificuldade: ***";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -62,7 +62,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x <= PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
               player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y <= PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA)) {
         
-        mensagem = "Você deseja ir para o mapa 2?\nPressione [P]";
+        mensagem = "Você deseja viajar para o Bashir'har?\nPressione [P]\n\nDificuldade: ****";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -74,7 +74,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x <= PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
               player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y <= PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA)) {
         
-        mensagem = "Você deseja ir para o mapa 3?\nPressione [P]";
+        mensagem = "Você deseja viajar para o Qasr'Rahim?\nPressione [P]\n\nDificuldade: *****";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -271,7 +271,7 @@ void drawLobby() {
             }
         }
     } else if (mensagem != NULL) {
-        DrawDialogBox(mensagem, 70, 600, 400, 80, WHITE, BLACK, true);
+        DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, true);
     } else {
         isInteractingWithMerchant = 0;
     }
