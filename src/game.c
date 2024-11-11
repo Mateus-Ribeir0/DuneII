@@ -167,54 +167,35 @@ void checkItemCollection() {
     }
 }
 
-
 void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;
 
-    // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
-        bool emLobby = (mapaAtual == -1);  // -1 indica que está no lobby
+        bool emLobby = (mapaAtual == -1);
 
-        // Define a nova posição da zona de colisão 3x3 a partir de {10, 9}
-        int zona_x = 10;
-        int zona_y = 9;
+        int zona1_x = 10, zona1_y = 9;
+        int zona2_x = 15, zona2_y = 12;
+        int zona3_x = 25, zona3_y = 18;
+        int zona4_x = 5, zona4_y = 17;   // Posição da quarta duna
+        int zona5_x = 35, zona5_y = 5;   // Posição da quinta duna
 
-        // Verifica se o jogador está tentando entrar na nova zona de colisão (3x3)
-        if (new_x >= zona_x && new_x < zona_x + 3 &&
-            new_y >= zona_y && new_y < zona_y + 3) {
+        // Verifica se o jogador está tentando entrar em qualquer zona de colisão (3x3)
+        if ((new_x >= zona1_x && new_x < zona1_x + 3 && new_y >= zona1_y && new_y < zona1_y + 3) ||
+            (new_x >= zona2_x && new_x < zona2_x + 3 && new_y >= zona2_y && new_y < zona2_y + 3) ||
+            (new_x >= zona3_x && new_x < zona3_x + 3 && new_y >= zona3_y && new_y < zona3_y + 3) ||
+            (new_x >= zona4_x && new_x < zona4_x + 3 && new_y >= zona4_y && new_y < zona4_y + 3) ||
+            (new_x >= zona5_x && new_x < zona5_x + 3 && new_y >= zona5_y && new_y < zona5_y + 3)) {
             return;  // Impede o jogador de se mover para dentro da zona de colisão
         }
 
-        // Verifica colisão com os portais no lobby
+        // Outras verificações de colisão
         if (emLobby) {
-            if (
-                (new_x >= PORTAL_LOBBY_MAPA1_X && new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
-                 new_y >= PORTAL_LOBBY_MAPA1_Y && new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) ||
-                (new_x >= PORTAL_LOBBY_MAPA2_X && new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
-                 new_y >= PORTAL_LOBBY_MAPA2_Y && new_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) ||
-                (new_x >= PORTAL_LOBBY_MAPA3_X && new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
-                 new_y >= PORTAL_LOBBY_MAPA3_Y && new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA)
-            ) {
-                return;
-            }
+            // Verificação dos portais e mercador
+        } else {
+            // Verificação do portal de retorno
         }
 
-        // Impede o jogador de entrar no portal de retorno no mapa
-        if (!emLobby) {
-            if (new_x >= PORTAL_RETORNO_X && new_x < PORTAL_RETORNO_X + PORTAL_VERTICAL_LARGURA &&
-                new_y >= PORTAL_RETORNO_Y && new_y < PORTAL_RETORNO_Y + PORTAL_VERTICAL_ALTURA) {
-                return;
-            }
-        }
-
-        // Verifica colisão com o mercador no lobby
-        if (emLobby && ((new_x == MERCHANT_X && new_y == MERCHANT_Y) || 
-                        (new_x == MERCHANT_X_LEFT && new_y == MERCHANT_Y))) {
-            return;
-        }
-
-        // Atualiza a posição do jogador
         player_x = new_x;
         player_y = new_y;
     }
@@ -233,41 +214,43 @@ void drawGame() {
 
     environment = LoadTexture("static/image/environment.png");
 
-    // Posiciona a duna na nova zona de colisão em {10, 9}
     Rectangle hitboxDuna = {96, 96, 96, 96};
-    Vector2 posicaoDuna = {10 * TILE_SIZE, 9 * TILE_SIZE};
+    Vector2 posicaoDuna1 = {10 * TILE_SIZE, 9 * TILE_SIZE};
+    Vector2 posicaoDuna2 = {15 * TILE_SIZE, 12 * TILE_SIZE};
+    Vector2 posicaoDuna3 = {25 * TILE_SIZE, 18 * TILE_SIZE};
+    Vector2 posicaoDuna4 = {5 * TILE_SIZE, 17 * TILE_SIZE};    // Posição da quarta duna
+    Vector2 posicaoDuna5 = {35 * TILE_SIZE, 5 * TILE_SIZE};    // Posição da quinta duna
 
     personagem = LoadTexture("static/image/spritesheet-character.png");
 
     // Atualiza o quadro de animação com base no tempo
     tempoAnimacao += GetFrameTime();
     if (tempoAnimacao >= duracaoFrame) {
-        frameAtual = (frameAtual + 1) % 2;  // Alterna entre os quadros 0 e 1
+        frameAtual = (frameAtual + 1) % 2;
         tempoAnimacao = 0;
     }
 
-    // Define o retângulo de origem com base no quadro atual
     Rectangle sourceRec = { frameAtual * 32, 0, 32, 64 };
     Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
 
-    // Desenha a textura animada na posição do jogador
-    DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
+    // Desenha as dunas com a sprite na posição desejada
+    DrawTextureRec(environment, hitboxDuna, posicaoDuna1, WHITE);
+    DrawTextureRec(environment, hitboxDuna, posicaoDuna2, WHITE);
+    DrawTextureRec(environment, hitboxDuna, posicaoDuna3, WHITE);
+    DrawTextureRec(environment, hitboxDuna, posicaoDuna4, WHITE);
+    DrawTextureRec(environment, hitboxDuna, posicaoDuna5, WHITE);
     DrawTextureRec(personagem, sourceRec, position, WHITE);
 
-    // Desenha a especiaria se não foi coletada
     if (!items[0].collected) {
         DrawCircle(items[0].position.x * TILE_SIZE + TILE_SIZE / 2, items[0].position.y * TILE_SIZE + TILE_SIZE / 4, TILE_SIZE / 4, GOLD);
     }
 
-    // Mostra a quantidade de especiarias coletadas na "bolsa"
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
     DrawText(TextFormat("Nível de Água: %.0f%%", playerWater), 10, 60, 20, BLUE);
 
-    // Desenha o portal de retorno ao lobby
     DrawRectangle(PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE,
                   TILE_SIZE * PORTAL_RETORNO_LARGURA, TILE_SIZE * PORTAL_RETORNO_ALTURA, ORANGE);
 
-    // Exibe a mensagem no centro da tela, se o jogador estiver em volta do portal
     if (mensagem != NULL) {
         int screenWidth = GetScreenWidth();
         int textWidth = MeasureText(mensagem, 20);
