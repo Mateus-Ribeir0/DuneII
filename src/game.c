@@ -168,8 +168,6 @@ void checkItemCollection() {
 }
 
 
-
-// Função para mover o jogador
 void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;
@@ -177,6 +175,16 @@ void movePlayer(int dx, int dy) {
     // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool emLobby = (mapaAtual == -1);  // -1 indica que está no lobby
+
+        // Define a nova posição da zona de colisão 3x3 a partir de {10, 9}
+        int zona_x = 10;
+        int zona_y = 9;
+
+        // Verifica se o jogador está tentando entrar na nova zona de colisão (3x3)
+        if (new_x >= zona_x && new_x < zona_x + 3 &&
+            new_y >= zona_y && new_y < zona_y + 3) {
+            return;  // Impede o jogador de se mover para dentro da zona de colisão
+        }
 
         // Verifica colisão com os portais no lobby
         if (emLobby) {
@@ -212,7 +220,8 @@ void movePlayer(int dx, int dy) {
     }
 }
 
-// Função de desenho do jogo
+
+
 void drawGame() {
     ClearBackground(RAYWHITE);
 
@@ -224,8 +233,9 @@ void drawGame() {
 
     environment = LoadTexture("static/image/environment.png");
 
+    // Posiciona a duna na nova zona de colisão em {10, 9}
     Rectangle hitboxDuna = {96, 96, 96, 96};
-    Vector2 posicaoDuna = {20, 20};
+    Vector2 posicaoDuna = {10 * TILE_SIZE, 9 * TILE_SIZE};
 
     personagem = LoadTexture("static/image/spritesheet-character.png");
 
@@ -265,7 +275,7 @@ void drawGame() {
         DrawText(mensagem, xPosition, GetScreenHeight() / 2, 20, BLACK);
     }
 }
-// ... (restante do código, como no exemplo anterior, mantendo as funções playGame e resetarJogo conforme sua lógica e estrutura)
+
 
 
 // Contador de ocorrências consecutivas
