@@ -60,4 +60,15 @@ extern int playerMoney;
 extern const char* mensagem;
 extern int MAX_ESPECIARIAS; // Capacidade atual da bolsa, que começará com a bolsa pequena
 
+// Variáveis globais para controle de água
+extern float playerWater;
+extern double lastWaterUpdateTime;
+
+// Taxas de perda de água por mapa em segundos
+#define LOBBY_WATER_LOSS_INTERVAL 30.0
+#define MAP1_WATER_LOSS_INTERVAL 20.0
+#define MAP2_WATER_LOSS_INTERVAL 15.0
+#define MAP3_WATER_LOSS_INTERVAL 10.0
+
+
 #endif

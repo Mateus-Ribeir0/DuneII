@@ -1,4 +1,9 @@
+
 #include "lobby.h"
+#include "game.h"  // Inclui a declaração de funções de game.c
+
+void updateWaterLevel(GameScreen *currentScreen);
+void resetarJogo();
 
 int MAX_ESPECIARIAS = BOLSA_CAPACIDADE_PEQUENA;
 Texture2D vendinha;
@@ -19,6 +24,17 @@ int isPlayerNearMerchant() {
 void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     mapaAtual = -1;  // Identifica que o jogador está no lobby
     int dx = 0, dy = 0;
+
+    // Atualiza o nível de água no lobby
+    updateWaterLevel(currentScreen);
+
+    // Verifica se o jogador ficou sem água e redireciona para o ranking
+    if (playerWater <= 0.0) {
+        *currentScreen = RANKINGS;
+        resetarJogo();
+        return;
+    }
+
     if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) dx = 1;
     if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) dx = -1;
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) dy = -1;
@@ -148,6 +164,7 @@ void drawLobby() {
     // Mostra a quantidade de especiarias coletadas no lobby
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
     DrawText(TextFormat("Dinheiro: %d", playerMoney), 10, 40, 20, BLACK);
+    DrawText(TextFormat("Nível de Água: %.0f%%", playerWater), 10, 60, 20, BLUE);
 
     // Verifica se o jogador ainda está próximo ao mercador para decidir sobre a mensagem de erro
     if (!isPlayerNearMerchant() && showErrorMessage) {

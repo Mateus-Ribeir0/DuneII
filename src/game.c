@@ -114,6 +114,31 @@ void inicializarEspeciaria() {
     }
 }
 
+void updateWaterLevel(GameScreen *currentScreen) {
+    double currentTime = GetTime();
+    double interval = LOBBY_WATER_LOSS_INTERVAL;
+
+    if (mapaAtual == 0) {
+        interval = MAP1_WATER_LOSS_INTERVAL;
+    } else if (mapaAtual == 1) {
+        interval = MAP2_WATER_LOSS_INTERVAL;
+    } else if (mapaAtual == 2) {
+        interval = MAP3_WATER_LOSS_INTERVAL;
+    }
+
+    if (currentTime - lastWaterUpdateTime >= interval) {
+        playerWater -= 1.0;
+        lastWaterUpdateTime = currentTime;
+
+        if (playerWater <= 0.0) {
+            playerWater = 0.0;
+            *currentScreen = RANKINGS;
+        }
+    }
+}
+
+
+
 // Lógica de coleta de especiarias, com atualização para a próxima posição após a coleta
 void checkItemCollection() {
     if (!items[0].collected && items[0].position.x == player_x && items[0].position.y == player_y) {
@@ -226,6 +251,7 @@ void drawGame() {
 
     // Mostra a quantidade de especiarias coletadas na "bolsa"
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
+    DrawText(TextFormat("Nível de Água: %.0f%%", playerWater), 10, 60, 20, BLUE);
 
     // Desenha o portal de retorno ao lobby
     DrawRectangle(PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE,
@@ -360,6 +386,15 @@ void playGame(GameScreen *currentScreen) {
         int dx = 0, dy = 0;
         char movimento = '\0';
 
+        // Atualiza o nível de água de acordo com o mapa atual
+        updateWaterLevel(currentScreen);
+
+        if (playerWater <= 0.0) {
+            *currentScreen = RANKINGS;
+            resetarJogo();
+            break;
+        }
+
         if (IsKeyPressed(KEY_W)) { dy = -1; movimento = 'w'; }
         if (IsKeyPressed(KEY_S)) { dy = 1; movimento = 's'; }
         if (IsKeyPressed(KEY_A)) { dx = -1; movimento = 'a'; }
@@ -376,15 +411,13 @@ void playGame(GameScreen *currentScreen) {
         if (pertoDoPortal && IsKeyPressed(KEY_P)) {
             player_x = MAPA_LARGURA / 2;
             player_y = MAPA_ALTURA / 2;
-            if(mapaAtual==0){
+            if(mapaAtual == 0) {
                 UnloadSound(musicaMapa0);
                 teveUnload = 0;
-            }
-            else if(mapaAtual==1){
+            } else if(mapaAtual == 1) {
                 UnloadSound(musicaMapa1);
                 teveUnload = 0;
-            }
-            else if(mapaAtual==2){
+            } else if(mapaAtual == 2) {
                 UnloadSound(musicaMapa2);
                 teveUnload = 0;
             }
@@ -393,7 +426,7 @@ void playGame(GameScreen *currentScreen) {
             PlaySound(spellCastSound);
 
             sleep(2);
-            
+
             showLoadingScreen(loadingImagesLobby);
             *currentScreen = LOBBY;
             mapaAtual = -1;
