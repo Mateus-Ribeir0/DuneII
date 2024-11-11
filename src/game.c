@@ -167,63 +167,99 @@ void checkItemCollection() {
     }
 }
 
+#define DUNAS_MAPA1 5
+#define DUNAS_MAPA2 7
+#define DUNAS_MAPA3 10
+
+// Array para posições das dunas em cada mapa
+Point posicoesDunasMapa1[DUNAS_MAPA1] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5} };
+Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {20, 10}, {12, 14} };
+Point posicoesDunasMapa3[DUNAS_MAPA3] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {20, 10}, {12, 14}, {28, 6}, {7, 19}, {17, 3} };
+
+
 void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;
 
+    // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
-        bool emLobby = (mapaAtual == -1);
+        bool colidiuComDuna = false;
 
-        int zona1_x = 10, zona1_y = 9;
-        int zona2_x = 15, zona2_y = 12;
-        int zona3_x = 25, zona3_y = 18;
-        int zona4_x = 5, zona4_y = 17;   // Posição da quarta duna
-        int zona5_x = 35, zona5_y = 5;   // Posição da quinta duna
-
-        // Verifica se o jogador está tentando entrar em qualquer zona de colisão (3x3)
-        if ((new_x >= zona1_x && new_x < zona1_x + 3 && new_y >= zona1_y && new_y < zona1_y + 3) ||
-            (new_x >= zona2_x && new_x < zona2_x + 3 && new_y >= zona2_y && new_y < zona2_y + 3) ||
-            (new_x >= zona3_x && new_x < zona3_x + 3 && new_y >= zona3_y && new_y < zona3_y + 3) ||
-            (new_x >= zona4_x && new_x < zona4_x + 3 && new_y >= zona4_y && new_y < zona4_y + 3) ||
-            (new_x >= zona5_x && new_x < zona5_x + 3 && new_y >= zona5_y && new_y < zona5_y + 3)) {
-            return;  // Impede o jogador de se mover para dentro da zona de colisão
+        // Verifica colisão com dunas dependendo do mapa atual
+        if (mapaAtual == 0) {
+            for (int i = 0; i < DUNAS_MAPA1; i++) {
+                if ((new_x >= posicoesDunasMapa1[i].x && new_x < posicoesDunasMapa1[i].x + 3) &&
+                    (new_y >= posicoesDunasMapa1[i].y && new_y < posicoesDunasMapa1[i].y + 2)) {
+                    colidiuComDuna = true;
+                    break;
+                }
+            }
+        } else if (mapaAtual == 1) {
+            for (int i = 0; i < DUNAS_MAPA2; i++) {
+                if ((new_x >= posicoesDunasMapa2[i].x && new_x < posicoesDunasMapa2[i].x + 3) &&
+                    (new_y >= posicoesDunasMapa2[i].y && new_y < posicoesDunasMapa2[i].y + 2)) {
+                    colidiuComDuna = true;
+                    break;
+                }
+            }
+        } else if (mapaAtual == 2) {
+            for (int i = 0; i < DUNAS_MAPA3; i++) {
+                if ((new_x >= posicoesDunasMapa3[i].x && new_x < posicoesDunasMapa3[i].x + 3) &&
+                    (new_y >= posicoesDunasMapa3[i].y && new_y < posicoesDunasMapa3[i].y + 2)) {
+                    colidiuComDuna = true;
+                    break;
+                }
+            }
         }
 
-        // Outras verificações de colisão
-        if (emLobby) {
-            // Verificação dos portais e mercador
-        } else {
-            // Verificação do portal de retorno
+        // Se não houver colisão com uma duna, movimenta o jogador
+        if (!colidiuComDuna) {
+            player_x = new_x;
+            player_y = new_y;
         }
-
-        player_x = new_x;
-        player_y = new_y;
     }
 }
+
+
 
 
 
 void drawGame() {
     ClearBackground(RAYWHITE);
 
+    // Desenha o mapa de fundo
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
             DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){195, 160, 81, 255});
         }
     }
 
+    // Carrega a textura do ambiente
     environment = LoadTexture("static/image/environment.png");
-
     Rectangle hitboxDuna = {96, 96, 96, 96};
-    Vector2 posicaoDuna1 = {10 * TILE_SIZE, 9 * TILE_SIZE};
-    Vector2 posicaoDuna2 = {15 * TILE_SIZE, 12 * TILE_SIZE};
-    Vector2 posicaoDuna3 = {25 * TILE_SIZE, 18 * TILE_SIZE};
-    Vector2 posicaoDuna4 = {5 * TILE_SIZE, 17 * TILE_SIZE};    // Posição da quarta duna
-    Vector2 posicaoDuna5 = {35 * TILE_SIZE, 5 * TILE_SIZE};    // Posição da quinta duna
 
+    // Desenha as dunas com base no mapa atual
+    if (mapaAtual == 0) {
+        for (int i = 0; i < DUNAS_MAPA1; i++) {
+            Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
+            DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
+        }
+    } else if (mapaAtual == 1) {
+        for (int i = 0; i < DUNAS_MAPA2; i++) {
+            Vector2 posicaoDuna = { posicoesDunasMapa2[i].x * TILE_SIZE, posicoesDunasMapa2[i].y * TILE_SIZE };
+            DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
+        }
+    } else if (mapaAtual == 2) {
+        for (int i = 0; i < DUNAS_MAPA3; i++) {
+            Vector2 posicaoDuna = { posicoesDunasMapa3[i].x * TILE_SIZE, posicoesDunasMapa3[i].y * TILE_SIZE };
+            DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
+        }
+    }
+
+    // Desenha o personagem
     personagem = LoadTexture("static/image/spritesheet-character.png");
 
-    // Atualiza o quadro de animação com base no tempo
+    // Atualiza o quadro de animação do personagem com base no tempo
     tempoAnimacao += GetFrameTime();
     if (tempoAnimacao >= duracaoFrame) {
         frameAtual = (frameAtual + 1) % 2;
@@ -232,25 +268,22 @@ void drawGame() {
 
     Rectangle sourceRec = { frameAtual * 32, 0, 32, 64 };
     Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
-
-    // Desenha as dunas com a sprite na posição desejada
-    DrawTextureRec(environment, hitboxDuna, posicaoDuna1, WHITE);
-    DrawTextureRec(environment, hitboxDuna, posicaoDuna2, WHITE);
-    DrawTextureRec(environment, hitboxDuna, posicaoDuna3, WHITE);
-    DrawTextureRec(environment, hitboxDuna, posicaoDuna4, WHITE);
-    DrawTextureRec(environment, hitboxDuna, posicaoDuna5, WHITE);
     DrawTextureRec(personagem, sourceRec, position, WHITE);
 
+    // Desenha o item se não estiver coletado
     if (!items[0].collected) {
         DrawCircle(items[0].position.x * TILE_SIZE + TILE_SIZE / 2, items[0].position.y * TILE_SIZE + TILE_SIZE / 4, TILE_SIZE / 4, GOLD);
     }
 
+    // Desenha o HUD do jogo
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
     DrawText(TextFormat("Nível de Água: %.0f%%", playerWater), 10, 60, 20, BLUE);
 
+    // Desenha o portal de retorno ao lobby
     DrawRectangle(PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE,
                   TILE_SIZE * PORTAL_RETORNO_LARGURA, TILE_SIZE * PORTAL_RETORNO_ALTURA, ORANGE);
 
+    // Desenha a mensagem centralizada, se existir
     if (mensagem != NULL) {
         int screenWidth = GetScreenWidth();
         int textWidth = MeasureText(mensagem, 20);
@@ -258,6 +291,7 @@ void drawGame() {
         DrawText(mensagem, xPosition, GetScreenHeight() / 2, 20, BLACK);
     }
 }
+
 
 
 
