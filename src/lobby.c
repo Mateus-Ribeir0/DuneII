@@ -167,31 +167,47 @@ const int heigthMercador = 140;
 void drawLobby() {
     ClearBackground((Color){195, 160, 81, 255});  // Define um fundo claro para o lobby
 
-    vendinha = LoadTexture("static/image/market_assets.png");
+    Texture2D vendinha = LoadTexture("static/image/market_assets.png");
 
     Rectangle hitboxVendinha = {96, 0, 90, 96};
     Vector2 posicaoVendinha = {20, 20};
 
+    // Desenha o fundo do lobby com tiles de areia
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
             DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){195, 160, 81, 255});
         }
     }
 
+    // Desenha a textura da vendinha
     DrawTextureRec(vendinha, hitboxVendinha, posicaoVendinha, WHITE);
     DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
 
-    DrawRectangle(PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE,
-                  TILE_SIZE * PORTAL_HORIZONTAL_LARGURA, TILE_SIZE * PORTAL_HORIZONTAL_ALTURA, ORANGE);
-    DrawRectangle(PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE,
-                  TILE_SIZE * PORTAL_VERTICAL_LARGURA, TILE_SIZE * PORTAL_VERTICAL_ALTURA, ORANGE);
-    DrawRectangle(PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE,
-                  TILE_SIZE * PORTAL_HORIZONTAL_LARGURA, TILE_SIZE * PORTAL_HORIZONTAL_ALTURA, ORANGE);
+    // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby com 3x3 tiles (96x96 pixels)
+    Texture2D portal = LoadTexture("static/image/portal.png");
 
+    // Define o recorte na sprite sheet: começa em (0, 0) e tem tamanho 96x96
+    Rectangle portalSourceRec = { 0, 0, 32, 32};
+
+    // Define a área de destino onde o portal será desenhado, com escala de 3.0
+    Rectangle portalDestRec1 = { PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 32 * 3, 32 * 3 };
+    Rectangle portalDestRec2 = { PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 32 * 3, 32 * 3 };
+    Rectangle portalDestRec3 = { PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 32 * 3, 32 * 3 };
+
+    // Ponto de origem (pivot) para a rotação, definindo como o canto superior esquerdo
+    Vector2 origin = { 0, 0 };
+
+    // Desenha o portal recortado e escalado em 3.0 nas posições dos portais no mapa do lobby
+    DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);
+    DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);
+    DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);
+
+    // Atualiza e exibe informações da bolsa e status do jogador
     DrawText(TextFormat("Especiarias na bolsa: %d/%d", itemsCollected, MAX_ESPECIARIAS), 10, 10, 20, BLACK);
     DrawText(TextFormat("Dinheiro: %d", playerMoney), 10, 40, 20, BLACK);
     DrawText(TextFormat("Nível de Água: %.0f%%", playerWater), 10, 70, 20, BLUE);
 
+    // Verifica interações com o mercador e exibe diálogos/mensagens
     if (!isPlayerNearMerchant() && showErrorMessage) {
         showErrorMessage = false;
         isInteractingWithMerchant = 0;
@@ -214,6 +230,7 @@ void drawLobby() {
         return;
     }
 
+    // Exibe mensagem de negociação com o mercador se o jogador estiver próximo
     if (isPlayerNearMerchant()) {
         if (!isInteractingWithMerchant) {
             DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1] para vender especiarias\n[2] para comprar uma bolsa nova\n[3] para comprar garrafa de água", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
@@ -225,6 +242,7 @@ void drawLobby() {
                 isInteractingWithMerchant = 3;  // Opção de compra de garrafa de água
             }
         } else {
+            // Lógica de interação com o mercador para venda de especiarias, compra de bolsa e garrafa de água
             if (isInteractingWithMerchant == 1) {
                 if (itemsCollected > 0) {
                     playerMoney += itemsCollected * 300;
@@ -306,6 +324,9 @@ void drawLobby() {
         isInteractingWithMerchant = 0;
     }
 }
+
+
+
 
 
 void desenharLobbyDetalhado() {
