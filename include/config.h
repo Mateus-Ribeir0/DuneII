@@ -39,11 +39,11 @@ typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME, OBJETIVO } Gam
 #define PORTAL_VERTICAL_ALTURA 4
 
 // Coordenadas para os três portais no lobby
-#define PORTAL_LOBBY_MAPA1_X 25
-#define PORTAL_LOBBY_MAPA1_Y 1
-#define PORTAL_LOBBY_MAPA2_X 34
+#define PORTAL_LOBBY_MAPA1_X 22
+#define PORTAL_LOBBY_MAPA1_Y 19
+#define PORTAL_LOBBY_MAPA2_X 28
 #define PORTAL_LOBBY_MAPA2_Y 19
-#define PORTAL_LOBBY_MAPA3_X 25
+#define PORTAL_LOBBY_MAPA3_X 34
 #define PORTAL_LOBBY_MAPA3_Y 19
 
 // Coordenadas para o portal de retorno ao lobby
