@@ -270,25 +270,24 @@ void drawGame() {
     Rectangle ruinasSourceRec = {0, 0, ruinasDeAreiaGrandes.width, ruinasDeAreiaGrandes.height}; // Recorte original da textura
     Rectangle ruinasDestRec = {20, 20, 256, 256}; // Destino com escala maior (256x256)
 
-    // Desenha ruinasDeAreia em tamanho maior
-    DrawTexturePro(ruinasDeAreiaGrandes, ruinasSourceRec, ruinasDestRec, origin, 0.0f, WHITE);
-    DrawTexture(ruinasDeAreiaPequenas, 20, 20, RAYWHITE);
 
     // Definindo a caixa de colisão de ruinasDeAreia em 256x256
 
 
     if (mapaAtual == 0) {
-
         for (int i = 0; i < DUNAS_MAPA1; i++) {
-            Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
+            Vector2 posicaoDuna = { posicoesDunasMapa2[i].x * TILE_SIZE, posicoesDunasMapa2[i].y * TILE_SIZE };
             Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
             DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     } else if (mapaAtual == 1) {
+        // Desenha ruinasDeAreia em tamanho maior
+        DrawTexturePro(ruinasDeAreiaGrandes, ruinasSourceRec, ruinasDestRec, origin, 0.0f, WHITE);
+        DrawTexture(ruinasDeAreiaPequenas, 20, 20, RAYWHITE);
         for (int i = 0; i < DUNAS_MAPA2; i++) {
-            Vector2 posicaoDuna = { posicoesDunasMapa2[i].x * TILE_SIZE, posicoesDunasMapa2[i].y * TILE_SIZE };
+            Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
             Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
-            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
+            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE); 
         }
     } else if (mapaAtual == 2) {
         for (int i = 0; i < DUNAS_MAPA3; i++) {
