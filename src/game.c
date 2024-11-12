@@ -295,12 +295,25 @@ void drawGame() {
     int infoBoxWidth = 220;
     int infoBoxHeight = 100;
 
-    // Desenha a caixa de informações
-    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){169, 169, 169, 255});
-    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){105, 105, 105, 255});
+    // Desenhar o preenchimento da caixa com um marrom mais suave
+    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){205, 133, 63, 255});
 
-    // Exibe as informações de especiarias, dinheiro e nível de água
-    DrawText(TextFormat("Especiarias: %d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 10, infoBoxY + 10, 18, WHITE);
+    // Desenhar a borda simulando uma espessura extra
+    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){101, 67, 33, 255});
+    DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, (Color){101, 67, 33, 255});
+    DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, (Color){101, 67, 33, 255});
+
+
+        // Posiciona a imagem da especiaria à esquerda do texto, ajustando a posição mais acima
+    Vector2 especiariaIconPos = { infoBoxX + 10, infoBoxY + 1 };  // Alterado de infoBoxY + 5 para infoBoxY - 5
+    DrawTextureRec(cerealsTexture, cerealsSourceRec, especiariaIconPos, WHITE);
+
+
+    // Desenha o texto "Especiarias" ao lado da imagem e a quantidade coletada
+    DrawText("Especiarias:", infoBoxX + 50, infoBoxY + 10, 18, WHITE);
+    DrawText(TextFormat("%d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 160, infoBoxY + 10, 18, WHITE);
+
+    // Exibe informações adicionais, como dinheiro e nível de água
     DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 10, infoBoxY + 40, 18, WHITE);
     DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 10, infoBoxY + 70, 18, WHITE);
 

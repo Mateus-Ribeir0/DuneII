@@ -177,6 +177,8 @@ void drawLobby() {
     ClearBackground((Color){195, 160, 81, 255});  // Define um fundo claro para o lobby
 
     Texture2D vendinha = LoadTexture("static/image/market_assets.png");
+    Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
+    Texture2D goldTexture = LoadTexture("static/image/gold.png");
 
     Rectangle hitboxVendinha = {96, 0, 90, 96};
     Vector2 posicaoVendinha = {20, 20};
@@ -192,54 +194,70 @@ void drawLobby() {
     DrawTextureRec(vendinha, hitboxVendinha, posicaoVendinha, WHITE);
     DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
 
-    // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby com 3x3 tiles (96x96 pixels)
+    // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby
     Texture2D portal = LoadTexture("static/image/portal.png");
 
     Rectangle portalSourceRec = { 0, 0, 32, 32 };
     Rectangle portalDestRec1 = { 
-    PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
-    PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 
-    32 * (PORTAL_HORIZONTAL_LARGURA - 1),  // Reduz uma coluna da largura
-    32 * (PORTAL_HORIZONTAL_ALTURA + 1)    // Adiciona uma linha na altura
-};
-
+        PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 
+        32 * (PORTAL_HORIZONTAL_LARGURA - 1),  
+        32 * (PORTAL_HORIZONTAL_ALTURA + 1)    
+    };
     Rectangle portalDestRec2 = { 
-    PORTAL_LOBBY_MAPA2_X * TILE_SIZE, 
-    PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 
-    32 * (PORTAL_VERTICAL_LARGURA + 1),  // Adiciona uma coluna na largura
-    32 * PORTAL_VERTICAL_ALTURA 
-};
-
+        PORTAL_LOBBY_MAPA2_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 
+        32 * (PORTAL_VERTICAL_LARGURA + 1),  
+        32 * PORTAL_VERTICAL_ALTURA 
+    };
     Rectangle portalDestRec3 = { 
-    PORTAL_LOBBY_MAPA3_X * TILE_SIZE, 
-    PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 
-    32 * (PORTAL_HORIZONTAL_LARGURA - 1),  // Reduz uma coluna da largura
-    32 * (PORTAL_HORIZONTAL_ALTURA + 1)    // Adiciona uma linha na altura
-};
+        PORTAL_LOBBY_MAPA3_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 
+        32 * (PORTAL_HORIZONTAL_LARGURA - 1),  
+        32 * (PORTAL_HORIZONTAL_ALTURA + 1)    
+    };
 
     Vector2 origin = { 0, 0 };
 
-    // No código onde você desenha os portais, altere o portal do mapa 2:
-    DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);  // Portal do mapa 1 sem rotação
-    DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);  // Portal do mapa 2 rotacionado em 90 graus
-    DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);  // Portal do mapa 3 sem rotação
+    // Desenha os portais
+    DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);
+    DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);
+    DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);
 
-
-    // Define a área de informações à direita da tela
+    // Define a área de informações no canto direito da tela
     int infoBoxX = SCREEN_WIDTH - 230;
     int infoBoxY = 10;
     int infoBoxWidth = 220;
     int infoBoxHeight = 100;
 
-    // Desenha o fundo e a borda arredondada para a caixa de informações
-    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){169, 169, 169, 255}); // Fundo cinza claro
-    // Corrigindo a linha para desenhar a borda arredondada com os parâmetros corretos
-    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){105, 105, 105, 255});
+    // Definir as cores para o preenchimento e borda conforme desejado
+    Color fillColor = (Color){205, 133, 63, 255};   // Marrom claro para o preenchimento
+    Color borderColor = (Color){101, 67, 33, 255};  // Marrom escuro para a borda
 
+    // Desenhar o fundo e a borda arredondada para a caixa de informações no lobby
+    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, fillColor);
+    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, borderColor);
+    DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, borderColor);
+    DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, borderColor);
 
-    // Exibe as informações de especiarias, dinheiro e nível de água dentro da caixa de informações
-    DrawText(TextFormat("Especiarias: %d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 10, infoBoxY + 10, 18, WHITE);
-    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 10, infoBoxY + 40, 18, WHITE);
+    // Ajuste da posição vertical para centralizar melhor a imagem da especiaria
+    int especiariaIconY = infoBoxY + 1;
+    Vector2 especiariaIconPos = { infoBoxX + 10, especiariaIconY };
+    DrawTextureRec(cerealsTexture, (Rectangle){64, 64, 32, 32}, especiariaIconPos, WHITE);
+
+    // Exibe as informações de especiarias, dinheiro e água dentro da caixa de informações
+    DrawText("Especiarias:", infoBoxX + 50, infoBoxY + 10, 18, WHITE);
+    DrawText(TextFormat("%d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 160, infoBoxY + 10, 18, WHITE);
+
+    // Exibe o ícone de ouro e o texto do dinheiro
+        // Exibe o ícone de ouro e o texto do dinheiro
+    Vector2 goldIconPos = { infoBoxX + 15, infoBoxY + 35 };  // Ajustado para ficar mais à direita e para cima
+    Rectangle goldSourceRec = { 0, 0, 16, 16 };  // Tamanho original da imagem
+    Rectangle goldDestRec = { goldIconPos.x, goldIconPos.y, 24, 24 };  // Tamanho ajustado para 24x24
+
+    DrawTexturePro(goldTexture, goldSourceRec, goldDestRec, origin, 0.0f, WHITE);
+    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 50, infoBoxY + 40, 18, WHITE);
+
     DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 10, infoBoxY + 70, 18, WHITE);
 
     // Verifica interações com o mercador e exibe diálogos/mensagens
@@ -359,6 +377,8 @@ void drawLobby() {
         isInteractingWithMerchant = 0;
     }
 }
+
+
 
 
 
