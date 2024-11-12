@@ -178,6 +178,7 @@ void drawLobby() {
 
     Texture2D vendinha = LoadTexture("static/image/market_assets.png");
     Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
+    Texture2D goldTexture = LoadTexture("static/image/gold.png");
 
     Rectangle hitboxVendinha = {96, 0, 90, 96};
     Vector2 posicaoVendinha = {20, 20};
@@ -240,16 +241,23 @@ void drawLobby() {
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, borderColor);
 
     // Ajuste da posição vertical para centralizar melhor a imagem da especiaria
-    // Ajuste da posição vertical para centralizar melhor a imagem da especiaria
-    int especiariaIconY = infoBoxY + 1;  // Ajuste o valor para a posição desejada
+    int especiariaIconY = infoBoxY + 1;
     Vector2 especiariaIconPos = { infoBoxX + 10, especiariaIconY };
     DrawTextureRec(cerealsTexture, (Rectangle){64, 64, 32, 32}, especiariaIconPos, WHITE);
-
 
     // Exibe as informações de especiarias, dinheiro e água dentro da caixa de informações
     DrawText("Especiarias:", infoBoxX + 50, infoBoxY + 10, 18, WHITE);
     DrawText(TextFormat("%d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 160, infoBoxY + 10, 18, WHITE);
-    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 10, infoBoxY + 40, 18, WHITE);
+
+    // Exibe o ícone de ouro e o texto do dinheiro
+        // Exibe o ícone de ouro e o texto do dinheiro
+    Vector2 goldIconPos = { infoBoxX + 15, infoBoxY + 35 };  // Ajustado para ficar mais à direita e para cima
+    Rectangle goldSourceRec = { 0, 0, 16, 16 };  // Tamanho original da imagem
+    Rectangle goldDestRec = { goldIconPos.x, goldIconPos.y, 24, 24 };  // Tamanho ajustado para 24x24
+
+    DrawTexturePro(goldTexture, goldSourceRec, goldDestRec, origin, 0.0f, WHITE);
+    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 50, infoBoxY + 40, 18, WHITE);
+
     DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 10, infoBoxY + 70, 18, WHITE);
 
     // Verifica interações com o mercador e exibe diálogos/mensagens
@@ -369,6 +377,7 @@ void drawLobby() {
         isInteractingWithMerchant = 0;
     }
 }
+
 
 
 
