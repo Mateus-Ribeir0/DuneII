@@ -185,9 +185,20 @@ void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;
 
+    // Define o retângulo do jogador
+    Rectangle playerRect = { new_x * TILE_SIZE, new_y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
+
+    // Define o retângulo de colisão das ruínas (deve estar no escopo da função ou global)
+    Rectangle ruinasCollisionBox = { 20, 20, 256, 256 };  // Ajuste conforme necessário
+
     // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool colidiuComDuna = false;
+
+        // Verifica colisão com o retângulo das ruínas
+        if (CheckCollisionRecs(playerRect, ruinasCollisionBox)) {
+            return; // Bloqueia a movimentação se houver colisão com as ruínas
+        }
 
         // Verifica colisão com os portais no lobby e nos mapas
         if (isPlayerOnPortal(new_x, new_y, mapaAtual)) {
@@ -221,7 +232,7 @@ void movePlayer(int dx, int dy) {
             }
         }
 
-        // Se não houver colisão com uma duna ou portal, movimenta o jogador
+        // Se não houver colisão com uma duna, ruínas ou portal, movimenta o jogador
         if (!colidiuComDuna) {
             player_x = new_x;
             player_y = new_y;
@@ -239,38 +250,51 @@ void drawGame() {
 
     Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
 
-    // Desenha o mapa de fundo
-    Texture2D desertTileset = LoadTexture("static/image/environment.png");
-
-    // Define o recorte do tile desejado no tileset. 
-    Rectangle tileSourceRec = { 128, 32, 32, 32 };
+    Texture2D ruinasDeAreiaGrandes = LoadTexture("static/image/Sand_ruins1.png");
 
     // Itera sobre a área do mapa e desenha o tile em cada posição
+    Color desertColor = (Color){210, 178, 104, 255};  // Define a cor desejada
+
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
             Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
-            DrawTextureRec(desertTileset, tileSourceRec, tilePosition, WHITE);
+            DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, desertColor);
         }
     }
 
-    // Carrega a textura do ambiente e desenha dunas, personagem, e itens coletáveis
-    Texture2D environment = LoadTexture("static/image/environment.png");
-    Rectangle hitboxDuna = {96, 96, 96, 96};
+    Texture2D environment = LoadTexture("static/image/Rock6_1.png");
+    Texture2D ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
+    Rectangle sourceRect = {64, 64, 64, 64}; // Área da textura original
+    Vector2 origin = {0, 0}; // Origem de rotação (mantida em (0, 0))
+
+    Rectangle ruinasSourceRec = {0, 0, ruinasDeAreiaGrandes.width, ruinasDeAreiaGrandes.height}; // Recorte original da textura
+    Rectangle ruinasDestRec = {20, 20, 256, 256}; // Destino com escala maior (256x256)
+
+    // Desenha ruinasDeAreia em tamanho maior
+    DrawTexturePro(ruinasDeAreiaGrandes, ruinasSourceRec, ruinasDestRec, origin, 0.0f, WHITE);
+    DrawTexture(ruinasDeAreiaPequenas, 20, 20, RAYWHITE);
+
+    // Definindo a caixa de colisão de ruinasDeAreia em 256x256
+
 
     if (mapaAtual == 0) {
+
         for (int i = 0; i < DUNAS_MAPA1; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
-            DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
+            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
+            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     } else if (mapaAtual == 1) {
         for (int i = 0; i < DUNAS_MAPA2; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa2[i].x * TILE_SIZE, posicoesDunasMapa2[i].y * TILE_SIZE };
-            DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
+            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
+            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     } else if (mapaAtual == 2) {
         for (int i = 0; i < DUNAS_MAPA3; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa3[i].x * TILE_SIZE, posicoesDunasMapa3[i].y * TILE_SIZE };
-            DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
+            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
+            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     }
 
