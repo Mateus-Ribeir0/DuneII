@@ -10,5 +10,8 @@ void atualizarMenu(GameScreen *currentScreen);
 void desenharMenu(GameScreen currentScreen);
 void finalizarMenu();
 void cutsceneArrakis(Music music);
+// Função para exibir o objetivo
+void exibirObjetivo();
+
 
 #endif

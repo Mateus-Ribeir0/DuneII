@@ -7,7 +7,8 @@
 #include <string.h>
 #include "raylib.h"
 
-typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
+typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME, OBJETIVO } GameScreen;
+
 
 // Constantes de configuração, disponíveis para todos os arquivos
 #define TILE_SIZE 32

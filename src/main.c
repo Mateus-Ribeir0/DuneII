@@ -14,32 +14,38 @@ int main() {
     iniciarMenu(&currentScreen);
 
     while (!WindowShouldClose()) {
-        UpdateMusicStream(titleMusic);
+    UpdateMusicStream(titleMusic);
 
-        switch (currentScreen) {
-            case TITLE:
-            case RANKINGS:
-                atualizarMenu(&currentScreen);
-                desenharMenu(currentScreen);
-                if (IsKeyPressed(KEY_ENTER) && currentScreen == TITLE) {
-                    currentScreen = CUTSCENE;
-                }
-                break;
-            case CUTSCENE:
-                cutsceneArrakis(titleMusic);
-                currentScreen = LOBBY;
-                break;
-            case LOBBY:
-                processarEntradaLobby(&currentScreen, &lobbyInitialized);
-                BeginDrawing();
-                desenharLobbyDetalhado();
-                EndDrawing();
-                break;
-            case GAME:
-                playGame(&currentScreen);
-                break;
-        }
-    }
+    switch (currentScreen) {
+        case TITLE:
+        case RANKINGS:
+            atualizarMenu(&currentScreen);
+            desenharMenu(currentScreen);
+            if (IsKeyPressed(KEY_ENTER) && currentScreen == TITLE) {
+                currentScreen = CUTSCENE;
+            }
+            break;
+        case CUTSCENE:
+            cutsceneArrakis(titleMusic);
+            currentScreen = LOBBY;
+            break;
+        case LOBBY:
+            processarEntradaLobby(&currentScreen, &lobbyInitialized);
+            BeginDrawing();
+            desenharLobbyDetalhado();
+            EndDrawing();
+            break;
+        case GAME:
+            playGame(&currentScreen);
+            break;
+        case OBJETIVO:
+            if (IsKeyPressed(KEY_Q)) {
+                currentScreen = TITLE; // Volta ao menu principal
+            } else {
+                exibirObjetivo(); // Função para desenhar a imagem do objetivo
+            }
+            break;
+    }}
 
     StopMusicStream(titleMusic);
     UnloadMusicStream(titleMusic);
