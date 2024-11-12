@@ -38,7 +38,7 @@ bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
             return true;
         }
 
-        // Verifica o portal do mapa 3
+        // Verifica o portal do mapa 3 com uma linha a mais de colisão e uma coluna a menos
         if (new_x >= PORTAL_LOBBY_MAPA3_X && new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA - 1 &&
             new_y >= PORTAL_LOBBY_MAPA3_Y && new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1) {
             return true;
@@ -53,8 +53,7 @@ bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
     return false;
 }
 
-
-
+// Função para processar a entrada no lobby e exibir a mensagem de portal ao se aproximar
 void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     mapaAtual = -1;  // Identifica que o jogador está no lobby
     int dx = 0, dy = 0;
@@ -79,9 +78,9 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     // Variável para controlar se o jogador está perto de um portal
     bool pertoDePortal = false;
 
-    // Verifica se o jogador está em volta do portal para o mapa 1
-    if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x <= PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
-         player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y <= PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA)) {
+    // Verifica proximidade com o portal para o mapa 1 com uma linha extra abaixo
+    if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
+         player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 2)) {
         
         mensagem = "Você deseja viajar para o Zamirat?\nPressione [P]\n\nDificuldade: ***";
         pertoDePortal = true;
@@ -91,9 +90,9 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
             mensagem = NULL;  // Limpa a mensagem ao entrar no mapa
         }
     }
-    // Verifica se o jogador está em volta do portal para o mapa 2
-    else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x <= PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
-              player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y <= PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA)) {
+    // Verifica proximidade com o portal para o mapa 2
+    else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1 &&
+              player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA)) {
         
         mensagem = "Você deseja viajar para o Bashir'har?\nPressione [P]\n\nDificuldade: ****";
         pertoDePortal = true;
@@ -103,9 +102,9 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
             mensagem = NULL;  // Limpa a mensagem ao entrar no mapa
         }
     }
-    // Verifica se o jogador está em volta do portal para o mapa 3
-    else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x <= PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
-              player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y <= PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA)) {
+    // Verifica proximidade com o portal para o mapa 3
+    else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
+              player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
         mensagem = "Você deseja viajar para o Qasr'Rahim?\nPressione [P]\n\nDificuldade: *****";
         pertoDePortal = true;
@@ -121,6 +120,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
         mensagem = NULL;
     }
 }
+
 
 
 void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool isPortalDialog) {
