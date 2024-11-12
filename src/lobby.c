@@ -193,11 +193,61 @@ void drawLobby() {
 
     // Desenha a textura da vendinha
     DrawTextureRec(vendinha, hitboxVendinha, posicaoVendinha, WHITE);
-    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
+
+    // Desenha o personagem animado no lugar do bloco azul
+    Texture2D personagem = LoadTexture("static/image/spritesheet-character.png");
+    static int direcao = 0;  // Variável para armazenar a direção atual do personagem
+    static int frameAtual = 0;  // Frame da animação
+    static float tempoAnimacao = 0.0f;
+    const float duracaoFrame = 0.1f;
+
+    // Atualize a direção com base na tecla pressionada
+    if (IsKeyPressed(KEY_A)) {
+        direcao = 1; // Esquerda
+    } else if (IsKeyPressed(KEY_D)) {
+        direcao = 2; // Direita
+    } else if (IsKeyPressed(KEY_W)) {
+        direcao = 3; // Cima
+    } else if (IsKeyPressed(KEY_S)) {
+        direcao = 4; // Baixo
+    }
+
+    // Atualize o `sourceRec` com base na direção atual
+    Rectangle sourceRec;
+    switch (direcao) {
+        case 1: // Esquerda
+            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 64 : 96, 0, 32, 64};
+            break;
+        case 2: // Direita
+            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 0 : 32, 0, 32, 64};
+            break;
+        case 3: // Cima
+            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 128 : 160, 0, 32, 64};
+            break;
+        case 4: // Baixo
+            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 192 : 224, 0, 32, 64};
+            break;
+        default: // Parado
+            sourceRec = (Rectangle){0, 0, 32, 64};
+            break;
+    }
+
+    // Define a posição do personagem no lobby
+    Vector2 playerPosition = { player_x * TILE_SIZE, player_y * TILE_SIZE };
+
+    // Desenha o sprite do personagem animado
+    DrawTextureRec(personagem, sourceRec, playerPosition, WHITE);
+
+    // Atualiza o frame atual para a próxima animação
+    tempoAnimacao += GetFrameTime();
+    if (tempoAnimacao >= duracaoFrame) {
+        tempoAnimacao = 0;
+        frameAtual = (frameAtual + 1) % 2;  // Alterna entre os dois frames (0 e 1)
+    }
 
     // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby
     Texture2D portal = LoadTexture("static/image/portal.png");
-
+    
     Rectangle portalSourceRec = { 0, 0, 32, 32 };
     Rectangle portalDestRec1 = { 
         PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
@@ -208,8 +258,8 @@ void drawLobby() {
     Rectangle portalDestRec2 = { 
         PORTAL_LOBBY_MAPA2_X * TILE_SIZE, 
         PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 
-        32 * (PORTAL_VERTICAL_LARGURA + 1),  
-        32 * PORTAL_VERTICAL_ALTURA 
+        32 * (PORTAL_HORIZONTAL_LARGURA - 1),  
+        32 * (PORTAL_HORIZONTAL_ALTURA + 1)    
     };
     Rectangle portalDestRec3 = { 
         PORTAL_LOBBY_MAPA3_X * TILE_SIZE, 
