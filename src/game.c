@@ -11,6 +11,9 @@ Texture2D personagem;
 Texture2D environment;
 int teveUnload = 0;
 int deathEmotivaTocando;
+Texture2D cerealsTexture;
+
+Rectangle cerealsSourceRec = { 64, 64, 32, 32 };
 
 // Arrays para armazenar as imagens de carregamento
 Texture2D loadingImagesMap0[4];
@@ -234,6 +237,8 @@ void movePlayer(int dx, int dy) {
 void drawGame() {
     ClearBackground(RAYWHITE);
 
+    Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
+
     // Desenha o mapa de fundo
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
@@ -269,9 +274,10 @@ void drawGame() {
     Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
     DrawTextureRec(personagem, sourceRec, position, WHITE);
 
-    // Desenha o item se não estiver coletado
+    // Desenha o item usando o novo sprite recortado se ele não estiver coletado
     if (!items[0].collected) {
-        DrawCircle(items[0].position.x * TILE_SIZE + TILE_SIZE / 2, items[0].position.y * TILE_SIZE + TILE_SIZE / 4, TILE_SIZE / 4, GOLD);
+        Vector2 itemPosition = { items[0].position.x * TILE_SIZE, items[0].position.y * TILE_SIZE };
+        DrawTextureRec(cerealsTexture, cerealsSourceRec, itemPosition, WHITE);
     }
 
     // Desenha o HUD do jogo no canto direito da tela
