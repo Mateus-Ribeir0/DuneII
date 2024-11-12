@@ -5,6 +5,62 @@ static Texture2D background, logo;
 static Music titleMusic;
 static float backgroundPosX;
 
+void recebeNomeDoPlayer(GameScreen *currentScreen) {
+    static char nameBuffer[MAX_NAME_LENGTH] = "";
+    int letra;
+
+    memset(nameBuffer, 0, sizeof(nameBuffer));
+
+    while (!WindowShouldClose()) {
+
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+        desenharBackgroundComLogo();
+        DrawText("Digite seu nome:", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 50, 20, WHITE);
+        DrawRectangle(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 100, 350, 30, WHITE);
+        DrawText(nameBuffer, SCREEN_WIDTH / 2 - 95, SCREEN_HEIGHT / 2 + 105, 20, BLACK);
+        DrawText("Pressione ENTER para continuar", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 150, 20, WHITE);
+        EndDrawing();
+
+        letra = GetCharPressed();
+        while (letra > 0) {
+            if ((letra >= 32) && (letra <= 125) && (strlen(nameBuffer) < MAX_NAME_LENGTH - 1)) {
+                int len = strlen(nameBuffer);
+                nameBuffer[len] = (char)letra;
+                nameBuffer[len + 1] = '\0';
+            }
+            letra = GetCharPressed();
+        }
+
+        if (IsKeyPressed(KEY_BACKSPACE) && strlen(nameBuffer) > 0) {
+            nameBuffer[strlen(nameBuffer) - 1] = '\0';
+        }
+
+        if (IsKeyPressed(KEY_ENTER) && strlen(nameBuffer) > 0) {
+            strcpy(playerName, nameBuffer);
+            *currentScreen = CUTSCENE;
+            break;
+        }
+    }
+}
+
+void desenharBackgroundComLogo() {
+    float scaleX = (float)SCREEN_WIDTH / background.width;
+    float scaleY = (float)SCREEN_HEIGHT / background.height;
+    float scale = scaleX > scaleY ? scaleX : scaleY;
+
+    DrawTextureEx(background, (Vector2){-backgroundPosX, 0}, 0.0f, scale, WHITE);
+
+    DrawTextureEx(background, (Vector2){-backgroundPosX + background.width * scale, 0}, 0.0f, scale, WHITE);
+
+    backgroundPosX += 0.2f;
+    if (backgroundPosX >= background.width * scale) {
+        backgroundPosX = 0;
+    }
+
+    DrawTexture(logo, SCREEN_WIDTH / 2 - logo.width / 2, 150, WHITE);
+}
+
 void cutsceneArrakis(Music titleMusic) {
     SetMusicVolume(titleMusic, 1.0f);
 
@@ -331,18 +387,9 @@ void atualizarMenu(GameScreen *currentScreen) {
         if (backgroundPosX >= background.width) {
             backgroundPosX = 0;
         }
-
-        // Iniciar o jogo ao pressionar ENTER
-        if (IsKeyPressed(KEY_ENTER)) {
-            *currentScreen = GAME;  // Muda para a tela do jogo
-        }
         else if (IsKeyPressed(KEY_R)) {
             *currentScreen = RANKINGS;  // Muda para a tela de rankings ao pressionar R
         }
-    }
-    else if (*currentScreen == RANKINGS && IsKeyPressed(KEY_Q)) {
-        *currentScreen = TITLE;
-        ResumeMusicStream(titleMusic);
     }
 }
 
@@ -352,32 +399,10 @@ void desenharMenu(GameScreen currentScreen) {
     ClearBackground(RAYWHITE);
 
     if (currentScreen == TITLE) {
-        // Define a escala para que o background cubra a tela
-        float scaleX = (float)SCREEN_WIDTH / background.width;
-        float scaleY = (float)SCREEN_HEIGHT / background.height;
-        float scale = scaleX > scaleY ? scaleX : scaleY;
-
-        // Desenha o fundo em loop horizontal
-        DrawTextureEx(background, (Vector2){-backgroundPosX, 0}, 0.0f, scale, WHITE);
-        
-        // Desenha uma cópia do background à direita para criar o loop contínuo
-        DrawTextureEx(background, (Vector2){-backgroundPosX + background.width * scale, 0}, 0.0f, scale, WHITE);
-        
-        // Atualiza a posição do background para movimento
-        backgroundPosX += 0.2f;  // Ajuste a velocidade conforme desejado
-        if (backgroundPosX >= background.width * scale) {
-            backgroundPosX = 0;  // Reinicia o loop
-        }
-
-        // Desenha a logo e o texto do menu
-        DrawTexture(logo, SCREEN_WIDTH / 2 - logo.width / 2, 150, WHITE);
+        desenharBackgroundComLogo();
         DrawText("Pressione ENTER para Jogar", SCREEN_WIDTH / 2 - 150, 400, 20, WHITE);
         DrawText("Pressione R para Rankings", SCREEN_WIDTH / 2 - 150, 650, 20, WHITE);
     } 
-    else if (currentScreen == RANKINGS) {
-        DrawText("Tela de Rankings", SCREEN_WIDTH / 2 - 100, 200, 30, BLACK);
-        DrawText("Pressione Q para voltar", SCREEN_WIDTH / 2 - 150, 400, 20, BLACK);
-    }
 
     EndDrawing();
 }

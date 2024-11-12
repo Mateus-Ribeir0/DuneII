@@ -429,9 +429,11 @@ void playGame(GameScreen *currentScreen) {
         updateWaterLevel(currentScreen);
 
         if (playerWater <= 0.0) {
+            atualizarRanking(playerName, playerMoney);
+            zerarMonetaria();
             *currentScreen = RANKINGS;
             resetarJogo();
-            break;
+            return;
         }
 
         if (IsKeyPressed(KEY_W)) { dy = -1; movimento = 'w'; }
@@ -508,8 +510,6 @@ void playGame(GameScreen *currentScreen) {
                 Texture2D characterBack = LoadTexture("static/image/characterback.png");
                 Texture2D sandworm = LoadTexture("static/image/sandworm.png");
 
-                zerarMonetaria();
-
                 teveUnload = 0;
                 UnloadSound(musicaMapa0);
                 UnloadSound(musicaMapa1);
@@ -580,10 +580,12 @@ void playGame(GameScreen *currentScreen) {
                 // Exibe o texto completo por mais 2 segundos antes de ir para o ranking
                 sleep(2);
 
+                atualizarRanking(playerName, playerMoney);
+                zerarMonetaria();
                 resetarJogo();
-                
+                ClearBackground(RAYWHITE);
                 *currentScreen = RANKINGS;
-                break;
+                return;
             }
         }
 

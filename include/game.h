@@ -3,6 +3,7 @@
 #define GAME_H
 
 #include "config.h"
+#include "ranking.h"
 
 void playGame(GameScreen *currentScreen);
 void movePlayer(int dx, int dy);

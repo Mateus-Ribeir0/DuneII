@@ -7,4 +7,4 @@ int mapaAtual = 0;
 int itemsCollected = 0;
 float playerWater = 100.0;  // Nível de água inicial
 double lastWaterUpdateTime = 0.0;  // Última vez que a água foi atualizada
-
+char playerName[MAX_NAME_LENGTH] = "";

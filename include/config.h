@@ -7,7 +7,7 @@
 #include <string.h>
 #include "raylib.h"
 
-typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
+typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, RANKINGS } GameScreen;
 
 // Constantes de configuração, disponíveis para todos os arquivos
 #define TILE_SIZE 32
@@ -15,6 +15,10 @@ typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
 #define MAPA_ALTURA 22
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 704
+
+// Nome do jogador
+#define MAX_NAME_LENGTH 50
+extern char playerName[MAX_NAME_LENGTH];
 
 // Definição da posição do mercador
 #define MERCHANT_X 2

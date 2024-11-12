@@ -1,0 +1,4 @@
+Miccuci|1500
+carlos|1000
+Mamede|600
+Mateus|300

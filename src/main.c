@@ -1,6 +1,7 @@
 #include "menu.h"
 #include "game.h"
 #include "lobby.h"
+#include "ranking.h"
 
 int main() {
     GameScreen currentScreen = TITLE;
@@ -18,12 +19,14 @@ int main() {
 
         switch (currentScreen) {
             case TITLE:
-            case RANKINGS:
                 atualizarMenu(&currentScreen);
                 desenharMenu(currentScreen);
-                if (IsKeyPressed(KEY_ENTER) && currentScreen == TITLE) {
-                    currentScreen = CUTSCENE;
+                if (IsKeyPressed(KEY_ENTER)) {
+                    currentScreen = NAME_INPUT;
                 }
+                break;
+            case NAME_INPUT:
+                recebeNomeDoPlayer(&currentScreen);
                 break;
             case CUTSCENE:
                 cutsceneArrakis(titleMusic);
@@ -37,6 +40,9 @@ int main() {
                 break;
             case GAME:
                 playGame(&currentScreen);
+                break;
+            case RANKINGS:
+                exibirRankingScreen(&currentScreen);
                 break;
         }
     }
