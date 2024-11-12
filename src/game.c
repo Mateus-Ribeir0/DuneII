@@ -347,17 +347,34 @@ void drawGame() {
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, (Color){101, 67, 33, 255});
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, (Color){101, 67, 33, 255});
 
-    // Posiciona a imagem da especiaria à esquerda do texto, ajustando a posição mais acima
-    Vector2 especiariaIconPos = { infoBoxX + 10, infoBoxY + 1 };
-    DrawTextureRec(cerealsTexture, cerealsSourceRec, especiariaIconPos, WHITE);
 
-    // Desenha o texto "Especiarias" ao lado da imagem e a quantidade coletada
+    Texture2D goldTexture = LoadTexture("static/image/gold.png");
+    Texture2D aguaTexture = LoadTexture("static/image/agua.png");
+
+    // Posiciona a imagem da especiaria (cerealsTexture) e o texto "Especiarias"
+    int especiariaIconY = infoBoxY + 1;
+    Vector2 especiariaIconPos = { infoBoxX + 10, especiariaIconY };
+    DrawTextureRec(cerealsTexture, (Rectangle){64, 64, 32, 32}, especiariaIconPos, WHITE);
+
+    // Desenha o texto "Especiarias:" ao lado da imagem e a quantidade coletada
     DrawText("Especiarias:", infoBoxX + 50, infoBoxY + 10, 18, WHITE);
     DrawText(TextFormat("%d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 160, infoBoxY + 10, 18, WHITE);
 
-    // Exibe informações adicionais, como dinheiro e nível de água
-    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 10, infoBoxY + 40, 18, WHITE);
-    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 10, infoBoxY + 70, 18, WHITE);
+    // Exibe o ícone de ouro e o texto do dinheiro logo abaixo
+    Vector2 goldIconPos = { infoBoxX + 15, infoBoxY + 35 };
+    Rectangle goldSourceRec = { 0, 0, 16, 16 };
+    Rectangle goldDestRec = { goldIconPos.x, goldIconPos.y, 24, 24 };
+
+    DrawTexturePro(goldTexture, goldSourceRec, goldDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 50, infoBoxY + 40, 18, WHITE);
+
+    // Exibe o ícone de água e o texto de água logo abaixo de goldTexture
+    Vector2 aguaIconPos = { infoBoxX + 18, infoBoxY + 65 };
+    Rectangle aguaSourceRec = { 0, 0, aguaTexture.width, aguaTexture.height };
+    Rectangle aguaDestRec = { aguaIconPos.x, aguaIconPos.y, 24, 24 };
+
+    DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
 
     // Desenha o portal de retorno ao lobby
     DrawRectangle(PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE,
