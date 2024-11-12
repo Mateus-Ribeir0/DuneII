@@ -597,9 +597,9 @@ void playGame(GameScreen *currentScreen) {
                     EndDrawing();
                 }
 
-                sleep(2);
-
                 PlaySound(barulhoMonstro);
+                sleep(1);
+
                 Sound deathEmotiva = LoadSound("static/music/deathemotiva.wav");
                 deathEmotivaTocando = 1;
                 PlaySound(deathEmotiva);

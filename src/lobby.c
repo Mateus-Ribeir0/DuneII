@@ -174,7 +174,9 @@ const int widthMercador = 620;
 const int heigthMercador = 140;
 
 void drawLobby() {
-    ClearBackground((Color){195, 160, 81, 255});  // Define um fundo claro para o lobby
+
+    Texture2D desertTileset = LoadTexture("static/image/environment.png");
+    Rectangle tileSourceRec = { 128, 32, 32, 32 };
 
     Texture2D vendinha = LoadTexture("static/image/market_assets.png");
     Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
@@ -187,7 +189,8 @@ void drawLobby() {
     // Desenha o fundo do lobby com tiles de areia
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
-            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){195, 160, 81, 255});
+            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+            DrawTextureRec(desertTileset, tileSourceRec, tilePosition, WHITE);
         }
     }
 
