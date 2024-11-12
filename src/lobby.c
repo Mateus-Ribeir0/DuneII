@@ -229,9 +229,15 @@ void drawLobby() {
     int infoBoxWidth = 220;
     int infoBoxHeight = 100;
 
-    // Desenha o fundo e a borda arredondada para a caixa de informações
-    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){169, 169, 169, 255});
-    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){105, 105, 105, 255});
+    // Definir as cores para o preenchimento e borda conforme desejado
+    Color fillColor = (Color){205, 133, 63, 255};   // Marrom claro para o preenchimento
+    Color borderColor = (Color){101, 67, 33, 255};  // Marrom escuro para a borda
+
+    // Desenhar o fundo e a borda arredondada para a caixa de informações no lobby
+    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, fillColor);
+    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, borderColor);
+    DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, borderColor);
+    DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, borderColor);
 
     // Ajuste da posição vertical para centralizar melhor a imagem da especiaria
     // Ajuste da posição vertical para centralizar melhor a imagem da especiaria
