@@ -175,6 +175,8 @@ const int heigthMercador = 140;
 
 void drawLobby() {
 
+    Sound troca = LoadSound("static/music/trocaDeDinheiro.wav");
+
     Texture2D desertTileset = LoadTexture("static/image/environment.png");
     Rectangle tileSourceRec = { 128, 32, 32, 32 };
 
@@ -335,6 +337,8 @@ void drawLobby() {
     }
 
     if (showThankYouMessage) {
+        
+        PlaySound(troca);
         DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
         if (GetTime() - errorMessageTimer >= MESSAGE_DURATION) {
             showThankYouMessage = false;
