@@ -195,8 +195,8 @@ void movePlayer(int dx, int dy) {
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool colidiuComDuna = false;
 
-        // Verifica colisão com o retângulo das ruínas
-        if (CheckCollisionRecs(playerRect, ruinasCollisionBox)) {
+        // Verifica colisão com o retângulo das ruínas apenas no mapa 3
+        if (mapaAtual == 2 && CheckCollisionRecs(playerRect, ruinasCollisionBox)) {
             return; // Bloqueia a movimentação se houver colisão com as ruínas
         }
 
@@ -239,6 +239,7 @@ void movePlayer(int dx, int dy) {
         }
     }
 }
+
 
 
 
@@ -442,23 +443,24 @@ int contar_ocorrencias_consecutivas(const char *historico, const char *padrao, s
 int identificar_padrao_mais_frequente(const char *historico, size_t tamanho_padrao, char *padrao_mais_frequente) {
     char padrao_atual[MAX_PADRAO + 1];
     int max_ocorrencias = 0;
-    int ocorrencias;
     size_t historico_len = strlen(historico);
 
     for (size_t i = 0; i <= historico_len - tamanho_padrao; i++) {
         strncpy(padrao_atual, &historico[i], tamanho_padrao);
         padrao_atual[tamanho_padrao] = '\0';
-        
-        ocorrencias = contar_ocorrencias_consecutivas(historico, padrao_atual, tamanho_padrao);
-        
+
+        int ocorrencias = contar_ocorrencias_consecutivas(historico, padrao_atual, tamanho_padrao);
+
         if (ocorrencias > max_ocorrencias) {
             max_ocorrencias = ocorrencias;
-            strncpy(padrao_mais_frequente, padrao_atual, MAX_PADRAO);
+            strncpy(padrao_mais_frequente, padrao_atual, tamanho_padrao);
+            padrao_mais_frequente[tamanho_padrao] = '\0';
         }
     }
-    
-    return max_ocorrencias > 1 ? max_ocorrencias : 0;
+
+    return max_ocorrencias;
 }
+
 
 void limparHistoricoPassos() {
     memset(historico, 0, sizeof(historico));
@@ -573,7 +575,6 @@ void playGame(GameScreen *currentScreen) {
 
             ClearBackground(BLACK);
             PlaySound(spellCastSound);
-
             sleep(2);
 
             showLoadingScreen(loadingImagesLobby);
@@ -607,12 +608,6 @@ void playGame(GameScreen *currentScreen) {
                 (dificuldade == 4 && strlen(historico) >= 4 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 4, padrao_encontrado))) ||
                 (dificuldade == 3 && strlen(historico) >= 3 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 3, padrao_encontrado)))) 
             {
-                char padrao_completo[MAX_PADRAO + 1];
-                for (int i = 0; i < dificuldade; i++) {
-                    padrao_completo[i] = padrao_encontrado[0];
-                }
-                padrao_completo[dificuldade] = '\0';
-
                 Sound gameOverSound = LoadSound("static/music/deathsound.wav");
                 Sound barulhoMonstro = LoadSound("static/music/monster.mp3");
                 Texture2D characterBack = LoadTexture("static/image/characterback.png");
@@ -626,14 +621,13 @@ void playGame(GameScreen *currentScreen) {
                 UnloadSound(musicaMapa2);
 
                 PlaySound(gameOverSound);
-
                 sleep(1);
 
                 for (int i = 0; i < 180; i++) {
                     BeginDrawing();
                     ClearBackground(BLACK);
                     DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
-                    DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_completo), 10, 40, 20, RED);
+                    DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
                     EndDrawing();
                 }
 
@@ -664,10 +658,9 @@ void playGame(GameScreen *currentScreen) {
                 UnloadTexture(characterBack);
                 UnloadTexture(sandworm);
 
-                // Exibição do texto com animação de digitação
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
-                float tempoPorCaractere = 0.5f;  // Tempo em segundos para cada caractere aparecer
+                float tempoPorCaractere = 0.5f;
                 float timer = 0;
 
                 while (caractereExibido < strlen(euFalhei) && !WindowShouldClose()) {
@@ -675,7 +668,6 @@ void playGame(GameScreen *currentScreen) {
                     ClearBackground(BLACK);
                     timer += GetFrameTime();
 
-                    // Exibe um caractere a cada intervalo de tempo
                     if (timer >= tempoPorCaractere) {
                         caractereExibido++;
                         timer = 0;
@@ -687,11 +679,9 @@ void playGame(GameScreen *currentScreen) {
                     EndDrawing();
                 }
 
-                // Exibe o texto completo por mais 2 segundos antes de ir para o ranking
                 sleep(2);
 
                 resetarJogo();
-                
                 *currentScreen = RANKINGS;
                 break;
             }
@@ -708,6 +698,7 @@ void playGame(GameScreen *currentScreen) {
         UnloadSound(musicaMapa2);
     }
 }
+
 
 
 
