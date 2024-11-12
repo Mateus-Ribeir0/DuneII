@@ -240,9 +240,18 @@ void drawGame() {
     Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
 
     // Desenha o mapa de fundo
+    Texture2D desertTileset = LoadTexture("static/image/environment.png");
+
+    // Define o recorte do tile desejado no tileset. 
+    // Aqui assumimos que o tile de areia está localizado em (0, 0) e tem tamanho 32x32.
+    Rectangle tileSourceRec = { 128, 32, 32, 32 };
+
+    // Itera sobre a área do mapa e desenha o tile em cada posição
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
-            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){195, 160, 81, 255});
+            // Define a posição onde o tile será desenhado
+            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+            DrawTextureRec(desertTileset, tileSourceRec, tilePosition, WHITE);
         }
     }
 
