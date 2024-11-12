@@ -231,8 +231,8 @@ void movePlayer(int dx, int dy) {
 
 
 
-
-
+// Variável para armazenar a direção atual do personagem
+int direcao = 0;  // 0 = parado, 1 = esquerda, 2 = direita, 3 = cima, 4 = baixo
 
 void drawGame() {
     ClearBackground(RAYWHITE);
@@ -243,23 +243,20 @@ void drawGame() {
     Texture2D desertTileset = LoadTexture("static/image/environment.png");
 
     // Define o recorte do tile desejado no tileset. 
-    // Aqui assumimos que o tile de areia está localizado em (0, 0) e tem tamanho 32x32.
     Rectangle tileSourceRec = { 128, 32, 32, 32 };
 
     // Itera sobre a área do mapa e desenha o tile em cada posição
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
-            // Define a posição onde o tile será desenhado
             Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
             DrawTextureRec(desertTileset, tileSourceRec, tilePosition, WHITE);
         }
     }
 
     // Carrega a textura do ambiente e desenha dunas, personagem, e itens coletáveis
-    environment = LoadTexture("static/image/environment.png");
+    Texture2D environment = LoadTexture("static/image/environment.png");
     Rectangle hitboxDuna = {96, 96, 96, 96};
 
-    // Desenha as dunas com base no mapa atual
     if (mapaAtual == 0) {
         for (int i = 0; i < DUNAS_MAPA1; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
@@ -278,10 +275,57 @@ void drawGame() {
     }
 
     // Desenha o personagem
-    personagem = LoadTexture("static/image/spritesheet-character.png");
-    Rectangle sourceRec = { frameAtual * 32, 0, 32, 64 };
+    Texture2D personagem = LoadTexture("static/image/spritesheet-character.png");
+    static int direcao = 0;  // Variável para armazenar a direção atual do personagem
+    Rectangle sourceRec = {0, 0, 32, 64};  // Inicializa o retângulo de origem
+
+    // Atualize a direção com base na tecla pressionada
+    if (IsKeyPressed(KEY_A)) {
+        direcao = 1; // Esquerda
+    } else if (IsKeyPressed(KEY_D)) {
+        direcao = 2; // Direita
+    } else if (IsKeyPressed(KEY_W)) {
+        direcao = 3; // Cima
+    } else if (IsKeyPressed(KEY_S)) {
+        direcao = 4; // Baixo
+    }
+
+    // Atualize o `sourceRec` com base na direção atual
+    switch (direcao) {
+        case 1: // Esquerda
+            sourceRec.x = (frameAtual % 2 == 0) ? 64 : 96;
+            sourceRec.y = 0;
+            break;
+        case 2: // Direita
+            sourceRec.x = (frameAtual % 2 == 0) ? 0 : 32;
+            sourceRec.y = 0;
+            break;
+        case 3: // Cima
+            sourceRec.x = (frameAtual % 2 == 0) ? 128 : 160;
+            sourceRec.y = 0;
+            break;
+        case 4: // Baixo
+            sourceRec.x = (frameAtual % 2 == 0) ? 192 : 224;
+            sourceRec.y = 0;
+            break;
+        default: // Parado
+            sourceRec.x = 0;
+            sourceRec.y = 0;
+            break;
+    }
+
+    // Define a posição do personagem na tela
     Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
+
+    // Desenha o sprite do personagem na tela
     DrawTextureRec(personagem, sourceRec, position, WHITE);
+
+    // Atualiza o frame atual para a próxima animação
+    tempoAnimacao += GetFrameTime();
+    if (tempoAnimacao >= duracaoFrame) {
+        tempoAnimacao = 0;
+        frameAtual = (frameAtual + 1) % 2;  // Alterna entre os dois frames (0 e 1)
+    }
 
     // Desenha o item usando o novo sprite recortado se ele não estiver coletado
     if (!items[0].collected) {
@@ -303,11 +347,9 @@ void drawGame() {
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, (Color){101, 67, 33, 255});
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, (Color){101, 67, 33, 255});
 
-
-        // Posiciona a imagem da especiaria à esquerda do texto, ajustando a posição mais acima
-    Vector2 especiariaIconPos = { infoBoxX + 10, infoBoxY + 1 };  // Alterado de infoBoxY + 5 para infoBoxY - 5
+    // Posiciona a imagem da especiaria à esquerda do texto, ajustando a posição mais acima
+    Vector2 especiariaIconPos = { infoBoxX + 10, infoBoxY + 1 };
     DrawTextureRec(cerealsTexture, cerealsSourceRec, especiariaIconPos, WHITE);
-
 
     // Desenha o texto "Especiarias" ao lado da imagem e a quantidade coletada
     DrawText("Especiarias:", infoBoxX + 50, infoBoxY + 10, 18, WHITE);
