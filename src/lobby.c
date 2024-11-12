@@ -179,6 +179,7 @@ void drawLobby() {
     Texture2D vendinha = LoadTexture("static/image/market_assets.png");
     Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
     Texture2D goldTexture = LoadTexture("static/image/gold.png");
+    Texture2D aguaTexture = LoadTexture("static/image/agua.png");
 
     Rectangle hitboxVendinha = {96, 0, 90, 96};
     Vector2 posicaoVendinha = {20, 20};
@@ -258,9 +259,15 @@ void drawLobby() {
     DrawTexturePro(goldTexture, goldSourceRec, goldDestRec, origin, 0.0f, WHITE);
     DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 50, infoBoxY + 40, 18, WHITE);
 
-    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 10, infoBoxY + 70, 18, WHITE);
+    // Ícone e texto da água
+    // Ícone e texto da água
+    Vector2 aguaIconPos = { infoBoxX + 18, infoBoxY + 65 };  // Move um pouco mais para a esquerda
+    Rectangle aguaSourceRec = { 0, 0, aguaTexture.width, aguaTexture.height }; // Usa a resolução original
+    Rectangle aguaDestRec = { aguaIconPos.x, aguaIconPos.y, 24, 24 };  // Tamanho ajustado para 24x24
 
-    // Verifica interações com o mercador e exibe diálogos/mensagens
+    DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, origin, 0.0f, WHITE);  // Desenha o ícone
+    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);  // Texto da água
+
     if (!isPlayerNearMerchant() && showErrorMessage) {
         showErrorMessage = false;
         isInteractingWithMerchant = 0;
