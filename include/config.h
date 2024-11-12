@@ -40,8 +40,8 @@ typedef enum GameScreen { TITLE, RANKINGS, CUTSCENE, LOBBY, GAME } GameScreen;
 // Coordenadas para os três portais no lobby
 #define PORTAL_LOBBY_MAPA1_X 25
 #define PORTAL_LOBBY_MAPA1_Y 1
-#define PORTAL_LOBBY_MAPA2_X 37
-#define PORTAL_LOBBY_MAPA2_Y 9
+#define PORTAL_LOBBY_MAPA2_X 34
+#define PORTAL_LOBBY_MAPA2_Y 19
 #define PORTAL_LOBBY_MAPA3_X 25
 #define PORTAL_LOBBY_MAPA3_Y 19
 

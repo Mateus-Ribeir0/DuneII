@@ -26,21 +26,24 @@ int isPlayerNearMerchant() {
 // Função para verificar se o jogador está na posição de um portal, tanto no lobby quanto nos mapas
 bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
     if (mapaAtual == -1) { // No lobby
-        // Verifica o portal do mapa 1
-        if (new_x >= PORTAL_LOBBY_MAPA1_X && new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
-            new_y >= PORTAL_LOBBY_MAPA1_Y && new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) {
+        // Verifica o portal do mapa 1 (lobby) com uma linha a mais de colisão e uma coluna a menos
+        if (new_x >= PORTAL_LOBBY_MAPA1_X && new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA - 1 &&
+            new_y >= PORTAL_LOBBY_MAPA1_Y && new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1) {
             return true;
         }
-        // Verifica o portal do mapa 2
-        if (new_x >= PORTAL_LOBBY_MAPA2_X && new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
+
+        // Verifica o portal do mapa 2 (lobby) com uma coluna a mais de colisão
+        if (new_x >= PORTAL_LOBBY_MAPA2_X && new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1 &&
             new_y >= PORTAL_LOBBY_MAPA2_Y && new_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) {
             return true;
         }
+
         // Verifica o portal do mapa 3
-        if (new_x >= PORTAL_LOBBY_MAPA3_X && new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
-            new_y >= PORTAL_LOBBY_MAPA3_Y && new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA) {
+        if (new_x >= PORTAL_LOBBY_MAPA3_X && new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA - 1 &&
+            new_y >= PORTAL_LOBBY_MAPA3_Y && new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1) {
             return true;
         }
+
     } else { // Nos mapas, verifica o portal de retorno ao lobby
         if (new_x >= PORTAL_RETORNO_X && new_x < PORTAL_RETORNO_X + PORTAL_RETORNO_LARGURA &&
             new_y >= PORTAL_RETORNO_Y && new_y < PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA) {
@@ -193,14 +196,34 @@ void drawLobby() {
     Texture2D portal = LoadTexture("static/image/portal.png");
 
     Rectangle portalSourceRec = { 0, 0, 32, 32 };
-    Rectangle portalDestRec1 = { PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 32 * 3, 32 * 3 };
-    Rectangle portalDestRec2 = { PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 32 * 3, 32 * 3 };
-    Rectangle portalDestRec3 = { PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 32 * 3, 32 * 3 };
+    Rectangle portalDestRec1 = { 
+    PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
+    PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 
+    32 * (PORTAL_HORIZONTAL_LARGURA - 1),  // Reduz uma coluna da largura
+    32 * (PORTAL_HORIZONTAL_ALTURA + 1)    // Adiciona uma linha na altura
+};
+
+    Rectangle portalDestRec2 = { 
+    PORTAL_LOBBY_MAPA2_X * TILE_SIZE, 
+    PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 
+    32 * (PORTAL_VERTICAL_LARGURA + 1),  // Adiciona uma coluna na largura
+    32 * PORTAL_VERTICAL_ALTURA 
+};
+
+    Rectangle portalDestRec3 = { 
+    PORTAL_LOBBY_MAPA3_X * TILE_SIZE, 
+    PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 
+    32 * (PORTAL_HORIZONTAL_LARGURA - 1),  // Reduz uma coluna da largura
+    32 * (PORTAL_HORIZONTAL_ALTURA + 1)    // Adiciona uma linha na altura
+};
+
     Vector2 origin = { 0, 0 };
 
-    DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);
-    DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);
-    DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);
+    // No código onde você desenha os portais, altere o portal do mapa 2:
+    DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);  // Portal do mapa 1 sem rotação
+    DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);  // Portal do mapa 2 rotacionado em 90 graus
+    DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);  // Portal do mapa 3 sem rotação
+
 
     // Define a área de informações à direita da tela
     int infoBoxX = SCREEN_WIDTH - 230;
