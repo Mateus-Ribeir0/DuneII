@@ -188,15 +188,15 @@ void movePlayer(int dx, int dy) {
     // Define o retângulo do jogador
     Rectangle playerRect = { new_x * TILE_SIZE, new_y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
 
-    // Define o retângulo de colisão das ruínas (deve estar no escopo da função ou global)
+    // Define o retângulo de colisão das ruínas
     Rectangle ruinasCollisionBox = { 20, 20, 256, 256 };  // Ajuste conforme necessário
 
     // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool colidiuComDuna = false;
 
-        // Verifica colisão com o retângulo das ruínas apenas no mapa 3
-        if (mapaAtual == 2 && CheckCollisionRecs(playerRect, ruinasCollisionBox)) {
+        // Verifica colisão com o retângulo das ruínas apenas no mapa 2
+        if (mapaAtual == 1 && CheckCollisionRecs(playerRect, ruinasCollisionBox)) {
             return; // Bloqueia a movimentação se houver colisão com as ruínas
         }
 
