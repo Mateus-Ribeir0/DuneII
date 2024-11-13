@@ -1,7 +1,7 @@
 #include "menu.h"
 
-// Variáveis para elementos visuais e música
-static Texture2D background, logo;
+// Variáveis para elementos visuais
+static Texture2D background, logo, objetivoImage;
 static Music titleMusic;
 static float backgroundPosX;
 
@@ -382,16 +382,45 @@ void atualizarMenu(GameScreen *currentScreen) {
     UpdateMusicStream(titleMusic);
 
     if (*currentScreen == TITLE) {
-        // Movimento de fundo
         backgroundPosX += 0.2f;
         if (backgroundPosX >= background.width) {
             backgroundPosX = 0;
         }
-        else if (IsKeyPressed(KEY_R)) {
-            *currentScreen = RANKINGS;  // Muda para a tela de rankings ao pressionar R
+
+        if (IsKeyPressed(KEY_ENTER)) {
+            *currentScreen = GAME;
+        } else if (IsKeyPressed(KEY_C)) {
+            *currentScreen = OBJETIVO;  // Abre a tela do objetivo
+        } else if (IsKeyPressed(KEY_R)) {
+            *currentScreen = RANKINGS;  // Continua levando para a tela de rankings
         }
+    } else if (*currentScreen == RANKINGS && IsKeyPressed(KEY_Q)) {
+        *currentScreen = TITLE;
+        ResumeMusicStream(titleMusic);
     }
 }
+
+
+void exibirObjetivo() {
+    static bool objetivoLoaded = false;
+
+    if (!objetivoLoaded) {
+        objetivoImage = LoadTexture("static/image/objetivo.png");
+        objetivoLoaded = true;
+    }
+
+    Rectangle source = { 0.0f, 0.0f, (float)objetivoImage.width, (float)objetivoImage.height }; // Área completa da imagem
+    Rectangle dest = { 0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT }; // Tamanho da tela para ocupar 100%
+    Vector2 origin = { 0.0f, 0.0f };
+
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+    DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE); // Desenho com ajuste de tamanho
+    EndDrawing();
+}
+
+
+
 
 // Desenha o menu principal com as opções de dificuldade e transição para o jogo
 void desenharMenu(GameScreen currentScreen) {
@@ -402,6 +431,7 @@ void desenharMenu(GameScreen currentScreen) {
         desenharBackgroundComLogo();
         DrawText("Pressione ENTER para Jogar", SCREEN_WIDTH / 2 - 150, 400, 20, WHITE);
         DrawText("Pressione R para Rankings", SCREEN_WIDTH / 2 - 150, 650, 20, WHITE);
+        DrawText("Pressione C para Controles", SCREEN_WIDTH / 2 - 150, 600, 20, WHITE);
     } 
 
     EndDrawing();
@@ -413,6 +443,7 @@ void finalizarMenu() {
     UnloadTexture(logo);
     StopMusicStream(titleMusic);
     UnloadMusicStream(titleMusic);
+    UnloadTexture(objetivoImage); // Libera a textura do objetivo
     CloseAudioDevice();
     CloseWindow();
 }

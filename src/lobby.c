@@ -26,21 +26,24 @@ int isPlayerNearMerchant() {
 // Função para verificar se o jogador está na posição de um portal, tanto no lobby quanto nos mapas
 bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
     if (mapaAtual == -1) { // No lobby
-        // Verifica o portal do mapa 1
-        if (new_x >= PORTAL_LOBBY_MAPA1_X && new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
-            new_y >= PORTAL_LOBBY_MAPA1_Y && new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) {
+        // Verifica o portal do mapa 1 (lobby) com uma linha a mais de colisão e uma coluna a menos
+        if (new_x >= PORTAL_LOBBY_MAPA1_X && new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA - 1 &&
+            new_y >= PORTAL_LOBBY_MAPA1_Y && new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1) {
             return true;
         }
-        // Verifica o portal do mapa 2
-        if (new_x >= PORTAL_LOBBY_MAPA2_X && new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
+
+        // Verifica o portal do mapa 2 (lobby) com uma coluna a mais de colisão
+        if (new_x >= PORTAL_LOBBY_MAPA2_X && new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1 &&
             new_y >= PORTAL_LOBBY_MAPA2_Y && new_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) {
             return true;
         }
-        // Verifica o portal do mapa 3
-        if (new_x >= PORTAL_LOBBY_MAPA3_X && new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
-            new_y >= PORTAL_LOBBY_MAPA3_Y && new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA) {
+
+        // Verifica o portal do mapa 3 com uma linha a mais de colisão e uma coluna a menos
+        if (new_x >= PORTAL_LOBBY_MAPA3_X && new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA - 1 &&
+            new_y >= PORTAL_LOBBY_MAPA3_Y && new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1) {
             return true;
         }
+
     } else { // Nos mapas, verifica o portal de retorno ao lobby
         if (new_x >= PORTAL_RETORNO_X && new_x < PORTAL_RETORNO_X + PORTAL_RETORNO_LARGURA &&
             new_y >= PORTAL_RETORNO_Y && new_y < PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA) {
@@ -50,8 +53,7 @@ bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
     return false;
 }
 
-
-
+// Função para processar a entrada no lobby e exibir a mensagem de portal ao se aproximar
 void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     mapaAtual = -1;  // Identifica que o jogador está no lobby
     int dx = 0, dy = 0;
@@ -76,9 +78,9 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     // Variável para controlar se o jogador está perto de um portal
     bool pertoDePortal = false;
 
-    // Verifica se o jogador está em volta do portal para o mapa 1
-    if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x <= PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
-         player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y <= PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA)) {
+    // Verifica proximidade com o portal para o mapa 1 com uma linha extra abaixo
+    if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
+         player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 2)) {
         
         mensagem = "Você deseja viajar para o Zamirat?\nPressione [P]\n\nDificuldade: ***";
         pertoDePortal = true;
@@ -88,9 +90,9 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
             mensagem = NULL;  // Limpa a mensagem ao entrar no mapa
         }
     }
-    // Verifica se o jogador está em volta do portal para o mapa 2
-    else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x <= PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
-              player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y <= PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA)) {
+    // Verifica proximidade com o portal para o mapa 2
+    else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1 &&
+              player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA)) {
         
         mensagem = "Você deseja viajar para o Bashir'har?\nPressione [P]\n\nDificuldade: ****";
         pertoDePortal = true;
@@ -100,9 +102,9 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
             mensagem = NULL;  // Limpa a mensagem ao entrar no mapa
         }
     }
-    // Verifica se o jogador está em volta do portal para o mapa 3
-    else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x <= PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
-              player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y <= PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA)) {
+    // Verifica proximidade com o portal para o mapa 3
+    else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
+              player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
         mensagem = "Você deseja viajar para o Qasr'Rahim?\nPressione [P]\n\nDificuldade: *****";
         pertoDePortal = true;
@@ -118,6 +120,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
         mensagem = NULL;
     }
 }
+
 
 
 void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool isPortalDialog) {
@@ -171,9 +174,16 @@ const int widthMercador = 620;
 const int heigthMercador = 140;
 
 void drawLobby() {
-    ClearBackground((Color){195, 160, 81, 255});  // Define um fundo claro para o lobby
+
+    Sound troca = LoadSound("static/music/trocaDeDinheiro.wav");
+
+    Texture2D desertTileset = LoadTexture("static/image/environment.png");
+    Rectangle tileSourceRec = { 128, 32, 32, 32 };
 
     Texture2D vendinha = LoadTexture("static/image/market_assets.png");
+    Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
+    Texture2D goldTexture = LoadTexture("static/image/gold.png");
+    Texture2D aguaTexture = LoadTexture("static/image/agua.png");
 
     Rectangle hitboxVendinha = {96, 0, 90, 96};
     Vector2 posicaoVendinha = {20, 20};
@@ -181,45 +191,138 @@ void drawLobby() {
     // Desenha o fundo do lobby com tiles de areia
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
-            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){195, 160, 81, 255});
+            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+            DrawTextureRec(desertTileset, tileSourceRec, tilePosition, WHITE);
         }
     }
 
     // Desenha a textura da vendinha
     DrawTextureRec(vendinha, hitboxVendinha, posicaoVendinha, WHITE);
-    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
 
-    // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby com 3x3 tiles (96x96 pixels)
+    // Desenha o personagem animado no lugar do bloco azul
+    Texture2D personagem = LoadTexture("static/image/spritesheet-character.png");
+    static int direcao = 0;  // Variável para armazenar a direção atual do personagem
+    static int frameAtual = 0;  // Frame da animação
+    static float tempoAnimacao = 0.0f;
+    const float duracaoFrame = 0.1f;
+
+    // Atualize a direção com base na tecla pressionada
+    if (IsKeyPressed(KEY_A)) {
+        direcao = 1; // Esquerda
+    } else if (IsKeyPressed(KEY_D)) {
+        direcao = 2; // Direita
+    } else if (IsKeyPressed(KEY_W)) {
+        direcao = 3; // Cima
+    } else if (IsKeyPressed(KEY_S)) {
+        direcao = 4; // Baixo
+    }
+
+    // Atualize o `sourceRec` com base na direção atual
+    Rectangle sourceRec;
+    switch (direcao) {
+        case 1: // Esquerda
+            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 64 : 96, 0, 32, 64};
+            break;
+        case 2: // Direita
+            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 0 : 32, 0, 32, 64};
+            break;
+        case 3: // Cima
+            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 128 : 160, 0, 32, 64};
+            break;
+        case 4: // Baixo
+            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 192 : 224, 0, 32, 64};
+            break;
+        default: // Parado
+            sourceRec = (Rectangle){0, 0, 32, 64};
+            break;
+    }
+
+    // Define a posição do personagem no lobby
+    Vector2 playerPosition = { player_x * TILE_SIZE, player_y * TILE_SIZE };
+
+    // Desenha o sprite do personagem animado
+    DrawTextureRec(personagem, sourceRec, playerPosition, WHITE);
+
+    // Atualiza o frame atual para a próxima animação
+    tempoAnimacao += GetFrameTime();
+    if (tempoAnimacao >= duracaoFrame) {
+        tempoAnimacao = 0;
+        frameAtual = (frameAtual + 1) % 2;  // Alterna entre os dois frames (0 e 1)
+    }
+
+    // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby
     Texture2D portal = LoadTexture("static/image/portal.png");
-
+    
     Rectangle portalSourceRec = { 0, 0, 32, 32 };
-    Rectangle portalDestRec1 = { PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 32 * 3, 32 * 3 };
-    Rectangle portalDestRec2 = { PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 32 * 3, 32 * 3 };
-    Rectangle portalDestRec3 = { PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 32 * 3, 32 * 3 };
+    Rectangle portalDestRec1 = { 
+        PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 
+        32 * (PORTAL_HORIZONTAL_LARGURA - 1),  
+        32 * (PORTAL_HORIZONTAL_ALTURA + 1)    
+    };
+    Rectangle portalDestRec2 = { 
+        PORTAL_LOBBY_MAPA2_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 
+        32 * (PORTAL_HORIZONTAL_LARGURA - 1),  
+        32 * (PORTAL_HORIZONTAL_ALTURA + 1)    
+    };
+    Rectangle portalDestRec3 = { 
+        PORTAL_LOBBY_MAPA3_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 
+        32 * (PORTAL_HORIZONTAL_LARGURA - 1),  
+        32 * (PORTAL_HORIZONTAL_ALTURA + 1)    
+    };
+
     Vector2 origin = { 0, 0 };
 
+    // Desenha os portais
     DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);
 
-    // Define a área de informações à direita da tela
+    // Define a área de informações no canto direito da tela
     int infoBoxX = SCREEN_WIDTH - 230;
     int infoBoxY = 10;
     int infoBoxWidth = 220;
     int infoBoxHeight = 100;
 
-    // Desenha o fundo e a borda arredondada para a caixa de informações
-    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){169, 169, 169, 255}); // Fundo cinza claro
-    // Corrigindo a linha para desenhar a borda arredondada com os parâmetros corretos
-    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){105, 105, 105, 255});
+    // Definir as cores para o preenchimento e borda conforme desejado
+    Color fillColor = (Color){205, 133, 63, 255};   // Marrom claro para o preenchimento
+    Color borderColor = (Color){101, 67, 33, 255};  // Marrom escuro para a borda
 
+    // Desenhar o fundo e a borda arredondada para a caixa de informações no lobby
+    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, fillColor);
+    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, borderColor);
+    DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, borderColor);
+    DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, borderColor);
 
-    // Exibe as informações de especiarias, dinheiro e nível de água dentro da caixa de informações
-    DrawText(TextFormat("Especiarias: %d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 10, infoBoxY + 10, 18, WHITE);
-    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 10, infoBoxY + 40, 18, WHITE);
-    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 10, infoBoxY + 70, 18, WHITE);
+    // Ajuste da posição vertical para centralizar melhor a imagem da especiaria
+    int especiariaIconY = infoBoxY + 1;
+    Vector2 especiariaIconPos = { infoBoxX + 10, especiariaIconY };
+    DrawTextureRec(cerealsTexture, (Rectangle){64, 64, 32, 32}, especiariaIconPos, WHITE);
 
-    // Verifica interações com o mercador e exibe diálogos/mensagens
+    // Exibe as informações de especiarias, dinheiro e água dentro da caixa de informações
+    DrawText("Especiarias:", infoBoxX + 50, infoBoxY + 10, 18, WHITE);
+    DrawText(TextFormat("%d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 160, infoBoxY + 10, 18, WHITE);
+
+    // Exibe o ícone de ouro e o texto do dinheiro
+        // Exibe o ícone de ouro e o texto do dinheiro
+    Vector2 goldIconPos = { infoBoxX + 15, infoBoxY + 35 };  // Ajustado para ficar mais à direita e para cima
+    Rectangle goldSourceRec = { 0, 0, 16, 16 };  // Tamanho original da imagem
+    Rectangle goldDestRec = { goldIconPos.x, goldIconPos.y, 24, 24 };  // Tamanho ajustado para 24x24
+
+    DrawTexturePro(goldTexture, goldSourceRec, goldDestRec, origin, 0.0f, WHITE);
+    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 50, infoBoxY + 40, 18, WHITE);
+
+    // Ícone e texto da água
+    // Ícone e texto da água
+    Vector2 aguaIconPos = { infoBoxX + 18, infoBoxY + 65 };  // Move um pouco mais para a esquerda
+    Rectangle aguaSourceRec = { 0, 0, aguaTexture.width, aguaTexture.height }; // Usa a resolução original
+    Rectangle aguaDestRec = { aguaIconPos.x, aguaIconPos.y, 24, 24 };  // Tamanho ajustado para 24x24
+
+    DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, origin, 0.0f, WHITE);  // Desenha o ícone
+    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);  // Texto da água
+
     if (!isPlayerNearMerchant() && showErrorMessage) {
         showErrorMessage = false;
         isInteractingWithMerchant = 0;
@@ -234,6 +337,8 @@ void drawLobby() {
     }
 
     if (showThankYouMessage) {
+        
+        PlaySound(troca);
         DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
         if (GetTime() - errorMessageTimer >= MESSAGE_DURATION) {
             showThankYouMessage = false;
@@ -336,6 +441,8 @@ void drawLobby() {
         isInteractingWithMerchant = 0;
     }
 }
+
+
 
 
 

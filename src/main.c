@@ -15,7 +15,7 @@ int main() {
     iniciarMenu(&currentScreen);
 
     while (!WindowShouldClose()) {
-        UpdateMusicStream(titleMusic);
+    UpdateMusicStream(titleMusic);
 
         switch (currentScreen) {
             case TITLE:
@@ -27,6 +27,13 @@ int main() {
                 break;
             case NAME_INPUT:
                 recebeNomeDoPlayer(&currentScreen);
+                break;
+            case OBJETIVO:
+                if (IsKeyPressed(KEY_Q)) {
+                    currentScreen = TITLE;
+                } else {
+                    exibirObjetivo();
+                }
                 break;
             case CUTSCENE:
                 cutsceneArrakis(titleMusic);

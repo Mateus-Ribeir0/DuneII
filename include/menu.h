@@ -10,6 +10,7 @@ void atualizarMenu(GameScreen *currentScreen);
 void desenharMenu(GameScreen currentScreen);
 void finalizarMenu();
 void cutsceneArrakis(Music music);
+void exibirObjetivo();
 void desenharBackgroundComLogo();
 void recebeNomeDoPlayer(GameScreen *currentScreen);
 

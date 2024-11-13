@@ -11,6 +11,9 @@ Texture2D personagem;
 Texture2D environment;
 int teveUnload = 0;
 int deathEmotivaTocando;
+Texture2D cerealsTexture;
+
+Rectangle cerealsSourceRec = { 64, 64, 32, 32 };
 
 // Arrays para armazenar as imagens de carregamento
 Texture2D loadingImagesMap0[4];
@@ -182,9 +185,20 @@ void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;
 
+    // Define o retângulo do jogador
+    Rectangle playerRect = { new_x * TILE_SIZE, new_y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
+
+    // Define o retângulo de colisão das ruínas (deve estar no escopo da função ou global)
+    Rectangle ruinasCollisionBox = { 20, 20, 256, 256 };  // Ajuste conforme necessário
+
     // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool colidiuComDuna = false;
+
+        // Verifica colisão com o retângulo das ruínas apenas no mapa 3
+        if (mapaAtual == 2 && CheckCollisionRecs(playerRect, ruinasCollisionBox)) {
+            return; // Bloqueia a movimentação se houver colisão com as ruínas
+        }
 
         // Verifica colisão com os portais no lobby e nos mapas
         if (isPlayerOnPortal(new_x, new_y, mapaAtual)) {
@@ -218,7 +232,7 @@ void movePlayer(int dx, int dy) {
             }
         }
 
-        // Se não houver colisão com uma duna ou portal, movimenta o jogador
+        // Se não houver colisão com uma duna, ruínas ou portal, movimenta o jogador
         if (!colidiuComDuna) {
             player_x = new_x;
             player_y = new_y;
@@ -229,49 +243,118 @@ void movePlayer(int dx, int dy) {
 
 
 
-
+// Variável para armazenar a direção atual do personagem
+int direcao = 0;  // 0 = parado, 1 = esquerda, 2 = direita, 3 = cima, 4 = baixo
 
 void drawGame() {
     ClearBackground(RAYWHITE);
 
-    // Desenha o mapa de fundo
+    Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
+
+    Texture2D ruinasDeAreiaGrandes = LoadTexture("static/image/Sand_ruins1.png");
+
+    // Itera sobre a área do mapa e desenha o tile em cada posição
+    Color desertColor = (Color){210, 178, 104, 255};  // Define a cor desejada
+
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
-            DrawRectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, (Color){195, 160, 81, 255});
+            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+            DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, desertColor);
         }
     }
 
-    // Carrega a textura do ambiente e desenha dunas, personagem, e itens coletáveis
-    environment = LoadTexture("static/image/environment.png");
-    Rectangle hitboxDuna = {96, 96, 96, 96};
+    Texture2D environment = LoadTexture("static/image/Rock6_1.png");
+    Texture2D ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
+    Rectangle sourceRect = {64, 64, 64, 64}; // Área da textura original
+    Vector2 origin = {0, 0}; // Origem de rotação (mantida em (0, 0))
 
-    // Desenha as dunas com base no mapa atual
+    Rectangle ruinasSourceRec = {0, 0, ruinasDeAreiaGrandes.width, ruinasDeAreiaGrandes.height}; // Recorte original da textura
+    Rectangle ruinasDestRec = {20, 20, 256, 256}; // Destino com escala maior (256x256)
+
+
+    // Definindo a caixa de colisão de ruinasDeAreia em 256x256
+
+
     if (mapaAtual == 0) {
         for (int i = 0; i < DUNAS_MAPA1; i++) {
-            Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
-            DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
+            Vector2 posicaoDuna = { posicoesDunasMapa2[i].x * TILE_SIZE, posicoesDunasMapa2[i].y * TILE_SIZE };
+            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
+            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     } else if (mapaAtual == 1) {
+        // Desenha ruinasDeAreia em tamanho maior
+        DrawTexturePro(ruinasDeAreiaGrandes, ruinasSourceRec, ruinasDestRec, origin, 0.0f, WHITE);
+        DrawTexture(ruinasDeAreiaPequenas, 20, 20, RAYWHITE);
         for (int i = 0; i < DUNAS_MAPA2; i++) {
-            Vector2 posicaoDuna = { posicoesDunasMapa2[i].x * TILE_SIZE, posicoesDunasMapa2[i].y * TILE_SIZE };
-            DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
+            Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
+            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
+            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE); 
         }
     } else if (mapaAtual == 2) {
         for (int i = 0; i < DUNAS_MAPA3; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa3[i].x * TILE_SIZE, posicoesDunasMapa3[i].y * TILE_SIZE };
-            DrawTextureRec(environment, hitboxDuna, posicaoDuna, WHITE);
+            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
+            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     }
 
     // Desenha o personagem
-    personagem = LoadTexture("static/image/spritesheet-character.png");
-    Rectangle sourceRec = { frameAtual * 32, 0, 32, 64 };
+    Texture2D personagem = LoadTexture("static/image/spritesheet-character.png");
+    static int direcao = 0;  // Variável para armazenar a direção atual do personagem
+    Rectangle sourceRec = {0, 0, 32, 64};  // Inicializa o retângulo de origem
+
+    // Atualize a direção com base na tecla pressionada
+    if (IsKeyPressed(KEY_A)) {
+        direcao = 1; // Esquerda
+    } else if (IsKeyPressed(KEY_D)) {
+        direcao = 2; // Direita
+    } else if (IsKeyPressed(KEY_W)) {
+        direcao = 3; // Cima
+    } else if (IsKeyPressed(KEY_S)) {
+        direcao = 4; // Baixo
+    }
+
+    // Atualize o `sourceRec` com base na direção atual
+    switch (direcao) {
+        case 1: // Esquerda
+            sourceRec.x = (frameAtual % 2 == 0) ? 64 : 96;
+            sourceRec.y = 0;
+            break;
+        case 2: // Direita
+            sourceRec.x = (frameAtual % 2 == 0) ? 0 : 32;
+            sourceRec.y = 0;
+            break;
+        case 3: // Cima
+            sourceRec.x = (frameAtual % 2 == 0) ? 128 : 160;
+            sourceRec.y = 0;
+            break;
+        case 4: // Baixo
+            sourceRec.x = (frameAtual % 2 == 0) ? 192 : 224;
+            sourceRec.y = 0;
+            break;
+        default: // Parado
+            sourceRec.x = 0;
+            sourceRec.y = 0;
+            break;
+    }
+
+    // Define a posição do personagem na tela
     Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
+
+    // Desenha o sprite do personagem na tela
     DrawTextureRec(personagem, sourceRec, position, WHITE);
 
-    // Desenha o item se não estiver coletado
+    // Atualiza o frame atual para a próxima animação
+    tempoAnimacao += GetFrameTime();
+    if (tempoAnimacao >= duracaoFrame) {
+        tempoAnimacao = 0;
+        frameAtual = (frameAtual + 1) % 2;  // Alterna entre os dois frames (0 e 1)
+    }
+
+    // Desenha o item usando o novo sprite recortado se ele não estiver coletado
     if (!items[0].collected) {
-        DrawCircle(items[0].position.x * TILE_SIZE + TILE_SIZE / 2, items[0].position.y * TILE_SIZE + TILE_SIZE / 4, TILE_SIZE / 4, GOLD);
+        Vector2 itemPosition = { items[0].position.x * TILE_SIZE, items[0].position.y * TILE_SIZE };
+        DrawTextureRec(cerealsTexture, cerealsSourceRec, itemPosition, WHITE);
     }
 
     // Desenha o HUD do jogo no canto direito da tela
@@ -280,14 +363,42 @@ void drawGame() {
     int infoBoxWidth = 220;
     int infoBoxHeight = 100;
 
-    // Desenha a caixa de informações
-    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){169, 169, 169, 255});
-    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){105, 105, 105, 255});
+    // Desenhar o preenchimento da caixa com um marrom mais suave
+    DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){205, 133, 63, 255});
 
-    // Exibe as informações de especiarias, dinheiro e nível de água
-    DrawText(TextFormat("Especiarias: %d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 10, infoBoxY + 10, 18, WHITE);
-    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 10, infoBoxY + 40, 18, WHITE);
-    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 10, infoBoxY + 70, 18, WHITE);
+    // Desenhar a borda simulando uma espessura extra
+    DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){101, 67, 33, 255});
+    DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, (Color){101, 67, 33, 255});
+    DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, (Color){101, 67, 33, 255});
+
+
+    Texture2D goldTexture = LoadTexture("static/image/gold.png");
+    Texture2D aguaTexture = LoadTexture("static/image/agua.png");
+
+    // Posiciona a imagem da especiaria (cerealsTexture) e o texto "Especiarias"
+    int especiariaIconY = infoBoxY + 1;
+    Vector2 especiariaIconPos = { infoBoxX + 10, especiariaIconY };
+    DrawTextureRec(cerealsTexture, (Rectangle){64, 64, 32, 32}, especiariaIconPos, WHITE);
+
+    // Desenha o texto "Especiarias:" ao lado da imagem e a quantidade coletada
+    DrawText("Especiarias:", infoBoxX + 50, infoBoxY + 10, 18, WHITE);
+    DrawText(TextFormat("%d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 160, infoBoxY + 10, 18, WHITE);
+
+    // Exibe o ícone de ouro e o texto do dinheiro logo abaixo
+    Vector2 goldIconPos = { infoBoxX + 15, infoBoxY + 35 };
+    Rectangle goldSourceRec = { 0, 0, 16, 16 };
+    Rectangle goldDestRec = { goldIconPos.x, goldIconPos.y, 24, 24 };
+
+    DrawTexturePro(goldTexture, goldSourceRec, goldDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 50, infoBoxY + 40, 18, WHITE);
+
+    // Exibe o ícone de água e o texto de água logo abaixo de goldTexture
+    Vector2 aguaIconPos = { infoBoxX + 18, infoBoxY + 65 };
+    Rectangle aguaSourceRec = { 0, 0, aguaTexture.width, aguaTexture.height };
+    Rectangle aguaDestRec = { aguaIconPos.x, aguaIconPos.y, 24, 24 };
+
+    DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
 
     // Desenha o portal de retorno ao lobby
     DrawRectangle(PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE,
@@ -332,23 +443,24 @@ int contar_ocorrencias_consecutivas(const char *historico, const char *padrao, s
 int identificar_padrao_mais_frequente(const char *historico, size_t tamanho_padrao, char *padrao_mais_frequente) {
     char padrao_atual[MAX_PADRAO + 1];
     int max_ocorrencias = 0;
-    int ocorrencias;
     size_t historico_len = strlen(historico);
 
     for (size_t i = 0; i <= historico_len - tamanho_padrao; i++) {
         strncpy(padrao_atual, &historico[i], tamanho_padrao);
         padrao_atual[tamanho_padrao] = '\0';
-        
-        ocorrencias = contar_ocorrencias_consecutivas(historico, padrao_atual, tamanho_padrao);
-        
+
+        int ocorrencias = contar_ocorrencias_consecutivas(historico, padrao_atual, tamanho_padrao);
+
         if (ocorrencias > max_ocorrencias) {
             max_ocorrencias = ocorrencias;
-            strncpy(padrao_mais_frequente, padrao_atual, MAX_PADRAO);
+            strncpy(padrao_mais_frequente, padrao_atual, tamanho_padrao);
+            padrao_mais_frequente[tamanho_padrao] = '\0';
         }
     }
-    
-    return max_ocorrencias > 1 ? max_ocorrencias : 0;
+
+    return max_ocorrencias;
 }
+
 
 void limparHistoricoPassos() {
     memset(historico, 0, sizeof(historico));
@@ -465,7 +577,6 @@ void playGame(GameScreen *currentScreen) {
 
             ClearBackground(BLACK);
             PlaySound(spellCastSound);
-
             sleep(2);
 
             showLoadingScreen(loadingImagesLobby);
@@ -499,12 +610,6 @@ void playGame(GameScreen *currentScreen) {
                 (dificuldade == 4 && strlen(historico) >= 4 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 4, padrao_encontrado))) ||
                 (dificuldade == 3 && strlen(historico) >= 3 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 3, padrao_encontrado)))) 
             {
-                char padrao_completo[MAX_PADRAO + 1];
-                for (int i = 0; i < dificuldade; i++) {
-                    padrao_completo[i] = padrao_encontrado[0];
-                }
-                padrao_completo[dificuldade] = '\0';
-
                 Sound gameOverSound = LoadSound("static/music/deathsound.wav");
                 Sound barulhoMonstro = LoadSound("static/music/monster.mp3");
                 Texture2D characterBack = LoadTexture("static/image/characterback.png");
@@ -516,20 +621,19 @@ void playGame(GameScreen *currentScreen) {
                 UnloadSound(musicaMapa2);
 
                 PlaySound(gameOverSound);
-
                 sleep(1);
 
                 for (int i = 0; i < 180; i++) {
                     BeginDrawing();
                     ClearBackground(BLACK);
                     DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
-                    DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_completo), 10, 40, 20, RED);
+                    DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
                     EndDrawing();
                 }
 
-                sleep(2);
-
                 PlaySound(barulhoMonstro);
+                sleep(1);
+
                 Sound deathEmotiva = LoadSound("static/music/deathemotiva.wav");
                 deathEmotivaTocando = 1;
                 PlaySound(deathEmotiva);
@@ -554,10 +658,9 @@ void playGame(GameScreen *currentScreen) {
                 UnloadTexture(characterBack);
                 UnloadTexture(sandworm);
 
-                // Exibição do texto com animação de digitação
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
-                float tempoPorCaractere = 0.5f;  // Tempo em segundos para cada caractere aparecer
+                float tempoPorCaractere = 0.5f;
                 float timer = 0;
 
                 while (caractereExibido < strlen(euFalhei) && !WindowShouldClose()) {
@@ -565,7 +668,6 @@ void playGame(GameScreen *currentScreen) {
                     ClearBackground(BLACK);
                     timer += GetFrameTime();
 
-                    // Exibe um caractere a cada intervalo de tempo
                     if (timer >= tempoPorCaractere) {
                         caractereExibido++;
                         timer = 0;
@@ -577,7 +679,6 @@ void playGame(GameScreen *currentScreen) {
                     EndDrawing();
                 }
 
-                // Exibe o texto completo por mais 2 segundos antes de ir para o ranking
                 sleep(2);
 
                 atualizarRanking(playerName, playerMoney);
@@ -600,6 +701,7 @@ void playGame(GameScreen *currentScreen) {
         UnloadSound(musicaMapa2);
     }
 }
+
 
 
 

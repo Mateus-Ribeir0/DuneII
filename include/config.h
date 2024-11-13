@@ -7,7 +7,8 @@
 #include <string.h>
 #include "raylib.h"
 
-typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, RANKINGS } GameScreen;
+typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RANKINGS } GameScreen;
+
 
 // Constantes de configuração, disponíveis para todos os arquivos
 #define TILE_SIZE 32
@@ -42,11 +43,11 @@ extern char playerName[MAX_NAME_LENGTH];
 #define PORTAL_VERTICAL_ALTURA 4
 
 // Coordenadas para os três portais no lobby
-#define PORTAL_LOBBY_MAPA1_X 25
-#define PORTAL_LOBBY_MAPA1_Y 1
-#define PORTAL_LOBBY_MAPA2_X 37
-#define PORTAL_LOBBY_MAPA2_Y 9
-#define PORTAL_LOBBY_MAPA3_X 25
+#define PORTAL_LOBBY_MAPA1_X 22
+#define PORTAL_LOBBY_MAPA1_Y 19
+#define PORTAL_LOBBY_MAPA2_X 28
+#define PORTAL_LOBBY_MAPA2_Y 19
+#define PORTAL_LOBBY_MAPA3_X 34
 #define PORTAL_LOBBY_MAPA3_Y 19
 
 // Coordenadas para o portal de retorno ao lobby
