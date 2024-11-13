@@ -1,17 +1,35 @@
 #include "game.h"
 #include "lobby.h"
 
+static Texture2D personagem;
+static Texture2D personagemAndando;
+static Texture2D environment;
+static Texture2D cerealsTexture;
+static Texture2D ruinasDeAreiaGrandes;
+static Texture2D environment1_1;
+static Texture2D environment1_2;
+static Texture2D environment2_1;
+static Texture2D environment2_2;
+static Texture2D ruinasDeAreiaPequenas;
+static Texture2D goldTexture;
+static Texture2D aguaTexture;
+static Texture2D characterBack;
+static Texture2D sandworm;
+static Sound musicaMapa0;
+static Sound musicaMapa1;
+static Sound musicaMapa2;
+static Sound spellCastSound;
+static Sound gameOverSound;
+static Sound barulhoMonstro;
+static Sound deathEmotiva;
+
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
 #define MAX_PADRAO 9
 #define TOTAL_ESPECIARIAS 15
 
 int playerMoney = 0;  // Definição
-Texture2D personagem;
-Texture2D environment;
-int teveUnload = 0;
 int deathEmotivaTocando;
-Texture2D cerealsTexture;
 
 Rectangle cerealsSourceRec = { 64, 64, 32, 32 };
 
@@ -23,7 +41,6 @@ Texture2D loadingImagesLobby[4];
 
 // Tempos de exibição de cada imagem (aumentado em 2 segundos)
 const float loadingImageDisplayTimes[4] = {2.5f, 3.0f, 3.5f, 4.0f};  
-Sound spellCastSound;  // Som para a tela de carregamento
 
 typedef struct {
     int x, y;
@@ -37,7 +54,6 @@ typedef struct {
 Item items[NUM_ITEMS];
 char historico[MAX_HISTORICO] = "";
 int passosRepetidosMax = 3;
-static unsigned long seed = 22135234;
 
 // Variáveis de animação do personagem
 int frameAtual = 0;
@@ -54,16 +70,6 @@ Point posicoesEspeciarias[TOTAL_ESPECIARIAS] = {
 
 // Índice para rastrear a próxima especiaria a aparecer
 int indiceEspeciariaAtual = 0;
-
-// Funções de randomização
-void custom_srand(unsigned long s) {
-    seed = s;
-}
-
-int custom_rand() {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    return (int)(seed % 32768); 
-}
 
 // Funções para inicializar as imagens de carregamento para cada mapa
 void initializeLoadingScreen() {
@@ -90,6 +96,71 @@ void initializeLoadingScreen() {
     loadingImagesLobby[2] = LoadTexture("static/image/cutsceneLobbyColored3.png");
     loadingImagesLobby[3] = LoadTexture("static/image/cutsceneLobbyColored4.png");
 
+}
+
+void iniciarGame() {
+    // Carrega texturas
+    personagem = LoadTexture("static/image/newstoppedsprites.png");
+    personagemAndando = LoadTexture("static/image/newwalkingsprites.png");
+    environment = LoadTexture("static/image/environment.png");
+    cerealsTexture = LoadTexture("static/image/Cereals.png");
+    ruinasDeAreiaGrandes = LoadTexture("static/image/Sand_ruins1.png");
+    environment1_1 = LoadTexture("static/image/Rock6_1.png");
+    environment1_2 = LoadTexture("static/image/Rock6_3.png");
+    environment2_1 = LoadTexture("static/image/Rock2_1.png");
+    environment2_2 = LoadTexture("static/image/Rock2_3.png");
+    ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
+    goldTexture = LoadTexture("static/image/gold.png");
+    aguaTexture = LoadTexture("static/image/agua.png");
+    characterBack = LoadTexture("static/image/characterback.png");
+    sandworm = LoadTexture("static/image/sandworm.png");
+
+    // Carrega sons
+    musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
+    musicaMapa1 = LoadSound("static/music/mapa1musica.wav");
+    musicaMapa2 = LoadSound("static/music/mapa2musica.wav");
+    spellCastSound = LoadSound("static/music/spellcast.mp3");
+    gameOverSound = LoadSound("static/music/deathsfx2.wav");
+    barulhoMonstro = LoadSound("static/music/monster.mp3");
+    deathEmotiva = LoadSound("static/music/deathemotiva.wav");
+
+    // Inicializa as imagens de carregamento
+    initializeLoadingScreen();
+}
+
+void finalizarGame() {
+    // Descarrega texturas
+    UnloadTexture(personagem);
+    UnloadTexture(personagemAndando);
+    UnloadTexture(environment);
+    UnloadTexture(cerealsTexture);
+    UnloadTexture(ruinasDeAreiaGrandes);
+    UnloadTexture(environment1_1);
+    UnloadTexture(environment1_2);
+    UnloadTexture(environment2_1);
+    UnloadTexture(environment2_2);
+    UnloadTexture(ruinasDeAreiaPequenas);
+    UnloadTexture(goldTexture);
+    UnloadTexture(aguaTexture);
+    UnloadTexture(characterBack);
+    UnloadTexture(sandworm);
+
+    // Descarrega sons
+    //UnloadSound(musicaMapa0);
+    //UnloadSound(musicaMapa1);
+    //UnloadSound(musicaMapa2);
+    UnloadSound(spellCastSound);
+    UnloadSound(gameOverSound);
+    UnloadSound(barulhoMonstro);
+    UnloadSound(deathEmotiva);
+
+    // Descarrega as imagens de carregamento
+    for (int i = 0; i < 4; i++) {
+        UnloadTexture(loadingImagesMap0[i]);
+        UnloadTexture(loadingImagesMap1[i]);
+        UnloadTexture(loadingImagesMap2[i]);
+        UnloadTexture(loadingImagesLobby[i]);
+    }
 }
 
 // Função para exibir a sequência de telas de carregamento
@@ -142,8 +213,6 @@ void updateWaterLevel(GameScreen *currentScreen) {
         }
     }
 }
-
-
 
 // Lógica de coleta de especiarias, com atualização para a próxima posição após a coleta
 void checkItemCollection() {
@@ -270,10 +339,6 @@ int direcao = 0;  // 0 = parado, 1 = esquerda, 2 = direita, 3 = cima, 4 = baixo
 void drawGame() {
     ClearBackground(RAYWHITE);
 
-    Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
-
-    Texture2D ruinasDeAreiaGrandes = LoadTexture("static/image/Sand_ruins1.png");
-
     // Itera sobre a área do mapa e desenha o tile em cada posição
     Color map0Color = (Color){210, 178, 104, 255};  // Define a cor desejada
     Color map1Color = (Color){210, 178, 104, 255};
@@ -286,11 +351,6 @@ void drawGame() {
         }
     }
 
-    Texture2D environment1_1 = LoadTexture("static/image/Rock6_1.png");
-    Texture2D environment1_2 = LoadTexture("static/image/Rock6_3.png");
-    Texture2D environment2_1 = LoadTexture("static/image/Rock2_1.png");
-    Texture2D environment2_2 = LoadTexture("static/image/Rock2_3.png");
-    Texture2D ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
     Rectangle sourceRect = {64, 64, 64, 64}; // Área da textura original
     Vector2 origin = {0, 0}; // Origem de rotação (mantida em (0, 0))
 
@@ -329,10 +389,6 @@ void drawGame() {
             DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     }
-
-    // Desenha o personagem
-    Texture2D personagem = LoadTexture("static/image/newstoppedsprites.png");
-    Texture2D personagemAndando = LoadTexture("static/image/newwalkingsprites.png");
 
     // Atualize a direção com base na tecla pressionada
     static int lastDirection = 3;  // Começa apontando para "baixo" (S)
@@ -419,9 +475,6 @@ void drawGame() {
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, (Color){101, 67, 33, 255});
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, (Color){101, 67, 33, 255});
 
-
-    Texture2D goldTexture = LoadTexture("static/image/gold.png");
-    Texture2D aguaTexture = LoadTexture("static/image/agua.png");
 
     // Posiciona a imagem da especiaria (cerealsTexture) e o texto "Especiarias"
     int especiariaIconY = infoBoxY + 1;
@@ -518,11 +571,9 @@ void resetarJogo() {
     player_x = MAPA_LARGURA / 2;
     player_y = MAPA_ALTURA / 2;
     limparHistoricoPassos();
-    custom_srand(1322);
     inicializarEspeciaria();
     playerWater = 100.0;  // Restaura o nível de água para 100%
 }
-
 
 void zerarMonetaria() {
     itemsCollected = 0;
@@ -545,19 +596,11 @@ bool isPlayerNearPortal() {
 }
 
 void playGame(GameScreen *currentScreen) {
-    initializeLoadingScreen();
 
     ClearBackground(BLACK);
     BeginDrawing();
     EndDrawing();
 
-    teveUnload = 1;
-
-    Sound musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
-    Sound musicaMapa1 = LoadSound("static/music/mapa1musica.wav");
-    Sound musicaMapa2 = LoadSound("static/music/mapa2musica.wav");
-
-    spellCastSound = LoadSound("static/music/spellcast.mp3");
     PlaySound(spellCastSound);
     sleep(2);
 
@@ -612,16 +655,6 @@ void playGame(GameScreen *currentScreen) {
         if (pertoDoPortal && IsKeyPressed(KEY_P)) {
             player_x = MAPA_LARGURA / 2;
             player_y = MAPA_ALTURA / 2;
-            if(mapaAtual == 0) {
-                UnloadSound(musicaMapa0);
-                teveUnload = 0;
-            } else if(mapaAtual == 1) {
-                UnloadSound(musicaMapa1);
-                teveUnload = 0;
-            } else if(mapaAtual == 2) {
-                UnloadSound(musicaMapa2);
-                teveUnload = 0;
-            }
 
             ClearBackground(BLACK);
             PlaySound(spellCastSound);
@@ -658,16 +691,12 @@ void playGame(GameScreen *currentScreen) {
                 (dificuldade == 4 && strlen(historico) >= 4 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 4, padrao_encontrado))) ||
                 (dificuldade == 3 && strlen(historico) >= 3 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 3, padrao_encontrado)))) 
             {
-                Sound gameOverSound = LoadSound("static/music/deathsfx2.wav");
-                Sound barulhoMonstro = LoadSound("static/music/monster.mp3");
-                Texture2D characterBack = LoadTexture("static/image/characterback.png");
-                Texture2D sandworm = LoadTexture("static/image/sandworm.png");
 
-                teveUnload = 0;
                 UnloadSound(musicaMapa0);
                 UnloadSound(musicaMapa1);
                 UnloadSound(musicaMapa2);
-
+                
+                sleep(1);
                 PlaySound(gameOverSound);
                 sleep(1);
 
@@ -682,7 +711,6 @@ void playGame(GameScreen *currentScreen) {
                 PlaySound(barulhoMonstro);
                 sleep(1);
 
-                Sound deathEmotiva = LoadSound("static/music/deathemotiva.wav");
                 deathEmotivaTocando = 1;
                 PlaySound(deathEmotiva);
 
@@ -701,10 +729,10 @@ void playGame(GameScreen *currentScreen) {
                     sleep(1);
                 }
 
-                UnloadSound(gameOverSound);
-                UnloadSound(barulhoMonstro);
-                UnloadTexture(characterBack);
-                UnloadTexture(sandworm);
+                //UnloadSound(gameOverSound);
+                //UnloadSound(barulhoMonstro);
+                //UnloadTexture(characterBack);
+                //UnloadTexture(sandworm);
 
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
@@ -743,22 +771,4 @@ void playGame(GameScreen *currentScreen) {
         EndDrawing();
     }
 
-    if (teveUnload != 0) {
-        UnloadSound(musicaMapa0);
-        UnloadSound(musicaMapa1);
-        UnloadSound(musicaMapa2);
-    }
-}
-
-
-
-
-// Função para liberar recursos no final do jogo
-void UnloadAssets() {
-    for (int i = 0; i < 4; i++) {
-        UnloadTexture(loadingImagesMap0[i]);
-        UnloadTexture(loadingImagesMap1[i]);
-        UnloadTexture(loadingImagesMap2[i]);
-        UnloadTexture(loadingImagesLobby[i]);
-    }
 }

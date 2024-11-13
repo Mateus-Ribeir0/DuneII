@@ -6,6 +6,7 @@
 int main() {
     GameScreen currentScreen = TITLE;
     bool lobbyInitialized = false;
+    bool gameInitialized = false;
 
     InitAudioDevice();
     Music titleMusic = LoadMusicStream("static/music/epicversion3.wav");
@@ -56,7 +57,18 @@ int main() {
                 }
                 break;
             case GAME:
+                if (!gameInitialized) {
+                    iniciarGame();
+                    gameInitialized = true;
+                }
+
                 playGame(&currentScreen);
+
+                // Se o currentScreen mudou para fora do jogo, finalize os recursos
+                if (currentScreen != GAME && gameInitialized) {
+                    finalizarGame();
+                    gameInitialized = false;
+                }
                 break;
             case RANKINGS:
                 exibirRankingScreen(&currentScreen);
