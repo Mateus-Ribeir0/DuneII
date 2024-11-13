@@ -11,6 +11,7 @@ static Texture2D environment2_1;
 static Texture2D environment2_2;
 static Texture2D environment3_1;
 static Texture2D environment3_2;
+static Texture2D safezone;
 static Texture2D ruinasDeAreiaPequenas;
 static Texture2D goldTexture;
 static Texture2D aguaTexture;
@@ -111,6 +112,7 @@ void iniciarGame() {
     environment2_2 = LoadTexture("static/image/Rock2_3.png");
     environment3_1 = LoadTexture("static/image/Rock8_1.png");
     environment3_2 = LoadTexture("static/image/Rock8_3.png");
+    safezone = LoadTexture ("static/image/desert_tileset2.png");
     ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
     goldTexture = LoadTexture("static/image/gold.png");
     aguaTexture = LoadTexture("static/image/agua.png");
@@ -396,7 +398,6 @@ void drawGame() {
 
     if (mapaAtual == 0) {
     // Desenha as pedras no mapa environment2_2
-
         for (int y = 0; y < MAPA_ALTURA; y++) {
             for (int x = 0; x < MAPA_LARGURA; x++) {
                 Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
@@ -415,6 +416,11 @@ void drawGame() {
             Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 };
             DrawTexturePro(environment2_1, sourceRect, destRect, origin, 0.0f, WHITE);
         }
+
+        Vector2 safezonePosition = {10 * TILE_SIZE, 10 * TILE_SIZE}; // Ajuste conforme necessário
+        Rectangle safezoneRec = {376, 136, 32, 32}; // Recorte da `safezone`
+        DrawTextureRec(safezone, safezoneRec, safezonePosition, RAYWHITE);
+
     } else if (mapaAtual == 1) {
         for (int y = 0; y < MAPA_ALTURA; y++) {
             for (int x = 0; x < MAPA_LARGURA; x++) {
@@ -431,6 +437,11 @@ void drawGame() {
             Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
             DrawTexturePro(environment1_1, sourceRect, destRect, origin, 0.0f, WHITE); 
         }
+
+        Vector2 safezonePosition = {15 * TILE_SIZE, 12 * TILE_SIZE}; // Posição ajustável
+        Rectangle safezoneRec = {376, 136, 32, 32}; 
+        DrawTextureRec(safezone, safezoneRec, safezonePosition, RAYWHITE);
+
     } else if (mapaAtual == 2) {
         for (int y = 0; y < MAPA_ALTURA; y++) {
             for (int x = 0; x < MAPA_LARGURA; x++) {
@@ -444,6 +455,11 @@ void drawGame() {
             Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
             DrawTexturePro(environment3_1, sourceRect, destRect, origin, 0.0f, WHITE);
         }
+
+        Vector2 safezonePosition = {20 * TILE_SIZE, 15 * TILE_SIZE}; // Posição ajustável
+        Rectangle safezoneRec = {376, 136, 32, 32}; 
+        DrawTextureRec(safezone, safezoneRec, safezonePosition, RAYWHITE);
+
     }
 
     // Atualize a direção com base na tecla pressionada
