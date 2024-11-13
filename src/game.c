@@ -3,13 +3,14 @@
 
 static Texture2D personagem;
 static Texture2D personagemAndando;
-static Texture2D environment;
 static Texture2D cerealsTexture;
 static Texture2D ruinasDeAreiaGrandes;
 static Texture2D environment1_1;
 static Texture2D environment1_2;
 static Texture2D environment2_1;
 static Texture2D environment2_2;
+static Texture2D environment3_1;
+static Texture2D environment3_2;
 static Texture2D ruinasDeAreiaPequenas;
 static Texture2D goldTexture;
 static Texture2D aguaTexture;
@@ -102,13 +103,14 @@ void iniciarGame() {
     // Carrega texturas
     personagem = LoadTexture("static/image/newstoppedsprites.png");
     personagemAndando = LoadTexture("static/image/newwalkingsprites.png");
-    environment = LoadTexture("static/image/environment.png");
     cerealsTexture = LoadTexture("static/image/Cereals.png");
     ruinasDeAreiaGrandes = LoadTexture("static/image/Sand_ruins1.png");
     environment1_1 = LoadTexture("static/image/Rock6_1.png");
     environment1_2 = LoadTexture("static/image/Rock6_3.png");
     environment2_1 = LoadTexture("static/image/Rock2_1.png");
     environment2_2 = LoadTexture("static/image/Rock2_3.png");
+    environment3_1 = LoadTexture("static/image/Rock8_1.png");
+    environment3_2 = LoadTexture("static/image/Rock8_3.png");
     ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
     goldTexture = LoadTexture("static/image/gold.png");
     aguaTexture = LoadTexture("static/image/agua.png");
@@ -132,13 +134,14 @@ void finalizarGame() {
     // Descarrega texturas
     UnloadTexture(personagem);
     UnloadTexture(personagemAndando);
-    UnloadTexture(environment);
     UnloadTexture(cerealsTexture);
     UnloadTexture(ruinasDeAreiaGrandes);
     UnloadTexture(environment1_1);
     UnloadTexture(environment1_2);
     UnloadTexture(environment2_1);
     UnloadTexture(environment2_2);
+    UnloadTexture(environment3_1);
+    UnloadTexture(environment3_2);
     UnloadTexture(ruinasDeAreiaPequenas);
     UnloadTexture(goldTexture);
     UnloadTexture(aguaTexture);
@@ -214,7 +217,6 @@ void updateWaterLevel(GameScreen *currentScreen) {
     }
 }
 
-// Lógica de coleta de especiarias, com atualização para a próxima posição após a coleta
 void checkItemCollection() {
     if (!items[0].collected && items[0].position.x == player_x && items[0].position.y == player_y) {
         if (itemsCollected < MAX_ESPECIARIAS) {
@@ -228,7 +230,11 @@ void checkItemCollection() {
                 case 2: especiariasGanhas = 4; break;
             }
 
+            // Calcula a nova quantidade de especiarias sem ultrapassar o limite da bolsa
             itemsCollected += especiariasGanhas;
+            if (itemsCollected > MAX_ESPECIARIAS) {
+                itemsCollected = MAX_ESPECIARIAS;
+            }
 
             // Atualiza para a próxima especiaria
             indiceEspeciariaAtual++;
@@ -241,6 +247,7 @@ void checkItemCollection() {
         }
     }
 }
+
 
 #define NUM_PEDRAS 12
 
@@ -340,21 +347,26 @@ void desenharAnimacaoMorte(Texture2D personagem, Texture2D personagemMorto) {
 
     // Posição exata do jogador, ajustando para centralizar o sprite de 96x96 pixels
     Vector2 posicao = {player_x * TILE_SIZE, player_y * TILE_SIZE};
-    Rectangle destRec = {posicao.x - 32, posicao.y - 32, 96, 96};  // 96x96 para centralizar como em drawGame
+    Rectangle destRec = {posicao.x - 32, posicao.y, 96, 96};  // 96x96 para centralizar como em drawGame
 
     // Duração de cada frame em segundos
-    const float duracaoFrame = 0.1f;
+    const float duracaoFramePrimeiro = 0.5f; // Duração estendida para o primeiro quadro
+    const float duracaoFrame = 0.1f;         // Duração para os demais quadros
     float tempoInicial = GetTime();
 
     // Exibe cada frame da animação de morte
     for (int i = 0; i < numFramesMorte; i++) {
-        while (GetTime() - tempoInicial < duracaoFrame) {
-            // Desenha o frame atual até que o tempo de exibição passe de 0.8 segundos
+        // Define a duração específica para o primeiro frame
+        float tempoFrameAtual = (i == 0) ? duracaoFramePrimeiro : duracaoFrame;
+
+        while (GetTime() - tempoInicial < tempoFrameAtual) {
+            // Desenha o frame atual até que o tempo de exibição passe do tempo do quadro atual
             ClearBackground(BLACK);
             BeginDrawing();
             DrawTexturePro(personagemMorto, framesMorte[i], destRec, (Vector2){0, 0}, 0.0f, WHITE);
             EndDrawing();
         }
+
         // Atualiza o tempo inicial para o próximo frame
         tempoInicial = GetTime();
     }
@@ -372,14 +384,7 @@ void drawGame() {
     // Itera sobre a área do mapa e desenha o tile em cada posição
     Color map0Color = (Color){210, 178, 104, 255};  // Define a cor desejada
     Color map1Color = (Color){210, 178, 104, 255};
-    Color map2Color = (Color){210, 178, 104, 255};
-
-    for (int y = 0; y < MAPA_ALTURA; y++) {
-        for (int x = 0; x < MAPA_LARGURA; x++) {
-            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
-            DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map1Color);
-        }
-    }
+    Color map2Color = (Color){228, 162, 68, 255};
 
     Rectangle sourceRect = {64, 64, 64, 64}; // Área da textura original
     Vector2 origin = {0, 0}; // Origem de rotação (mantida em (0, 0))
@@ -391,6 +396,14 @@ void drawGame() {
 
     if (mapaAtual == 0) {
     // Desenha as pedras no mapa environment2_2
+
+        for (int y = 0; y < MAPA_ALTURA; y++) {
+            for (int x = 0; x < MAPA_LARGURA; x++) {
+                Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+                DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map0Color);
+            }
+        }
+
         for (int i = 0; i < NUM_PEDRAS; i++) {
             Vector2 posicaoPedra = { posicoesPedras[i].x * TILE_SIZE, posicoesPedras[i].y * TILE_SIZE };
             DrawTexture(environment2_2, posicaoPedra.x, posicaoPedra.y, RAYWHITE);
@@ -403,6 +416,12 @@ void drawGame() {
             DrawTexturePro(environment2_1, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     } else if (mapaAtual == 1) {
+        for (int y = 0; y < MAPA_ALTURA; y++) {
+            for (int x = 0; x < MAPA_LARGURA; x++) {
+                Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+                DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map1Color);
+            }
+        }
         // Desenha ruinasDeAreia em tamanho maior
         DrawTexture(environment1_2, 20, 20, RAYWHITE);
         DrawTexturePro(ruinasDeAreiaGrandes, ruinasSourceRec, ruinasDestRec, origin, 0.0f, WHITE);
@@ -413,10 +432,17 @@ void drawGame() {
             DrawTexturePro(environment1_1, sourceRect, destRect, origin, 0.0f, WHITE); 
         }
     } else if (mapaAtual == 2) {
+        for (int y = 0; y < MAPA_ALTURA; y++) {
+            for (int x = 0; x < MAPA_LARGURA; x++) {
+                Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+                DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map2Color);
+            }
+        }
+        DrawTexture(environment3_2, 20, 20, RAYWHITE);
         for (int i = 0; i < DUNAS_MAPA3; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa3[i].x * TILE_SIZE, posicoesDunasMapa3[i].y * TILE_SIZE };
             Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
-            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
+            DrawTexturePro(environment3_1, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     }
 
@@ -543,7 +569,6 @@ void drawGame() {
         DrawText(mensagem, xPosition, GetScreenHeight() / 2, 20, BLACK);
     }
 }
-
 
 // Contador de ocorrências consecutivas
 int contar_ocorrencias_consecutivas(const char *historico, const char *padrao, size_t padrao_len) {
@@ -730,10 +755,9 @@ void playGame(GameScreen *currentScreen) {
 
                 Texture2D personagemMorto = LoadTexture("static/image/dead.png");
                 ClearBackground(BLACK);
-                desenharAnimacaoMorte(personagem, personagemMorto); 
+                desenharAnimacaoMorte(personagem, personagemMorto);
                 DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
-                sleep(4);
-                DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
+                sleep(3);
                 PlaySound(barulhoMonstro);
                 sleep(1);
 
@@ -762,7 +786,7 @@ void playGame(GameScreen *currentScreen) {
 
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
-                float tempoPorCaractere = 0.5f;
+                float tempoPorCaractere = 0.3f;
                 float timer = 0;
 
                 while (caractereExibido < strlen(euFalhei) && !WindowShouldClose()) {
