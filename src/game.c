@@ -261,8 +261,38 @@ void movePlayer(int dx, int dy) {
     }
 }
 
+void desenharAnimacaoMorte(Texture2D personagem, Texture2D personagemMorto) {
+    // Coordenadas dos frames para a animação de morte
+    Rectangle framesMorte[] = {
+        {128, 0, 64, 64}, {192, 0, 64, 64},
+        {256, 0, 64, 64}, {320, 0, 64, 64}, {384, 0, 64, 64}
+    };
+    int numFramesMorte = sizeof(framesMorte) / sizeof(framesMorte[0]);
 
+    // Posição exata do jogador, ajustando para centralizar o sprite de 96x96 pixels
+    Vector2 posicao = {player_x * TILE_SIZE, player_y * TILE_SIZE};
+    Rectangle destRec = {posicao.x - 32, posicao.y - 32, 96, 96};  // 96x96 para centralizar como em drawGame
 
+    // Duração de cada frame em segundos
+    const float duracaoFrame = 0.1f;
+    float tempoInicial = GetTime();
+
+    // Exibe cada frame da animação de morte
+    for (int i = 0; i < numFramesMorte; i++) {
+        while (GetTime() - tempoInicial < duracaoFrame) {
+            // Desenha o frame atual até que o tempo de exibição passe de 0.8 segundos
+            ClearBackground(BLACK);
+            BeginDrawing();
+            DrawTexturePro(personagemMorto, framesMorte[i], destRec, (Vector2){0, 0}, 0.0f, WHITE);
+            EndDrawing();
+        }
+        // Atualiza o tempo inicial para o próximo frame
+        tempoInicial = GetTime();
+    }
+
+    // Desenha o último frame permanentemente
+    DrawTexturePro(personagemMorto, framesMorte[numFramesMorte - 1], destRec, (Vector2){0, 0}, 0.0f, WHITE);
+}
 
 // Variável para armazenar a direção atual do personagem
 int direcao = 0;  // 0 = parado, 1 = esquerda, 2 = direita, 3 = cima, 4 = baixo
@@ -460,8 +490,6 @@ void drawGame() {
         DrawText(mensagem, xPosition, GetScreenHeight() / 2, 20, BLACK);
     }
 }
-
-
 
 
 // Contador de ocorrências consecutivas
@@ -671,14 +699,12 @@ void playGame(GameScreen *currentScreen) {
                 PlaySound(gameOverSound);
                 sleep(1);
 
-                for (int i = 0; i < 180; i++) {
-                    BeginDrawing();
-                    ClearBackground(BLACK);
-                    DrawRectangle(player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE, BLUE);
-                    DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
-                    EndDrawing();
-                }
-
+                Texture2D personagemMorto = LoadTexture("static/image/dead.png");
+                ClearBackground(BLACK);
+                desenharAnimacaoMorte(personagem, personagemMorto); 
+                DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
+                sleep(4);
+                DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
                 PlaySound(barulhoMonstro);
                 sleep(1);
 
