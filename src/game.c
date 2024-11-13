@@ -635,7 +635,7 @@ void playGame(GameScreen *currentScreen) {
                 (dificuldade == 4 && strlen(historico) >= 4 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 4, padrao_encontrado))) ||
                 (dificuldade == 3 && strlen(historico) >= 3 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 3, padrao_encontrado)))) 
             {
-                Sound gameOverSound = LoadSound("static/music/deathsound.wav");
+                Sound gameOverSound = LoadSound("static/music/deathsfx2.wav");
                 Sound barulhoMonstro = LoadSound("static/music/monster.mp3");
                 Texture2D characterBack = LoadTexture("static/image/characterback.png");
                 Texture2D sandworm = LoadTexture("static/image/sandworm.png");
