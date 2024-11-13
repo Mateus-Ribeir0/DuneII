@@ -40,10 +40,20 @@ int main() {
                 currentScreen = LOBBY;
                 break;
             case LOBBY:
+                if (!lobbyInitialized) {
+                    iniciarLobby();
+                    lobbyInitialized = true;
+                }
                 processarEntradaLobby(&currentScreen, &lobbyInitialized);
                 BeginDrawing();
                 desenharLobbyDetalhado();
                 EndDrawing();
+
+                // Verifica se o currentScreen mudou para fora do lobby
+                if (currentScreen != LOBBY && lobbyInitialized) {
+                    finalizarLobby();
+                    lobbyInitialized = false;
+                }
                 break;
             case GAME:
                 playGame(&currentScreen);

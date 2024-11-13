@@ -1,21 +1,57 @@
 
-#include "game.h"  // Inclui a declaração de funções de game.c
 #include "lobby.h"
-#include "game.h"  // Inclui a declaração de funções de game.c
-#include <math.h>  // Para usar a função fmin
+#include <math.h>
 
-void updateWaterLevel(GameScreen *currentScreen);
-void resetarJogo();
+// Variáveis de textura e som declaradas como static
+static Texture2D vendinha;
+static Texture2D velho;
+static Texture2D desertTileset;
+static Texture2D personagem;
+static Texture2D personagemAndando;
+static Texture2D portal;
+static Texture2D cerealsTexture;
+static Texture2D goldTexture;
+static Texture2D aguaTexture;
+static Sound troca;
 
-int MAX_ESPECIARIAS = BOLSA_CAPACIDADE_PEQUENA;
-Texture2D vendinha;
-
-// Variável para controlar o estado de interação com o mercador
+// Variáveis Globias
 int isInteractingWithMerchant = 0;
-
+int MAX_ESPECIARIAS = BOLSA_CAPACIDADE_PEQUENA;
 const char* mensagem = NULL;
+double errorMessageTimer = 0.0;
+bool showErrorMessage = false;
+bool showThankYouMessage = false;
+const double MESSAGE_DURATION = 5.0;
+const char *errorMessage = "";
+const int widthMercador = 620;
+const int heigthMercador = 140;
 
-// Função para verificar se o jogador está próximo do mercador
+void iniciarLobby() {
+    vendinha = LoadTexture("static/image/market_assets.png");
+    velho = LoadTexture("static/image/velho.png");
+    desertTileset = LoadTexture("static/image/environment.png");
+    personagem = LoadTexture("static/image/newstoppedsprites.png");
+    personagemAndando = LoadTexture("static/image/newwalkingsprites.png");
+    portal = LoadTexture("static/image/portal.png");
+    cerealsTexture = LoadTexture("static/image/Cereals.png");
+    goldTexture = LoadTexture("static/image/gold.png");
+    aguaTexture = LoadTexture("static/image/agua.png");
+    troca = LoadSound("static/music/trocaDeDinheiro.wav");
+}
+
+void finalizarLobby() {
+    UnloadTexture(vendinha);
+    UnloadTexture(velho);
+    UnloadTexture(desertTileset);
+    UnloadTexture(personagem);
+    UnloadTexture(personagemAndando);
+    UnloadTexture(portal);
+    UnloadTexture(cerealsTexture);
+    UnloadTexture(goldTexture);
+    UnloadTexture(aguaTexture);
+    UnloadSound(troca);
+}
+
 int isPlayerNearMerchant() {
     return (player_x == MERCHANT_X && (player_y == MERCHANT_Y - 1 || player_y == MERCHANT_Y + 1)) ||
             (player_y == MERCHANT_Y && (player_x == MERCHANT_X - 1 || player_x == MERCHANT_X + 1)) ||
@@ -23,7 +59,6 @@ int isPlayerNearMerchant() {
             (player_y == MERCHANT_Y && (player_x == MERCHANT_X_LEFT - 1 || player_x == MERCHANT_X_LEFT + 1));
 }
 
-// Função para verificar se o jogador está na posição de um portal, tanto no lobby quanto nos mapas
 bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
     if (mapaAtual == -1) { // No lobby
         // Verifica o portal do mapa 1 (lobby) com uma linha a mais de colisão e uma coluna a menos
@@ -53,7 +88,6 @@ bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
     return false;
 }
 
-// Função para processar a entrada no lobby e exibir a mensagem de portal ao se aproximar
 void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     mapaAtual = -1;  // Identifica que o jogador está no lobby
     int dx = 0, dy = 0;
@@ -121,8 +155,6 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     }
 }
 
-
-
 void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool isPortalDialog) {
     // Ajusta a largura para 400 quando a caixa é para um portal; caso contrário, mantém 600
     if (isPortalDialog) {
@@ -163,31 +195,10 @@ void DrawDialogBox(const char *text, int posX, int posY, int width, int height, 
     DrawText(TextSubtext(text, 0, charactersToShow), posX + 10, posY + 10, 20, textColor);
 }
 
-
-// Variáveis globais para controlar o temporizador e exibição da mensagem de erro
-double errorMessageTimer = 0.0;
-bool showErrorMessage = false;
-bool showThankYouMessage = false;
-const double MESSAGE_DURATION = 5.0;
-const char *errorMessage = "";
-const int widthMercador = 620;
-const int heigthMercador = 140;
-
 void drawLobby() {
 
-    Sound troca = LoadSound("static/music/trocaDeDinheiro.wav");
     bool soundPlayed = false;
-
-    Texture2D velho = LoadTexture("static/image/velho.png");
-
-    Texture2D desertTileset = LoadTexture("static/image/environment.png");
     Rectangle tileSourceRec = { 128, 32, 32, 32 };
-
-    Texture2D vendinha = LoadTexture("static/image/market_assets.png");
-    Texture2D cerealsTexture = LoadTexture("static/image/Cereals.png");
-    Texture2D goldTexture = LoadTexture("static/image/gold.png");
-    Texture2D aguaTexture = LoadTexture("static/image/agua.png");
-
     Rectangle hitboxVendinha = {96, 0, 90, 96};
     Vector2 posicaoVendinha = {20, 20};
 
@@ -201,10 +212,6 @@ void drawLobby() {
 
     // Desenha a textura da vendinha
     DrawTextureRec(vendinha, hitboxVendinha, posicaoVendinha, WHITE);
-
-    // Desenha o personagem animado no lugar do bloco azul
-    Texture2D personagem = LoadTexture("static/image/newstoppedsprites.png");
-    Texture2D personagemAndando = LoadTexture("static/image/newwalkingsprites.png");
 
     // Atualize a direção com base na tecla pressionada
     static int lastDirection = 3;  // Começa apontando para "baixo" (S)
@@ -272,7 +279,7 @@ void drawLobby() {
     }
 
     // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby
-    Texture2D portal = LoadTexture("static/image/portal.png");
+    //Texture2D portal = LoadTexture("static/image/portal.png");
     
     Rectangle portalSourceRec = { 0, 0, 32, 32 };
     Rectangle portalDestRec1 = { 
@@ -494,10 +501,6 @@ void drawLobby() {
         isInteractingWithMerchant = 0;
     }
 }
-
-
-
-
 
 void desenharLobbyDetalhado() {
     drawLobby();
