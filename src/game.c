@@ -214,7 +214,6 @@ void updateWaterLevel(GameScreen *currentScreen) {
     }
 }
 
-// Lógica de coleta de especiarias, com atualização para a próxima posição após a coleta
 void checkItemCollection() {
     if (!items[0].collected && items[0].position.x == player_x && items[0].position.y == player_y) {
         if (itemsCollected < MAX_ESPECIARIAS) {
@@ -228,7 +227,11 @@ void checkItemCollection() {
                 case 2: especiariasGanhas = 4; break;
             }
 
+            // Calcula a nova quantidade de especiarias sem ultrapassar o limite da bolsa
             itemsCollected += especiariasGanhas;
+            if (itemsCollected > MAX_ESPECIARIAS) {
+                itemsCollected = MAX_ESPECIARIAS;
+            }
 
             // Atualiza para a próxima especiaria
             indiceEspeciariaAtual++;
@@ -241,6 +244,7 @@ void checkItemCollection() {
         }
     }
 }
+
 
 #define NUM_PEDRAS 12
 
