@@ -173,13 +173,21 @@ void checkItemCollection() {
     }
 }
 
+#define NUM_PEDRAS 12
+
+Vector2 posicoesPedras[NUM_PEDRAS] = {
+    {5, 5}, {10, 8}, {15, 12}, {20, 3},
+    {25, 18}, {30, 10}, {35, 15}, {40, 5},
+    {8, 20}, {12, 25}, {18, 30}, {22, 35}
+};
+
 #define DUNAS_MAPA1 5
 #define DUNAS_MAPA2 7
 #define DUNAS_MAPA3 10
 
 // Array para posições das dunas em cada mapa
 Point posicoesDunasMapa1[DUNAS_MAPA1] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5} };
-Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {20, 10}, {12, 14} };
+Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {12, 14} };
 Point posicoesDunasMapa3[DUNAS_MAPA3] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {20, 10}, {12, 14}, {28, 6}, {7, 19}, {17, 3} };
 
 
@@ -189,12 +197,14 @@ void movePlayer(int dx, int dy) {
 
     // Define o retângulo do jogador
     Rectangle playerRect = { new_x * TILE_SIZE, new_y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
-    Rectangle ruinasCollisionBox = { 30, 40, 200, 180 };  // Y deslocado para 40, altura reduzida para 180
 
+    // Define o retângulo de colisão das ruínas, removendo 20 pixels da parte superior
+    Rectangle ruinasCollisionBox = { 30, 40, 190, 180 };  // Y deslocado para 40, altura reduzida para 180
 
     // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool colidiuComDuna = false;
+        bool colidiuComPedra = false;
 
         // Verifica colisão com o retângulo das ruínas apenas no mapa 2
         if (mapaAtual == 1 && CheckCollisionRecs(playerRect, ruinasCollisionBox)) {
@@ -206,8 +216,16 @@ void movePlayer(int dx, int dy) {
             return; // Bloqueia a movimentação se houver colisão com um portal
         }
 
-        // Verifica colisão com dunas dependendo do mapa atual
+        // Verifica colisão com as pedras no mapa 0
         if (mapaAtual == 0) {
+            for (int i = 0; i < NUM_PEDRAS; i++) {
+                if (new_x == (int)posicoesPedras[i].x && new_y == (int)posicoesPedras[i].y) {
+                    colidiuComPedra = true;
+                    break;
+                }
+            }
+
+            // Verifica colisão com dunas no mapa 0
             for (int i = 0; i < DUNAS_MAPA1; i++) {
                 if ((new_x >= posicoesDunasMapa1[i].x && new_x < posicoesDunasMapa1[i].x + 3) &&
                     (new_y >= posicoesDunasMapa1[i].y && new_y < posicoesDunasMapa1[i].y + 2)) {
@@ -216,6 +234,7 @@ void movePlayer(int dx, int dy) {
                 }
             }
         } else if (mapaAtual == 1) {
+            // Verifica colisão com dunas no mapa 1
             for (int i = 0; i < DUNAS_MAPA2; i++) {
                 if ((new_x >= posicoesDunasMapa2[i].x && new_x < posicoesDunasMapa2[i].x + 3) &&
                     (new_y >= posicoesDunasMapa2[i].y && new_y < posicoesDunasMapa2[i].y + 2)) {
@@ -224,6 +243,7 @@ void movePlayer(int dx, int dy) {
                 }
             }
         } else if (mapaAtual == 2) {
+            // Verifica colisão com dunas no mapa 2
             for (int i = 0; i < DUNAS_MAPA3; i++) {
                 if ((new_x >= posicoesDunasMapa3[i].x && new_x < posicoesDunasMapa3[i].x + 3) &&
                     (new_y >= posicoesDunasMapa3[i].y && new_y < posicoesDunasMapa3[i].y + 2)) {
@@ -233,8 +253,8 @@ void movePlayer(int dx, int dy) {
             }
         }
 
-        // Se não houver colisão com uma duna, ruínas ou portal, movimenta o jogador
-        if (!colidiuComDuna) {
+        // Se não houver colisão com uma duna, ruínas, pedra ou portal, movimenta o jogador
+        if (!colidiuComDuna && !colidiuComPedra) {
             player_x = new_x;
             player_y = new_y;
         }
@@ -270,8 +290,6 @@ void drawGame() {
     Texture2D environment1_2 = LoadTexture("static/image/Rock6_3.png");
     Texture2D environment2_1 = LoadTexture("static/image/Rock2_1.png");
     Texture2D environment2_2 = LoadTexture("static/image/Rock2_3.png");
-    Texture2D environment3_1 = LoadTexture("static/image/Rock8_ground_shadow1.png");
-    Texture2D environment3_2 = LoadTexture("static/image/Rock8_ground_shadow3.png");
     Texture2D ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
     Rectangle sourceRect = {64, 64, 64, 64}; // Área da textura original
     Vector2 origin = {0, 0}; // Origem de rotação (mantida em (0, 0))
@@ -282,10 +300,16 @@ void drawGame() {
     // Definindo a caixa de colisão de ruinasDeAreia em 256x256
 
     if (mapaAtual == 0) {
-        DrawTexture(environment2_2, 20, 20, RAYWHITE);
+    // Desenha as pedras no mapa environment2_2
+        for (int i = 0; i < NUM_PEDRAS; i++) {
+            Vector2 posicaoPedra = { posicoesPedras[i].x * TILE_SIZE, posicoesPedras[i].y * TILE_SIZE };
+            DrawTexture(environment2_2, posicaoPedra.x, posicaoPedra.y, RAYWHITE);
+        }
+
+        // Desenha as dunas (sua lógica original)
         for (int i = 0; i < DUNAS_MAPA1; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa2[i].x * TILE_SIZE, posicoesDunasMapa2[i].y * TILE_SIZE };
-            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
+            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 };
             DrawTexturePro(environment2_1, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     } else if (mapaAtual == 1) {
@@ -299,11 +323,10 @@ void drawGame() {
             DrawTexturePro(environment1_1, sourceRect, destRect, origin, 0.0f, WHITE); 
         }
     } else if (mapaAtual == 2) {
-        DrawTexture(environment3_2, 20, 20, RAYWHITE);
         for (int i = 0; i < DUNAS_MAPA3; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa3[i].x * TILE_SIZE, posicoesDunasMapa3[i].y * TILE_SIZE };
             Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
-            DrawTexturePro(environment3_1, sourceRect, destRect, origin, 0.0f, WHITE);
+            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     }
 
