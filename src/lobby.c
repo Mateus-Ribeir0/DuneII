@@ -200,54 +200,72 @@ void drawLobby() {
     DrawTextureRec(vendinha, hitboxVendinha, posicaoVendinha, WHITE);
 
     // Desenha o personagem animado no lugar do bloco azul
-    Texture2D personagem = LoadTexture("static/image/spritesheet-character.png");
-    static int direcao = 0;  // Variável para armazenar a direção atual do personagem
-    static int frameAtual = 0;  // Frame da animação
-    static float tempoAnimacao = 0.0f;
-    const float duracaoFrame = 0.1f;
+    Texture2D personagem = LoadTexture("static/image/newstoppedsprites.png");
+    Texture2D personagemAndando = LoadTexture("static/image/newwalkingsprites.png");
 
     // Atualize a direção com base na tecla pressionada
-    if (IsKeyPressed(KEY_A)) {
-        direcao = 1; // Esquerda
-    } else if (IsKeyPressed(KEY_D)) {
-        direcao = 2; // Direita
-    } else if (IsKeyPressed(KEY_W)) {
-        direcao = 3; // Cima
+    static int lastDirection = 3;  // Começa apontando para "baixo" (S)
+    static float walkingTimer = 0.0f; // Temporizador para a animação de "andando"
+    static bool isWalking = false;    // Controle se está na animação de "andando"
+
+    // Detecta qual tecla foi pressionada e atualiza a direção e o temporizador
+    if (IsKeyPressed(KEY_W)) {
+        lastDirection = 1;  // Cima
+        isWalking = true;
+        walkingTimer = 0.3f; // Iniciar o temporizador
+    } else if (IsKeyPressed(KEY_A)) {
+        lastDirection = 2;  // Esquerda
+        isWalking = true;
+        walkingTimer = 0.3f;
     } else if (IsKeyPressed(KEY_S)) {
-        direcao = 4; // Baixo
+        lastDirection = 3;  // Baixo
+        isWalking = true;
+        walkingTimer = 0.3f;
+    } else if (IsKeyPressed(KEY_D)) {
+        lastDirection = 4;  // Direita
+        isWalking = true;
+        walkingTimer = 0.3f;
     }
 
-    // Atualize o `sourceRec` com base na direção atual
+    // Atualiza o temporizador se estiver "andando"
+    if (isWalking) {
+        walkingTimer -= GetFrameTime();
+        if (walkingTimer <= 0) {
+            isWalking = false;  // Termina a animação de "andando"
+        }
+    }
+
+    // Usa switch para definir o retângulo de origem com base na última direção
     Rectangle sourceRec;
-    switch (direcao) {
-        case 1: // Esquerda
-            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 64 : 96, 0, 32, 64};
+    switch (lastDirection) {
+        case 1: // Cima
+            sourceRec = (Rectangle){0, 192, 64, 64};
             break;
-        case 2: // Direita
-            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 0 : 32, 0, 32, 64};
+        case 2: // Esquerda
+            sourceRec = (Rectangle){0, 64, 64, 64};
             break;
-        case 3: // Cima
-            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 128 : 160, 0, 32, 64};
+        case 3: // Baixo
+            sourceRec = (Rectangle){0, 0, 64, 64};
             break;
-        case 4: // Baixo
-            sourceRec = (Rectangle){(frameAtual % 2 == 0) ? 192 : 224, 0, 32, 64};
+        case 4: // Direita
+            sourceRec = (Rectangle){0, 128, 64, 64};
             break;
-        default: // Parado
-            sourceRec = (Rectangle){0, 0, 32, 64};
+        default:
+            sourceRec = (Rectangle){0, 0, 64, 64}; // Posição padrão (parado)
             break;
     }
 
-    // Define a posição do personagem no lobby
-    Vector2 playerPosition = { player_x * TILE_SIZE, player_y * TILE_SIZE };
+    // Define a posição do personagem na tela
+    Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
 
-    // Desenha o sprite do personagem animado
-    DrawTextureRec(personagem, sourceRec, playerPosition, WHITE);
+    // Desenha o sprite redimensionado para 96x96, centralizando sobre a posição de 32x32
+    Rectangle destRec = { position.x - 32, position.y - 32, 96, 96 };  // Ajuste para centralizar o sprite maior
 
-    // Atualiza o frame atual para a próxima animação
-    tempoAnimacao += GetFrameTime();
-    if (tempoAnimacao >= duracaoFrame) {
-        tempoAnimacao = 0;
-        frameAtual = (frameAtual + 1) % 2;  // Alterna entre os dois frames (0 e 1)
+    // Se estiver "andando", desenha o sprite de "andando"; caso contrário, desenha o sprite de direção final
+    if (isWalking) {
+        DrawTexturePro(personagemAndando, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
+    } else {
+        DrawTexturePro(personagem, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
     // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby

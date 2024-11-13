@@ -254,16 +254,21 @@ void drawGame() {
     Texture2D ruinasDeAreiaGrandes = LoadTexture("static/image/Sand_ruins1.png");
 
     // Itera sobre a área do mapa e desenha o tile em cada posição
-    Color desertColor = (Color){210, 178, 104, 255};  // Define a cor desejada
+    Color map0Color = (Color){210, 178, 104, 255};  // Define a cor desejada
+    Color map1Color = (Color){210, 178, 104, 255};
+    Color map2Color = (Color){210, 178, 104, 255};
 
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
             Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
-            DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, desertColor);
+            DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map1Color);
         }
     }
 
-    Texture2D environment = LoadTexture("static/image/Rock6_1.png");
+    Texture2D environment1_1 = LoadTexture("static/image/Rock6_1.png");
+    Texture2D environment1_2 = LoadTexture("static/image/Rock6_3.png");
+    Texture2D environment2_1 = LoadTexture("static/image/Rock2_1.png");
+    Texture2D environment2_2 = LoadTexture("static/image/Rock2_3.png");
     Texture2D ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
     Rectangle sourceRect = {64, 64, 64, 64}; // Área da textura original
     Vector2 origin = {0, 0}; // Origem de rotação (mantida em (0, 0))
@@ -271,24 +276,24 @@ void drawGame() {
     Rectangle ruinasSourceRec = {0, 0, ruinasDeAreiaGrandes.width, ruinasDeAreiaGrandes.height}; // Recorte original da textura
     Rectangle ruinasDestRec = {20, 20, 256, 256}; // Destino com escala maior (256x256)
 
-
     // Definindo a caixa de colisão de ruinasDeAreia em 256x256
 
-
     if (mapaAtual == 0) {
+        DrawTexture(environment2_2, 20, 20, RAYWHITE);
         for (int i = 0; i < DUNAS_MAPA1; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa2[i].x * TILE_SIZE, posicoesDunasMapa2[i].y * TILE_SIZE };
             Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
-            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
+            DrawTexturePro(environment2_1, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     } else if (mapaAtual == 1) {
         // Desenha ruinasDeAreia em tamanho maior
+        DrawTexture(environment1_2, 20, 20, RAYWHITE);
         DrawTexturePro(ruinasDeAreiaGrandes, ruinasSourceRec, ruinasDestRec, origin, 0.0f, WHITE);
         DrawTexture(ruinasDeAreiaPequenas, 20, 20, RAYWHITE);
         for (int i = 0; i < DUNAS_MAPA2; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
             Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
-            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE); 
+            DrawTexturePro(environment1_1, sourceRect, destRect, origin, 0.0f, WHITE); 
         }
     } else if (mapaAtual == 2) {
         for (int i = 0; i < DUNAS_MAPA3; i++) {
@@ -299,56 +304,72 @@ void drawGame() {
     }
 
     // Desenha o personagem
-    Texture2D personagem = LoadTexture("static/image/spritesheet-character.png");
-    static int direcao = 0;  // Variável para armazenar a direção atual do personagem
-    Rectangle sourceRec = {0, 0, 32, 64};  // Inicializa o retângulo de origem
+    Texture2D personagem = LoadTexture("static/image/newstoppedsprites.png");
+    Texture2D personagemAndando = LoadTexture("static/image/newwalkingsprites.png");
 
     // Atualize a direção com base na tecla pressionada
-    if (IsKeyPressed(KEY_A)) {
-        direcao = 1; // Esquerda
-    } else if (IsKeyPressed(KEY_D)) {
-        direcao = 2; // Direita
-    } else if (IsKeyPressed(KEY_W)) {
-        direcao = 3; // Cima
+    static int lastDirection = 3;  // Começa apontando para "baixo" (S)
+    static float walkingTimer = 0.0f; // Temporizador para a animação de "andando"
+    static bool isWalking = false;    // Controle se está na animação de "andando"
+
+    // Detecta qual tecla foi pressionada e atualiza a direção e o temporizador
+    if (IsKeyPressed(KEY_W)) {
+        lastDirection = 1;  // Cima
+        isWalking = true;
+        walkingTimer = 0.3f; // Iniciar o temporizador
+    } else if (IsKeyPressed(KEY_A)) {
+        lastDirection = 2;  // Esquerda
+        isWalking = true;
+        walkingTimer = 0.3f;
     } else if (IsKeyPressed(KEY_S)) {
-        direcao = 4; // Baixo
+        lastDirection = 3;  // Baixo
+        isWalking = true;
+        walkingTimer = 0.3f;
+    } else if (IsKeyPressed(KEY_D)) {
+        lastDirection = 4;  // Direita
+        isWalking = true;
+        walkingTimer = 0.3f;
     }
 
-    // Atualize o `sourceRec` com base na direção atual
-    switch (direcao) {
-        case 1: // Esquerda
-            sourceRec.x = (frameAtual % 2 == 0) ? 64 : 96;
-            sourceRec.y = 0;
+    // Atualiza o temporizador se estiver "andando"
+    if (isWalking) {
+        walkingTimer -= GetFrameTime();
+        if (walkingTimer <= 0) {
+            isWalking = false;  // Termina a animação de "andando"
+        }
+    }
+
+    // Usa switch para definir o retângulo de origem com base na última direção
+    Rectangle sourceRec;
+    switch (lastDirection) {
+        case 1: // Cima
+            sourceRec = (Rectangle){0, 192, 64, 64};
             break;
-        case 2: // Direita
-            sourceRec.x = (frameAtual % 2 == 0) ? 0 : 32;
-            sourceRec.y = 0;
+        case 2: // Esquerda
+            sourceRec = (Rectangle){0, 64, 64, 64};
             break;
-        case 3: // Cima
-            sourceRec.x = (frameAtual % 2 == 0) ? 128 : 160;
-            sourceRec.y = 0;
+        case 3: // Baixo
+            sourceRec = (Rectangle){0, 0, 64, 64};
             break;
-        case 4: // Baixo
-            sourceRec.x = (frameAtual % 2 == 0) ? 192 : 224;
-            sourceRec.y = 0;
+        case 4: // Direita
+            sourceRec = (Rectangle){0, 128, 64, 64};
             break;
-        default: // Parado
-            sourceRec.x = 0;
-            sourceRec.y = 0;
+        default:
+            sourceRec = (Rectangle){0, 0, 64, 64}; // Posição padrão (parado)
             break;
     }
 
     // Define a posição do personagem na tela
     Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
 
-    // Desenha o sprite do personagem na tela
-    DrawTextureRec(personagem, sourceRec, position, WHITE);
+    // Desenha o sprite redimensionado para 96x96, centralizando sobre a posição de 32x32
+    Rectangle destRec = { position.x - 32, position.y - 32, 96, 96 };  // Ajuste para centralizar o sprite maior
 
-    // Atualiza o frame atual para a próxima animação
-    tempoAnimacao += GetFrameTime();
-    if (tempoAnimacao >= duracaoFrame) {
-        tempoAnimacao = 0;
-        frameAtual = (frameAtual + 1) % 2;  // Alterna entre os dois frames (0 e 1)
+    // Se estiver "andando", desenha o sprite de "andando"; caso contrário, desenha o sprite de direção final
+    if (isWalking) {
+        DrawTexturePro(personagemAndando, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
+    } else {
+        DrawTexturePro(personagem, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
     // Desenha o item usando o novo sprite recortado se ele não estiver coletado
