@@ -270,6 +270,8 @@ void drawGame() {
     Texture2D environment1_2 = LoadTexture("static/image/Rock6_3.png");
     Texture2D environment2_1 = LoadTexture("static/image/Rock2_1.png");
     Texture2D environment2_2 = LoadTexture("static/image/Rock2_3.png");
+    Texture2D environment3_1 = LoadTexture("static/image/Rock8_ground_shadow1.png");
+    Texture2D environment3_2 = LoadTexture("static/image/Rock8_ground_shadow3.png");
     Texture2D ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
     Rectangle sourceRect = {64, 64, 64, 64}; // Área da textura original
     Vector2 origin = {0, 0}; // Origem de rotação (mantida em (0, 0))
@@ -297,10 +299,11 @@ void drawGame() {
             DrawTexturePro(environment1_1, sourceRect, destRect, origin, 0.0f, WHITE); 
         }
     } else if (mapaAtual == 2) {
+        DrawTexture(environment3_2, 20, 20, RAYWHITE);
         for (int i = 0; i < DUNAS_MAPA3; i++) {
             Vector2 posicaoDuna = { posicoesDunasMapa3[i].x * TILE_SIZE, posicoesDunasMapa3[i].y * TILE_SIZE };
             Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 }; // Tamanho maior: 96x96
-            DrawTexturePro(environment, sourceRect, destRect, origin, 0.0f, WHITE);
+            DrawTexturePro(environment3_1, sourceRect, destRect, origin, 0.0f, WHITE);
         }
     }
 

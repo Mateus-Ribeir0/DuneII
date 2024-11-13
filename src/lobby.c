@@ -176,6 +176,7 @@ const int heigthMercador = 140;
 void drawLobby() {
 
     Sound troca = LoadSound("static/music/trocaDeDinheiro.wav");
+    bool soundPlayed = false;
 
     Texture2D desertTileset = LoadTexture("static/image/environment.png");
     Rectangle tileSourceRec = { 128, 32, 32, 32 };
@@ -354,21 +355,26 @@ void drawLobby() {
         return;
     }
 
-    bool trocaSFXtocou = false;
+    bool teveTroca = false;
 
     if (showThankYouMessage) {
-
-        if (!trocaSFXtocou) {
+        if (!soundPlayed) {
             PlaySound(troca);
-            trocaSFXtocou = true;
+            soundPlayed = true;  // Marca como tocado para evitar repetições
         }
-        
         DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+
         if (GetTime() - errorMessageTimer >= MESSAGE_DURATION) {
             showThankYouMessage = false;
             isInteractingWithMerchant = 0;
+            soundPlayed = false;  // Reseta para permitir que o som toque em uma futura interação
         }
         return;
+    }
+
+    // Resetar o som caso a mensagem não esteja ativa, fora da condição de exibição
+    if (!showThankYouMessage) {
+        soundPlayed = false;
     }
 
     // Exibe mensagem de negociação com o mercador se o jogador estiver próximo
