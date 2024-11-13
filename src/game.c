@@ -45,10 +45,12 @@ float tempoAnimacao = 0;
 const float duracaoFrame = 0.2f;  // Duração de cada quadro em segundos
 
 // Coordenadas predefinidas para especiarias, garantindo distância entre os pontos
+// Coordenadas predefinidas para especiarias, revisadas para evitar colisões e garantir acessibilidade no mapa 2
 Point posicoesEspeciarias[TOTAL_ESPECIARIAS] = {
-    {2, 2}, {6, 8}, {10, 4}, {14, 10}, {18, 16}, {22, 3}, {26, 15}, 
-    {30, 7}, {34, 18}, {38, 5}, {5, 14}, {15, 19}, {20, 2}, {28, 9}, {35, 13}
+    {20, 4}, {8, 6}, {12, 11}, {17, 8}, {23, 12}, {28, 5}, {32, 14}, 
+    {36, 17}, {6, 15}, {15, 16}, {20, 7}, {26, 18}, {30, 10}, {33, 6}, {37, 13}
 };
+
 
 // Índice para rastrear a próxima especiaria a aparecer
 int indiceEspeciariaAtual = 0;
@@ -187,9 +189,8 @@ void movePlayer(int dx, int dy) {
 
     // Define o retângulo do jogador
     Rectangle playerRect = { new_x * TILE_SIZE, new_y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
+    Rectangle ruinasCollisionBox = { 30, 40, 200, 180 };  // Y deslocado para 40, altura reduzida para 180
 
-    // Define o retângulo de colisão das ruínas
-    Rectangle ruinasCollisionBox = { 20, 20, 256, 256 };  // Ajuste conforme necessário
 
     // Verifica se a nova posição está dentro dos limites do mapa
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
