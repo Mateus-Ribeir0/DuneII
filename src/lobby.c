@@ -336,9 +336,15 @@ void drawLobby() {
         return;
     }
 
+    bool trocaSFXtocou = false;
+
     if (showThankYouMessage) {
+
+        if (!trocaSFXtocou) {
+            PlaySound(troca);
+            trocaSFXtocou = true;
+        }
         
-        PlaySound(troca);
         DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
         if (GetTime() - errorMessageTimer >= MESSAGE_DURATION) {
             showThankYouMessage = false;
