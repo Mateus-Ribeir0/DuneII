@@ -151,9 +151,9 @@ void finalizarGame() {
     UnloadTexture(sandworm);
 
     // Descarrega sons
-    //UnloadSound(musicaMapa0);
-    //UnloadSound(musicaMapa1);
-    //UnloadSound(musicaMapa2);
+    UnloadSound(musicaMapa0);
+    UnloadSound(musicaMapa1);
+    UnloadSound(musicaMapa2);
     UnloadSound(spellCastSound);
     UnloadSound(gameOverSound);
     UnloadSound(barulhoMonstro);
@@ -761,9 +761,9 @@ void playGame(GameScreen *currentScreen) {
                 (dificuldade == 3 && strlen(historico) >= 3 && (encontrou_padrao = identificar_padrao_mais_frequente(historico, 3, padrao_encontrado)))) 
             {
 
-                UnloadSound(musicaMapa0);
-                UnloadSound(musicaMapa1);
-                UnloadSound(musicaMapa2);
+                StopSound(musicaMapa0);
+                StopSound(musicaMapa1);
+                StopSound(musicaMapa2);
                 
                 sleep(1);
                 PlaySound(gameOverSound);

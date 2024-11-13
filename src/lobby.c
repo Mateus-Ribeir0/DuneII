@@ -364,7 +364,6 @@ void drawLobby() {
         return;
     }
 
-    bool teveTroca = false;
 
     if (showThankYouMessage) {
         if (!soundPlayed) {
