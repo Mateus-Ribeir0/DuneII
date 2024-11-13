@@ -343,21 +343,26 @@ void desenharAnimacaoMorte(Texture2D personagem, Texture2D personagemMorto) {
 
     // Posição exata do jogador, ajustando para centralizar o sprite de 96x96 pixels
     Vector2 posicao = {player_x * TILE_SIZE, player_y * TILE_SIZE};
-    Rectangle destRec = {posicao.x-32, posicao.y, 96, 96};  // 96x96 para centralizar como em drawGame
+    Rectangle destRec = {posicao.x - 32, posicao.y, 96, 96};  // 96x96 para centralizar como em drawGame
 
     // Duração de cada frame em segundos
-    const float duracaoFrame = 0.1f;
+    const float duracaoFramePrimeiro = 0.5f; // Duração estendida para o primeiro quadro
+    const float duracaoFrame = 0.1f;         // Duração para os demais quadros
     float tempoInicial = GetTime();
 
     // Exibe cada frame da animação de morte
     for (int i = 0; i < numFramesMorte; i++) {
-        while (GetTime() - tempoInicial < duracaoFrame) {
-            // Desenha o frame atual até que o tempo de exibição passe de 0.8 segundos
+        // Define a duração específica para o primeiro frame
+        float tempoFrameAtual = (i == 0) ? duracaoFramePrimeiro : duracaoFrame;
+
+        while (GetTime() - tempoInicial < tempoFrameAtual) {
+            // Desenha o frame atual até que o tempo de exibição passe do tempo do quadro atual
             ClearBackground(BLACK);
             BeginDrawing();
             DrawTexturePro(personagemMorto, framesMorte[i], destRec, (Vector2){0, 0}, 0.0f, WHITE);
             EndDrawing();
         }
+
         // Atualiza o tempo inicial para o próximo frame
         tempoInicial = GetTime();
     }
@@ -560,7 +565,6 @@ void drawGame() {
         DrawText(mensagem, xPosition, GetScreenHeight() / 2, 20, BLACK);
     }
 }
-
 
 // Contador de ocorrências consecutivas
 int contar_ocorrencias_consecutivas(const char *historico, const char *padrao, size_t padrao_len) {
