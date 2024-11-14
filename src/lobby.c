@@ -12,6 +12,7 @@ static Texture2D cerealsTexture;
 static Texture2D goldTexture;
 static Texture2D aguaTexture;
 static Texture2D cityTexture;
+static Texture2D bonesTexture;
 static Texture2D monstersTexture;
 static Sound troca;
 
@@ -53,12 +54,14 @@ void iniciarLobby() {
     aguaTexture = LoadTexture("static/image/agua.png");
     troca = LoadSound("static/music/trocaDeDinheiro.wav");
     monstersTexture = LoadTexture("static/image/monsters.png");
+    bonesTexture = LoadTexture("static/image/bones.png");
 }
 
 void finalizarLobby() {
     UnloadTexture(velho);
     UnloadTexture(cityTexture);
     UnloadTexture(monstersTexture);
+    UnloadTexture(bonesTexture);
     UnloadTexture(desertTileset);
     UnloadTexture(personagem);
     UnloadTexture(personagemAndando);
@@ -239,6 +242,72 @@ void drawLobby() {
                 (Rectangle){ positionMonster.x, positionMonster.y, 106, 116 },  // Tamanho de destino
                 (Vector2){ 0, 0 }, 0.0f, WHITE);
 
+    // Defina a região da imagem que deseja desenhar (ajuste as coordenadas conforme necessário)
+    Rectangle sourceRecbones = { 557, 60, 45, 37 };  // Exemplo de um monstro de 64x64 pixels na posição inicial da spritesheet
+    Rectangle sourceRecbones2 = { 557, 60, 45, 37 };
+    Rectangle sourceRecbones3 = { 557, 60, 45, 37 };
+    Rectangle sourceRecbones4 = { 557, 60, 45, 37 };
+
+    Rectangle sourceRecbones5 = { 666, 125, 23, 19 };
+    Rectangle sourceRecbones6 = { 666, 125, 23, 19 };
+    Rectangle sourceRecbones7 = { 666, 125, 23, 19 };
+
+    Rectangle sourceRecbones8 = { 784, 72, 29, 24 };
+    Rectangle sourceRecbones9 = { 784, 72, 29, 24 };
+    Rectangle sourceRecbones10 = { 181, 140, 43, 32 };
+
+    // Defina a posição onde a imagem será exibida no lobby
+    Vector2 positionBones = { 300, 50 };  // Posição x e y no lobby, ajuste conforme desejado
+    Vector2 positionBones2 = { 660, 600 }; 
+    Vector2 positionBones3 = { 200, 680 }; 
+    Vector2 positionBones4 = {760, 300 }; 
+
+    Vector2 positionBones5 = {730, 330 }; 
+    Vector2 positionBones6 = {780, 543}; 
+    Vector2 positionBones7 = {900, 203}; 
+
+    Vector2 positionBones8 = {1164, 540}; 
+    Vector2 positionBones9 = {370, 512}; 
+
+    Vector2 positionBones10 = {560, 134}; 
+    
+    // Desenhe o monstro no lobby usando a função DrawTexturePro
+    DrawTexturePro(bonesTexture, sourceRecbones, 
+                (Rectangle){ positionBones.x, positionBones.y, 45, 37 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones2, 
+                (Rectangle){ positionBones2.x, positionBones2.y, 45, 37 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones3, 
+                (Rectangle){ positionBones3.x, positionBones3.y, 45, 37 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones4, 
+                (Rectangle){ positionBones4.x, positionBones4.y, 45, 37 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+
+    
+    DrawTexturePro(bonesTexture, sourceRecbones5, 
+                (Rectangle){ positionBones5.x, positionBones5.y, 23, 19 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+
+    DrawTexturePro(bonesTexture, sourceRecbones6, 
+                (Rectangle){ positionBones6.x, positionBones6.y, 23, 19 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones7, 
+                (Rectangle){ positionBones7.x, positionBones7.y, 23, 19 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+
+
+    DrawTexturePro(bonesTexture, sourceRecbones8, 
+                (Rectangle){ positionBones8.x, positionBones8.y, 29, 24 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones9, 
+                (Rectangle){ positionBones9.x, positionBones9.y, 29, 24 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+
+    DrawTexturePro(bonesTexture, sourceRecbones10, 
+                (Rectangle){ positionBones10.x, positionBones10.y, 43, 32 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
 
     DrawTexturePro(cityTexture, hitboxVendinha, destRecVendinha, (Vector2){0, 0}, 0.0f, WHITE);
 
