@@ -248,6 +248,8 @@ Point posicoesDunasMapa1[DUNAS_MAPA1] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, 
 Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {12, 14} };
 Point posicoesDunasMapa3[DUNAS_MAPA3] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {20, 10}, {12, 14}, {28, 6}, {7, 19}, {17, 3} };
 
+Rectangle vendinhaCollisionBox = {20 + (123 * 0.8) / 4, 20 + (120 * 0.8) / 4, (123 * 0.8) / 2, (120 * 0.8) / 2};
+
 
 void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
@@ -266,6 +268,10 @@ void movePlayer(int dx, int dy) {
         }
 
         if (isPlayerOnPortal(new_x, new_y, mapaAtual)) {
+            return;
+        }
+
+        if (mapaAtual == -1 && CheckCollisionRecs(playerRect, vendinhaCollisionBox)) {
             return;
         }
 
@@ -302,6 +308,7 @@ void movePlayer(int dx, int dy) {
             }
         }
 
+        // Atualiza posição do jogador se não houver colisão
         if (!colidiuComDuna && !colidiuComPedra) {
             player_x = new_x;
             player_y = new_y;

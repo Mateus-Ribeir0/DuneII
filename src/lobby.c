@@ -26,6 +26,18 @@ const char *errorMessage = "";
 const int widthMercador = 620;
 const int heigthMercador = 140;
 
+bool isPlayerOnVendinha(int player_x, int player_y) {
+    // Ajuste para a posição e tamanho corretos da vendinha
+    int vendinha_x = 20;  // Baseado em posicaoVendinha.x
+    int vendinha_y = 20;  // Baseado em posicaoVendinha.y
+    int vendinha_largura = 123 * 0.8;  // Ajustado pelo fator de escala
+    int vendinha_altura = 120 * 0.8;   // Ajustado pelo fator de escala
+
+    return player_x >= vendinha_x && player_x < vendinha_x + vendinha_largura &&
+           player_y >= vendinha_y && player_y < vendinha_y + vendinha_altura;
+}
+
+
 void iniciarLobby() {
     velho = LoadTexture("static/image/velho.png");
     cityTexture = LoadTexture("static/image/city.png");
