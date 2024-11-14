@@ -644,6 +644,15 @@ void playGame(GameScreen *currentScreen) {
         updateWaterLevel(currentScreen);
 
         if (playerWater <= 0.0) {
+            StopSound(musicaMapa0);
+            StopSound(musicaMapa1);
+            StopSound(musicaMapa2);
+
+            Texture2D personagemMorto = LoadTexture("static/image/dead.png");
+            ClearBackground(BLACK);
+            desenharAnimacaoMorte(personagem, personagemMorto);
+            DrawText("GAME OVER - Você ficou sem água!", 10, 40, 20, RED);
+            sleep(3);
             atualizarRanking(playerName, playerMoney);
             zerarMonetaria();
             *currentScreen = RANKINGS;
