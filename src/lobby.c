@@ -3,7 +3,6 @@
 #include <math.h>
 
 // Variáveis de textura e som declaradas como static
-static Texture2D vendinha;
 static Texture2D velho;
 static Texture2D desertTileset;
 static Texture2D personagem;
@@ -12,6 +11,7 @@ static Texture2D portal;
 static Texture2D cerealsTexture;
 static Texture2D goldTexture;
 static Texture2D aguaTexture;
+static Texture2D cityTexture;
 static Sound troca;
 
 // Variáveis Globias
@@ -27,8 +27,8 @@ const int widthMercador = 620;
 const int heigthMercador = 140;
 
 void iniciarLobby() {
-    vendinha = LoadTexture("static/image/market_assets.png");
     velho = LoadTexture("static/image/velho.png");
+    cityTexture = LoadTexture("static/image/city.png");
     desertTileset = LoadTexture("static/image/environment.png");
     personagem = LoadTexture("static/image/newstoppedsprites.png");
     personagemAndando = LoadTexture("static/image/newwalkingsprites.png");
@@ -40,8 +40,8 @@ void iniciarLobby() {
 }
 
 void finalizarLobby() {
-    UnloadTexture(vendinha);
     UnloadTexture(velho);
+    UnloadTexture(cityTexture);
     UnloadTexture(desertTileset);
     UnloadTexture(personagem);
     UnloadTexture(personagemAndando);
@@ -196,11 +196,14 @@ void DrawDialogBox(const char *text, int posX, int posY, int width, int height, 
 }
 
 void drawLobby() {
-
     bool soundPlayed = false;
     Rectangle tileSourceRec = { 128, 32, 32, 32 };
-    Rectangle hitboxVendinha = {96, 0, 90, 96};
-    Vector2 posicaoVendinha = {20, 20};
+    // Define a área de recorte da nova sprite da vendinha
+    Rectangle hitboxVendinha = { 1389, 330, 123, 120 };
+
+    // Define a posição e o tamanho de destino onde deseja desenhar a nova sprite no lobby
+    Vector2 posicaoVendinha = { 20, 20 };
+    Rectangle destRecVendinha = { posicaoVendinha.x, posicaoVendinha.y, 123* 0.8 , 120* 0.8  }; // Tamanho da vendinha conforme especificado
 
     // Desenha o fundo do lobby com tiles de areia
     for (int y = 0; y < MAPA_ALTURA; y++) {
@@ -210,8 +213,81 @@ void drawLobby() {
         }
     }
 
-    // Desenha a textura da vendinha
-    DrawTextureRec(vendinha, hitboxVendinha, posicaoVendinha, WHITE);
+    // Desenha a nova textura da vendinha
+    DrawTexturePro(cityTexture, hitboxVendinha, destRecVendinha, (Vector2){0, 0}, 0.0f, WHITE);
+
+    
+    // Define a área de recorte da sprite `cityTexture`
+        // Define as áreas de recorte das sprites `cityTexture`
+    Rectangle sourceRec = { 831, 66, 108, 162 };
+    Rectangle sourceRec2 = { 1167, 108, 132, 120 };
+    Rectangle sourceRec3 = { 978, 102, 150, 126 };
+    Rectangle sourceRec4 = { 582, 354, 84, 135 };
+    Rectangle sourceRec5 = { 1068, 309, 90, 138 };
+    Rectangle sourceRec6 = { 936, 303, 96, 144 };
+    Rectangle sourceRec7 = { 801, 279, 96, 168 };
+    Rectangle sourceRec8 = { 120, 261, 81, 51 };
+    Rectangle sourceRec9 = { 459, 240, 84, 72 };
+    Rectangle sourceRec10 = { 1338, 60, 138, 168 };
+    Rectangle sourceRec11 = { 216, 246, 90, 63 };
+    Rectangle sourceRec12 = { 222, 147, 33, 51 };
+    Rectangle sourceRec13 = { 222, 147, 33, 51 };
+    Rectangle sourceRec14 = { 324, 264, 126, 48 };
+    Rectangle sourceRec15 = { 102, 363, 123, 126 };
+    
+
+
+    // Define as posições onde deseja desenhar as sprites `cityTexture` no lobby
+    Vector2 positionCity1 = { 800, 4 }; // Posição da primeira sprite
+    Vector2 positionCity2 = { 890, 36 }; // Posição da segunda sprite
+    Vector2 positionCity3 = { 1000, 36 }; // Posição da segunda sprite
+    Vector2 positionCity4 = { 1140, 270 }; // Posição da segunda sprite
+    Vector2 positionCity5 = { 300, 380 }; // Posição da segunda sprite
+    Vector2 positionCity6 = { 200, 376 }; // Posição da segunda sprite
+    Vector2 positionCity7 = { 100, 354 }; // Posição da segunda sprite
+    Vector2 positionCity8 = { 120, 600 }; // Posição da segunda sprite
+    Vector2 positionCity9 = { 18, 478 }; // Posição da segunda sprite
+    Vector2 positionCity10 = { 684, 2 }; // Posição da segunda sprite
+    Vector2 positionCity11 = { 760, 200 }; // Posição da segunda sprite
+    Vector2 positionCity12 = { 700, 180 }; // Posição da segunda sprite
+    Vector2 positionCity13 = { 1000, 280 }; // Posição da segunda sprite
+    Vector2 positionCity14 = { 1140, 150 }; // Posição da segunda sprite
+    Vector2 positionCity15 = { 1, 630 }; // Posição da segunda sprite
+
+
+    // Define os retângulos de destino com escala reduzida
+    Rectangle destRec = { positionCity1.x, positionCity1.y, 108 * 0.8, 162 * 0.8 };  // Reduz a escala da primeira sprite em 80%
+    Rectangle destRec2 = { positionCity2.x, positionCity2.y, 132 * 0.8, 120 * 0.8 }; // Reduz a escala da segunda sprite em 80%
+    Rectangle destRec3 = { positionCity3.x, positionCity3.y, 150 * 0.8, 126 * 0.8 };
+    Rectangle destRec4 = { positionCity4.x, positionCity4.y, 84 * 0.5, 135 * 0.5 };
+    Rectangle destRec5 = { positionCity5.x, positionCity5.y, 90 , 138 };
+    Rectangle destRec6 = { positionCity6.x, positionCity6.y, 96 , 144 };
+    Rectangle destRec7 = { positionCity7.x, positionCity7.y, 96 , 168 };
+    Rectangle destRec8 = { positionCity8.x, positionCity8.y, 81 * 0.8, 51 *0.8};
+    Rectangle destRec9 = { positionCity9.x, positionCity9.y, 81 , 51};
+    Rectangle destRec10 = { positionCity10.x, positionCity10.y, 138 * 0.8, 168 * 0.8};
+    Rectangle destRec11 = { positionCity11.x, positionCity11.y, 90 * 0.7, 63 * 0.7};
+    Rectangle destRec12 = { positionCity12.x, positionCity12.y, 33 * 0.5, 51 * 0.5};
+    Rectangle destRec13 = { positionCity13.x, positionCity13.y, 33 * 0.5, 51 * 0.5};
+    Rectangle destRec14 = { positionCity14.x, positionCity14.y, 126 * 0.8, 48 * 0.8};
+    Rectangle destRec15 = { positionCity15.x, positionCity15.y, 123 * 0.6, 126 * 0.6};
+
+    // Desenha as sprites `cityTexture` no lobby
+    DrawTexturePro(cityTexture, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec2, destRec2, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec3, destRec3, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec4, destRec4, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec5, destRec5, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec6, destRec6, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec7, destRec7, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec8, destRec8, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec9, destRec9, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec10, destRec10, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec11, destRec11, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec12, destRec12, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec13, destRec13, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec14, destRec14, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec15, destRec15, (Vector2){0, 0}, 0.0f, WHITE);
 
     // Atualize a direção com base na tecla pressionada
     static int lastDirection = 3;  // Começa apontando para "baixo" (S)
@@ -246,60 +322,43 @@ void drawLobby() {
     }
 
     // Usa switch para definir o retângulo de origem com base na última direção
-    Rectangle sourceRec;
+    Rectangle sourceRecPersonagem;
     switch (lastDirection) {
         case 1: // Cima
-            sourceRec = (Rectangle){0, 192, 64, 64};
+            sourceRecPersonagem = (Rectangle){0, 192, 64, 64};
             break;
         case 2: // Esquerda
-            sourceRec = (Rectangle){0, 64, 64, 64};
+            sourceRecPersonagem = (Rectangle){0, 64, 64, 64};
             break;
         case 3: // Baixo
-            sourceRec = (Rectangle){0, 0, 64, 64};
+            sourceRecPersonagem = (Rectangle){0, 0, 64, 64};
             break;
         case 4: // Direita
-            sourceRec = (Rectangle){0, 128, 64, 64};
+            sourceRecPersonagem = (Rectangle){0, 128, 64, 64};
             break;
         default:
-            sourceRec = (Rectangle){0, 0, 64, 64}; // Posição padrão (parado)
+            sourceRecPersonagem = (Rectangle){0, 0, 64, 64}; // Posição padrão (parado)
             break;
     }
 
     // Define a posição do personagem na tela
-    Vector2 position = { player_x * TILE_SIZE, player_y * TILE_SIZE };
+    Vector2 positionPersonagem = { player_x * TILE_SIZE, player_y * TILE_SIZE };
 
     // Desenha o sprite redimensionado para 96x96, centralizando sobre a posição de 32x32
-    Rectangle destRec = { position.x - 32, position.y - 32, 96, 96 };  // Ajuste para centralizar o sprite maior
+    Rectangle destRecPersonagem = { positionPersonagem.x - 32, positionPersonagem.y - 32, 96, 96 };
 
     // Se estiver "andando", desenha o sprite de "andando"; caso contrário, desenha o sprite de direção final
     if (isWalking) {
-        DrawTexturePro(personagemAndando, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
+        DrawTexturePro(personagemAndando, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
     } else {
-        DrawTexturePro(personagem, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
+        DrawTexturePro(personagem, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
     // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby
-    //Texture2D portal = LoadTexture("static/image/portal.png");
-    
     Rectangle portalSourceRec = { 0, 0, 32, 32 };
-    Rectangle portalDestRec1 = { 
-        PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
-        PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 
-        32 * (PORTAL_HORIZONTAL_LARGURA - 1),  
-        32 * (PORTAL_HORIZONTAL_ALTURA + 1)    
-    };
-    Rectangle portalDestRec2 = { 
-        PORTAL_LOBBY_MAPA2_X * TILE_SIZE, 
-        PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 
-        32 * (PORTAL_HORIZONTAL_LARGURA - 1),  
-        32 * (PORTAL_HORIZONTAL_ALTURA + 1)    
-    };
-    Rectangle portalDestRec3 = { 
-        PORTAL_LOBBY_MAPA3_X * TILE_SIZE, 
-        PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 
-        32 * (PORTAL_HORIZONTAL_LARGURA - 1),  
-        32 * (PORTAL_HORIZONTAL_ALTURA + 1)    
-    };
+    Rectangle portalDestRec1 = { PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 32 * (PORTAL_HORIZONTAL_LARGURA - 1), 32 * (PORTAL_HORIZONTAL_ALTURA + 1) };
+    Rectangle portalDestRec2 = { PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 32 * (PORTAL_HORIZONTAL_LARGURA - 1), 32 * (PORTAL_HORIZONTAL_ALTURA + 1) };
+    Rectangle portalDestRec3 = { PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 32 * (PORTAL_HORIZONTAL_LARGURA - 1), 32 * (PORTAL_HORIZONTAL_ALTURA + 1) };
 
     Vector2 origin = { 0, 0 };
 
@@ -314,42 +373,32 @@ void drawLobby() {
     int infoBoxWidth = 220;
     int infoBoxHeight = 100;
 
-    // Definir as cores para o preenchimento e borda conforme desejado
-    Color fillColor = (Color){205, 133, 63, 255};   // Marrom claro para o preenchimento
-    Color borderColor = (Color){101, 67, 33, 255};  // Marrom escuro para a borda
+    Color fillColor = (Color){205, 133, 63, 255};
+    Color borderColor = (Color){101, 67, 33, 255};
 
-    // Desenhar o fundo e a borda arredondada para a caixa de informações no lobby
     DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, fillColor);
     DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, borderColor);
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, borderColor);
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, borderColor);
 
-    // Ajuste da posição vertical para centralizar melhor a imagem da especiaria
-    int especiariaIconY = infoBoxY + 1;
-    Vector2 especiariaIconPos = { infoBoxX + 10, especiariaIconY };
+    Vector2 especiariaIconPos = { infoBoxX + 10, infoBoxY + 1 };
     DrawTextureRec(cerealsTexture, (Rectangle){64, 64, 32, 32}, especiariaIconPos, WHITE);
-
-    // Exibe as informações de especiarias, dinheiro e água dentro da caixa de informações
     DrawText("Especiarias:", infoBoxX + 50, infoBoxY + 10, 18, WHITE);
     DrawText(TextFormat("%d/%d", itemsCollected, MAX_ESPECIARIAS), infoBoxX + 160, infoBoxY + 10, 18, WHITE);
 
-    // Exibe o ícone de ouro e o texto do dinheiro
-        // Exibe o ícone de ouro e o texto do dinheiro
-    Vector2 goldIconPos = { infoBoxX + 15, infoBoxY + 35 };  // Ajustado para ficar mais à direita e para cima
-    Rectangle goldSourceRec = { 0, 0, 16, 16 };  // Tamanho original da imagem
-    Rectangle goldDestRec = { goldIconPos.x, goldIconPos.y, 24, 24 };  // Tamanho ajustado para 24x24
+    Vector2 goldIconPos = { infoBoxX + 15, infoBoxY + 35 };
+    Rectangle goldSourceRec = { 0, 0, 16, 16 };
+    Rectangle goldDestRec = { goldIconPos.x, goldIconPos.y, 24, 24 };
 
     DrawTexturePro(goldTexture, goldSourceRec, goldDestRec, origin, 0.0f, WHITE);
     DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 50, infoBoxY + 40, 18, WHITE);
 
-    // Ícone e texto da água
-    // Ícone e texto da água
-    Vector2 aguaIconPos = { infoBoxX + 18, infoBoxY + 65 };  // Move um pouco mais para a esquerda
-    Rectangle aguaSourceRec = { 0, 0, aguaTexture.width, aguaTexture.height }; // Usa a resolução original
-    Rectangle aguaDestRec = { aguaIconPos.x, aguaIconPos.y, 24, 24 };  // Tamanho ajustado para 24x24
+    Vector2 aguaIconPos = { infoBoxX + 18, infoBoxY + 65 };
+    Rectangle aguaSourceRec = { 0, 0, aguaTexture.width, aguaTexture.height };
+    Rectangle aguaDestRec = { aguaIconPos.x, aguaIconPos.y, 24, 24 };
 
-    DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, origin, 0.0f, WHITE);  // Desenha o ícone
-    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);  // Texto da água
+    DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, origin, 0.0f, WHITE);
+    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
 
     if (!isPlayerNearMerchant() && showErrorMessage) {
         showErrorMessage = false;
@@ -364,135 +413,40 @@ void drawLobby() {
         return;
     }
 
-    bool teveTroca = false;
-
     if (showThankYouMessage) {
         if (!soundPlayed) {
             PlaySound(troca);
-            soundPlayed = true;  // Marca como tocado para evitar repetições
+            soundPlayed = true;
         }
         DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
 
         if (GetTime() - errorMessageTimer >= MESSAGE_DURATION) {
             showThankYouMessage = false;
             isInteractingWithMerchant = 0;
-            soundPlayed = false;  // Reseta para permitir que o som toque em uma futura interação
+            soundPlayed = false;
         }
         return;
     }
 
-    // Resetar o som caso a mensagem não esteja ativa, fora da condição de exibição
     if (!showThankYouMessage) {
         soundPlayed = false;
     }
 
-    // Exibe mensagem de negociação com o mercador se o jogador estiver próximo
     if (isPlayerNearMerchant()) {
         if (!isInteractingWithMerchant) {
-            
-            // Define a área recortada da imagem original (128x128 pixels)
-            Rectangle sourceRec = { 0, 0, 550, 550 };
+            Rectangle sourceRecVelho = { 0, 0, 550, 550 };
+            Rectangle destRecVelho = { 105, 350, 256, 256 };
+            Vector2 originVelho = { 32, 32 };
 
-            // Define a área onde a imagem será desenhada na tela (redimensionada para 64x64 pixels)
-            Rectangle destRec = { 105, 350, 256, 256 };
-
-            // Define o ponto de origem (pivot) para o centro da área de destino
-            Vector2 origin = { 32, 32 };
-
-            // Desenha a textura na tela com proporção reduzida
-            DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
+            DrawTexturePro(velho, sourceRecVelho, destRecVelho, originVelho, 0.0f, WHITE);
             DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1] para vender especiarias\n[2] para comprar uma bolsa nova\n[3] para comprar garrafa de água", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+            
             if (IsKeyPressed(KEY_ONE)) {
-                isInteractingWithMerchant = 1;  // Opção de venda
+                isInteractingWithMerchant = 1;
             } else if (IsKeyPressed(KEY_TWO)) {
-                isInteractingWithMerchant = 2;  // Opção de compra de bolsa
+                isInteractingWithMerchant = 2;
             } else if (IsKeyPressed(KEY_THREE)) {
-                isInteractingWithMerchant = 3;  // Opção de compra de garrafa de água
-            }
-        } else {
-            // Lógica de interação com o mercador para venda de especiarias, compra de bolsa e garrafa de água
-            if (isInteractingWithMerchant == 1) {
-                if (itemsCollected > 0) {
-                    playerMoney += itemsCollected * 300;
-                    itemsCollected = 0;
-                    showThankYouMessage = true;
-                    errorMessageTimer = GetTime();
-                } else {
-                    DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
-                    errorMessage = "Saia daqui, você não tem nenhuma especiaria para negociar!";
-                    showErrorMessage = true;
-                    errorMessageTimer = GetTime();
-                }
-            } else if (isInteractingWithMerchant == 2) {
-                DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
-                DrawDialogBox("Qual bolsa deseja comprar?\n\n[1] Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-
-                if (IsKeyPressed(KEY_ONE)) {
-                    if (playerMoney >= 5000) {
-                        MAX_ESPECIARIAS = 12;
-                        playerMoney -= 5000;
-                    } else {
-                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
-                    }
-                } else if (IsKeyPressed(KEY_TWO)) {
-                    if (playerMoney >= 10000) {
-                        MAX_ESPECIARIAS = 24;
-                        playerMoney -= 10000;
-                    } else {
-                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
-                    }
-                } else if (IsKeyPressed(KEY_THREE)) {
-                    if (playerMoney >= 15000) {
-                        MAX_ESPECIARIAS = 32;
-                        playerMoney -= 15000;
-                    } else {
-                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
-                    }
-                }
-            } else if (isInteractingWithMerchant == 3) {
-                DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
-                DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1] Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-
-                if (IsKeyPressed(KEY_ONE)) {
-                    if (playerMoney >= 3000) {
-                        playerWater = fmin(playerWater + GARRAFA_PEQUENA_CAPACIDADE, 100);
-                        playerMoney -= 3000;
-                    } else {
-                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
-                    }
-                } else if (IsKeyPressed(KEY_TWO)) {
-                    if (playerMoney >= 5000) {
-                        playerWater = fmin(playerWater + GARRAFA_MEDIA_CAPACIDADE, 100);
-                        playerMoney -= 5000;
-                    } else {
-                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
-                    }
-                } else if (IsKeyPressed(KEY_THREE)) {
-                    if (playerMoney >= 7000) {
-                        playerWater = fmin(playerWater + GARRAFA_GRANDE_CAPACIDADE, 100);
-                        playerMoney -= 7000;
-                    } else {
-                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
-                    }
-                }
+                isInteractingWithMerchant = 3;
             }
         }
     } else if (mensagem != NULL) {
@@ -501,6 +455,7 @@ void drawLobby() {
         isInteractingWithMerchant = 0;
     }
 }
+
 
 void desenharLobbyDetalhado() {
     drawLobby();
