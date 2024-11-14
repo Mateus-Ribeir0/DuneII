@@ -26,14 +26,12 @@ void carregarRanking() {
     char line[256];
 
     while (fgets(line, sizeof(line), file)) {
-        // Remove o caractere de nova linha, se houver
         char *newline = strchr(line, '\n');
         if (newline) *newline = '\0';
 
-        // Encontra o delimitador '|'
         char *delimiter = strchr(line, '|');
         if (delimiter) {
-            *delimiter = '\0'; // Separa o nome da pontuação
+            *delimiter = '\0';
             char *name = line;
             char *scoreStr = delimiter + 1;
             int score = atoi(scoreStr);

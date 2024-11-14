@@ -1,7 +1,6 @@
 #include "menu.h"
 #include "raylib.h"
 
-// Variáveis para elementos visuais
 static Texture2D background, logo, objetivoImage;
 static Music titleMusic;
 static float backgroundPosX;
@@ -63,7 +62,6 @@ void desenharBackgroundComLogo() {
     DrawTexture(logo, SCREEN_WIDTH / 2 - logo.width / 2, 150, WHITE);
 }
 
-// Função auxiliar para exibir uma cutscene com texto gradual
 void displayCutscene(Texture2D image, const char* text, Music titleMusic, float speed, float scale, float duration) {
     int charactersToShow = 0;
     int frameCount = 0;
@@ -77,24 +75,20 @@ void displayCutscene(Texture2D image, const char* text, Music titleMusic, float 
         timer += GetFrameTime();
         UpdateMusicStream(titleMusic);
 
-        // Atualiza a posição horizontal da imagem
         scrollX -= speed * GetFrameTime();
         if (scrollX <= -image.width * scale) {
             scrollX = 0.0f;
         }
 
-        // Desenha a imagem para criar efeito de movimento contínuo
         DrawTextureEx(image, (Vector2){scrollX, 0}, 0.0f, scale, WHITE);
         DrawTextureEx(image, (Vector2){scrollX + image.width * scale, 0}, 0.0f, scale, WHITE);
 
-        // Exibição gradual do texto
         if (charactersToShow < strlen(text)) {
             frameCount++;
             charactersToShow = (frameCount / (duration * 50)) * strlen(text);
             if (charactersToShow > strlen(text)) charactersToShow = strlen(text);
         }
 
-        // Desenha o fundo do diálogo e o texto
         int dialogWidth = 600;
         int dialogHeight = 100;
         int posX = GetScreenWidth() / 2 - dialogWidth / 2;
@@ -126,7 +120,6 @@ void cutsceneArrakis(Music titleMusic) {
     float scale = 0.6f;
     float duration = 7.9f;
 
-    // Exibindo cada cutscene com as imagens e textos correspondentes
     Texture2D cutsceneImage1 = LoadTexture("static/image/cutscene2.png");
     displayCutscene(cutsceneImage1, text1, titleMusic, speed, scale, duration);
     UnloadTexture(cutsceneImage1);
@@ -168,8 +161,6 @@ void cutsceneArrakis(Music titleMusic) {
     UnloadTexture(cutsceneImage10);
 }
 
-
-// Inicializa o menu com música e texturas
 void iniciarMenu(GameScreen *currentScreen) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "DuneII");
     InitAudioDevice();
@@ -181,10 +172,9 @@ void iniciarMenu(GameScreen *currentScreen) {
     PlayMusicStream(titleMusic);
     SetTargetFPS(60);
 
-    *currentScreen = TITLE; // Define a tela inicial como TITLE
+    *currentScreen = TITLE;
 }
 
-// Atualiza a lógica do menu, incluindo a seleção de dificuldade
 void atualizarMenu(GameScreen *currentScreen) {
     UpdateMusicStream(titleMusic);
 
@@ -199,10 +189,10 @@ void atualizarMenu(GameScreen *currentScreen) {
             *currentScreen = GAME;
         } else if (IsKeyPressed(KEY_C)) {
             PlaySound(swordsfx);
-            *currentScreen = OBJETIVO;  // Abre a tela do objetivo
+            *currentScreen = OBJETIVO;  
         } else if (IsKeyPressed(KEY_R)) {
             PlaySound(swordsfx);
-            *currentScreen = RANKINGS;  // Continua levando para a tela de rankings
+            *currentScreen = RANKINGS;  
         }
     } else if (*currentScreen == RANKINGS && IsKeyPressed(KEY_Q)) {
         PlaySound(swordsfx);
@@ -221,19 +211,15 @@ void exibirObjetivo() {
     }
 
     Rectangle source = { 0.0f, 0.0f, (float)objetivoImage.width, (float)objetivoImage.height }; // Área completa da imagem
-    Rectangle dest = { 0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT }; // Tamanho da tela para ocupar 100%
+    Rectangle dest = { 0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT };
     Vector2 origin = { 0.0f, 0.0f };
 
     BeginDrawing();
     ClearBackground(RAYWHITE);
-    DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE); // Desenho com ajuste de tamanho
+    DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE); 
     EndDrawing();
 }
 
-
-
-
-// Desenha o menu principal com as opções de dificuldade e transição para o jogo
 void desenharMenu(GameScreen currentScreen) {
     BeginDrawing();
     ClearBackground(RAYWHITE);
@@ -248,13 +234,12 @@ void desenharMenu(GameScreen currentScreen) {
     EndDrawing();
 }
 
-// Finaliza e libera os recursos do menu
 void finalizarMenu() {
     UnloadTexture(background);
     UnloadTexture(logo);
     StopMusicStream(titleMusic);
     UnloadMusicStream(titleMusic);
-    UnloadTexture(objetivoImage); // Libera a textura do objetivo
+    UnloadTexture(objetivoImage); 
     CloseAudioDevice();
     CloseWindow();
 }
