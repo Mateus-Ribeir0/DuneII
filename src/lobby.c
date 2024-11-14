@@ -25,6 +25,8 @@ const double MESSAGE_DURATION = 5.0;
 const char *errorMessage = "";
 const int widthMercador = 620;
 const int heigthMercador = 140;
+static float portalAnimationTimer = 0.0f;
+static int portalFrameIndex = 0;
 
 bool isPlayerOnVendinha(int player_x, int player_y) {
     // Ajuste para a posição e tamanho corretos da vendinha
@@ -206,6 +208,16 @@ void drawLobby() {
     Vector2 posicaoVendinha = { 20, 20 };
     Rectangle destRecVendinha = { posicaoVendinha.x, posicaoVendinha.y, 123* 0.8 , 120* 0.8  }; 
 
+    portalAnimationTimer += GetFrameTime();
+    if (portalAnimationTimer >= 0.1f) {  // Ajuste a velocidade da animação aqui (0.1f é a velocidade em segundos por frame)
+        portalAnimationTimer = 0.0f;
+        portalFrameIndex++;
+        if (portalFrameIndex > 3) {  // Como temos 4 frames (0, 1, 2, 3)
+            portalFrameIndex = 0;
+        }
+    }
+
+
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
             Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
@@ -341,7 +353,7 @@ void drawLobby() {
         DrawTexturePro(personagem, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
-    Rectangle portalSourceRec = { 0, 0, 32, 32 };
+    Rectangle portalSourceRec = { 32 * portalFrameIndex, 0, 32, 32 };
     Rectangle portalDestRec1 = { 
         PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
         PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 
