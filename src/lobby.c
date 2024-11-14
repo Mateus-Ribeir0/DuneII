@@ -60,8 +60,7 @@ int isPlayerNearMerchant() {
 }
 
 bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
-    if (mapaAtual == -1) { // No lobby
-        // Verifica o portal do mapa 1 no lobby
+    if (mapaAtual == -1) {
         if (new_x >= PORTAL_LOBBY_MAPA1_X && 
             new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
             new_y >= PORTAL_LOBBY_MAPA1_Y && 
@@ -69,7 +68,6 @@ bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
             return true;
         }
 
-        // Verifica o portal do mapa 2 no lobby
         if (new_x >= PORTAL_LOBBY_MAPA2_X && 
             new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
             new_y >= PORTAL_LOBBY_MAPA2_Y && 
@@ -77,7 +75,6 @@ bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
             return true;
         }
 
-        // Verifica o portal do mapa 3 no lobby
         if (new_x >= PORTAL_LOBBY_MAPA3_X && 
             new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
             new_y >= PORTAL_LOBBY_MAPA3_Y && 
@@ -85,7 +82,7 @@ bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
             return true;
         }
 
-    } else { // Nos mapas, verifica o portal de retorno ao lobby
+    } else {
         if (new_x >= PORTAL_RETORNO_X && 
             new_x < PORTAL_RETORNO_X + PORTAL_RETORNO_LARGURA &&
             new_y >= PORTAL_RETORNO_Y && 
@@ -97,13 +94,11 @@ bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
 }
 
 void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
-    mapaAtual = -1;  // Identifica que o jogador está no lobby
+    mapaAtual = -1;
     int dx = 0, dy = 0;
 
-    // Atualiza o nível de água no lobby
     updateWaterLevel(currentScreen);
 
-    // Verifica se o jogador ficou sem água e redireciona para o ranking
     if (playerWater <= 0.0) {
         *currentScreen = RANKINGS;
         resetarJogo();
@@ -117,10 +112,8 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
 
     movePlayer(dx, dy);
 
-    // Variável para controlar se o jogador está perto de um portal
     bool pertoDePortal = false;
 
-    // Verifica proximidade com o portal para o mapa 1 com uma linha extra abaixo
     if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
         (player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
@@ -129,10 +122,9 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
             mapaAtual = 0;
-            mensagem = NULL;  // Limpa a mensagem ao entrar no mapa
+            mensagem = NULL;
         }
     }
-    // Verifica proximidade com o portal para o mapa 2
     else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1) &&
         (player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA + 1)) {
         
@@ -141,10 +133,9 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
             mapaAtual = 1;
-            mensagem = NULL;  // Limpa a mensagem ao entrar no mapa
+            mensagem = NULL;
         }
     }
-    // Verifica proximidade com o portal para o mapa 3
     else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
             (player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
@@ -153,18 +144,16 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
             mapaAtual = 2;
-            mensagem = NULL;  // Limpa a mensagem ao entrar no mapa
+            mensagem = NULL;
         }
     }
 
-    // Se o jogador não estiver perto de nenhum portal, limpa a mensagem
     if (!pertoDePortal) {
         mensagem = NULL;
     }
 }
 
 void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool isPortalDialog) {
-    // Ajusta a largura para 400 quando a caixa é para um portal; caso contrário, mantém 600
     if (isPortalDialog) {
         width = 420;
     } else {
@@ -176,44 +165,35 @@ void DrawDialogBox(const char *text, int posX, int posY, int width, int height, 
     static int frameCount = 0;
     static int charactersToShow = 0;
 
-    // Verifica se o diálogo é de um portal
     if (isPortalDialog) {
-        // Exibe o texto completo imediatamente
         charactersToShow = strlen(text);
     } else {
-        // Controle de exibição gradual para outros diálogos
         if (IsKeyPressed(KEY_SPACE)) {
-            charactersToShow = strlen(text);  // Mostra o texto completo
+            charactersToShow = strlen(text);
         } else if (charactersToShow < strlen(text)) {
             frameCount++;
-            charactersToShow = frameCount / 5;  // Velocidade do texto
+            charactersToShow = frameCount / 5; 
             if (charactersToShow > strlen(text)) charactersToShow = strlen(text);
         }
     }
 
-    // Calcular o máximo de caracteres que cabem na caixa
-    int maxCharsPerLine = (width - 20) / MeasureText("A", 20);  // Ajuste para cada linha
-    int maxLines = (height - 20) / 20;                          // Ajuste para a altura da caixa
+    int maxCharsPerLine = (width - 20) / MeasureText("A", 20);  
+    int maxLines = (height - 20) / 20;                          
     int maxCharsInBox = maxCharsPerLine * maxLines;
 
-    // Limita o texto ao máximo que cabe na caixa
     if (charactersToShow > maxCharsInBox) charactersToShow = maxCharsInBox;
 
-    // Desenha o texto até o número atual de caracteres a serem mostrados
     DrawText(TextSubtext(text, 0, charactersToShow), posX + 10, posY + 10, 20, textColor);
 }
 
 void drawLobby() {
     bool soundPlayed = false;
     Rectangle tileSourceRec = { 128, 32, 32, 32 };
-    // Define a área de recorte da nova sprite da vendinha
     Rectangle hitboxVendinha = { 1389, 330, 123, 120 };
 
-    // Define a posição e o tamanho de destino onde deseja desenhar a nova sprite no lobby
     Vector2 posicaoVendinha = { 20, 20 };
-    Rectangle destRecVendinha = { posicaoVendinha.x, posicaoVendinha.y, 123* 0.8 , 120* 0.8  }; // Tamanho da vendinha conforme especificado
+    Rectangle destRecVendinha = { posicaoVendinha.x, posicaoVendinha.y, 123* 0.8 , 120* 0.8  }; 
 
-    // Desenha o fundo do lobby com tiles de areia
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
             Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
@@ -221,12 +201,9 @@ void drawLobby() {
         }
     }
 
-    // Desenha a nova textura da vendinha
     DrawTexturePro(cityTexture, hitboxVendinha, destRecVendinha, (Vector2){0, 0}, 0.0f, WHITE);
 
     
-    // Define a área de recorte da sprite `cityTexture`
-        // Define as áreas de recorte das sprites `cityTexture`
     Rectangle sourceRec = { 831, 66, 108, 162 };
     Rectangle sourceRec2 = { 1167, 108, 132, 120 };
     Rectangle sourceRec3 = { 978, 102, 150, 126 };
@@ -245,27 +222,25 @@ void drawLobby() {
     
 
 
-    // Define as posições onde deseja desenhar as sprites `cityTexture` no lobby
-    Vector2 positionCity1 = { 800, 4 }; // Posição da primeira sprite
-    Vector2 positionCity2 = { 890, 36 }; // Posição da segunda sprite
-    Vector2 positionCity3 = { 1000, 36 }; // Posição da segunda sprite
-    Vector2 positionCity4 = { 1140, 270 }; // Posição da segunda sprite
-    Vector2 positionCity5 = { 300, 380 }; // Posição da segunda sprite
-    Vector2 positionCity6 = { 200, 376 }; // Posição da segunda sprite
-    Vector2 positionCity7 = { 100, 354 }; // Posição da segunda sprite
-    Vector2 positionCity8 = { 120, 600 }; // Posição da segunda sprite
-    Vector2 positionCity9 = { 18, 478 }; // Posição da segunda sprite
-    Vector2 positionCity10 = { 684, 2 }; // Posição da segunda sprite
-    Vector2 positionCity11 = { 760, 200 }; // Posição da segunda sprite
-    Vector2 positionCity12 = { 700, 180 }; // Posição da segunda sprite
-    Vector2 positionCity13 = { 1000, 280 }; // Posição da segunda sprite
-    Vector2 positionCity14 = { 1140, 150 }; // Posição da segunda sprite
-    Vector2 positionCity15 = { 1, 630 }; // Posição da segunda sprite
+    Vector2 positionCity1 = { 800, 4 };
+    Vector2 positionCity2 = { 890, 36 }; 
+    Vector2 positionCity3 = { 1000, 36 }; 
+    Vector2 positionCity4 = { 1140, 270 };
+    Vector2 positionCity5 = { 300, 380 };
+    Vector2 positionCity6 = { 200, 376 }; 
+    Vector2 positionCity7 = { 100, 354 };
+    Vector2 positionCity8 = { 120, 600 }; 
+    Vector2 positionCity9 = { 18, 478 };
+    Vector2 positionCity10 = { 684, 2 };
+    Vector2 positionCity11 = { 760, 200 };
+    Vector2 positionCity12 = { 700, 180 };
+    Vector2 positionCity13 = { 1000, 280 };
+    Vector2 positionCity14 = { 1140, 150 }; 
+    Vector2 positionCity15 = { 1, 630 };
 
 
-    // Define os retângulos de destino com escala reduzida
-    Rectangle destRec = { positionCity1.x, positionCity1.y, 108 * 0.8, 162 * 0.8 };  // Reduz a escala da primeira sprite em 80%
-    Rectangle destRec2 = { positionCity2.x, positionCity2.y, 132 * 0.8, 120 * 0.8 }; // Reduz a escala da segunda sprite em 80%
+    Rectangle destRec = { positionCity1.x, positionCity1.y, 108 * 0.8, 162 * 0.8 };
+    Rectangle destRec2 = { positionCity2.x, positionCity2.y, 132 * 0.8, 120 * 0.8 };
     Rectangle destRec3 = { positionCity3.x, positionCity3.y, 150 * 0.8, 126 * 0.8 };
     Rectangle destRec4 = { positionCity4.x, positionCity4.y, 84 * 0.5, 135 * 0.5 };
     Rectangle destRec5 = { positionCity5.x, positionCity5.y, 90 , 138 };
@@ -280,7 +255,6 @@ void drawLobby() {
     Rectangle destRec14 = { positionCity14.x, positionCity14.y, 126 * 0.8, 48 * 0.8};
     Rectangle destRec15 = { positionCity15.x, positionCity15.y, 123 * 0.6, 126 * 0.6};
 
-    // Desenha as sprites `cityTexture` no lobby
     DrawTexturePro(cityTexture, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(cityTexture, sourceRec2, destRec2, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(cityTexture, sourceRec3, destRec3, (Vector2){0, 0}, 0.0f, WHITE);
@@ -297,72 +271,64 @@ void drawLobby() {
     DrawTexturePro(cityTexture, sourceRec14, destRec14, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(cityTexture, sourceRec15, destRec15, (Vector2){0, 0}, 0.0f, WHITE);
 
-    // Atualize a direção com base na tecla pressionada
-    static int lastDirection = 3;  // Começa apontando para "baixo" (S)
-    static float walkingTimer = 0.0f; // Temporizador para a animação de "andando"
-    static bool isWalking = false;    // Controle se está na animação de "andando"
+    static int lastDirection = 3;
+    static float walkingTimer = 0.0f;
+    static bool isWalking = false;
 
-    // Detecta qual tecla foi pressionada e atualiza a direção e o temporizador
     if (IsKeyPressed(KEY_W)) {
-        lastDirection = 1;  // Cima
+        lastDirection = 1;
         isWalking = true;
-        walkingTimer = 0.3f; // Iniciar o temporizador
+        walkingTimer = 0.3f;
     } else if (IsKeyPressed(KEY_A)) {
-        lastDirection = 2;  // Esquerda
+        lastDirection = 2;
         isWalking = true;
         walkingTimer = 0.3f;
     } else if (IsKeyPressed(KEY_S)) {
-        lastDirection = 3;  // Baixo
+        lastDirection = 3;
         isWalking = true;
         walkingTimer = 0.3f;
     } else if (IsKeyPressed(KEY_D)) {
-        lastDirection = 4;  // Direita
+        lastDirection = 4;
         isWalking = true;
         walkingTimer = 0.3f;
     }
 
-    // Atualiza o temporizador se estiver "andando"
     if (isWalking) {
         walkingTimer -= GetFrameTime();
         if (walkingTimer <= 0) {
-            isWalking = false;  // Termina a animação de "andando"
+            isWalking = false;
         }
     }
 
-    // Usa switch para definir o retângulo de origem com base na última direção
     Rectangle sourceRecPersonagem;
     switch (lastDirection) {
-        case 1: // Cima
+        case 1:
             sourceRecPersonagem = (Rectangle){0, 192, 64, 64};
             break;
-        case 2: // Esquerda
+        case 2: 
             sourceRecPersonagem = (Rectangle){0, 64, 64, 64};
             break;
-        case 3: // Baixo
+        case 3:
             sourceRecPersonagem = (Rectangle){0, 0, 64, 64};
             break;
-        case 4: // Direita
+        case 4: 
             sourceRecPersonagem = (Rectangle){0, 128, 64, 64};
             break;
         default:
-            sourceRecPersonagem = (Rectangle){0, 0, 64, 64}; // Posição padrão (parado)
+            sourceRecPersonagem = (Rectangle){0, 0, 64, 64};
             break;
     }
 
-    // Define a posição do personagem na tela
     Vector2 positionPersonagem = { player_x * TILE_SIZE, player_y * TILE_SIZE };
 
-    // Desenha o sprite redimensionado para 96x96, centralizando sobre a posição de 32x32
     Rectangle destRecPersonagem = { positionPersonagem.x - 32, positionPersonagem.y - 32, 96, 96 };
 
-    // Se estiver "andando", desenha o sprite de "andando"; caso contrário, desenha o sprite de direção final
     if (isWalking) {
         DrawTexturePro(personagemAndando, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
     } else {
         DrawTexturePro(personagem, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
-    // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby
     Rectangle portalSourceRec = { 0, 0, 32, 32 };
     Rectangle portalDestRec1 = { 
         PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
@@ -387,12 +353,10 @@ void drawLobby() {
 
     Vector2 origin = { 0, 0 };
 
-    // Desenha os portais
     DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);
 
-    // Define a área de informações no canto direito da tela
     int infoBoxX = SCREEN_WIDTH - 230;
     int infoBoxY = 10;
     int infoBoxWidth = 220;
@@ -473,10 +437,9 @@ void drawLobby() {
             } else if (IsKeyPressed(KEY_TWO)) {
                 isInteractingWithMerchant = 2;
             } else if (IsKeyPressed(KEY_THREE)) {
-                isInteractingWithMerchant = 3;  // Opção de compra de garrafa de água
+                isInteractingWithMerchant = 3; 
             }
         } else {
-            // Lógica de interação com o mercador para venda de especiarias, compra de bolsa e garrafa de água
             if (isInteractingWithMerchant == 1) {
                 DrawTexturePro(velho, sourceRecVelho, destRecVelho, originVelho, 0.0f, WHITE);
                 if (itemsCollected > 0) {

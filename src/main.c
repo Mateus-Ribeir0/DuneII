@@ -50,7 +50,6 @@ int main() {
                 desenharLobbyDetalhado();
                 EndDrawing();
 
-                // Verifica se o currentScreen mudou para fora do lobby
                 if (currentScreen != LOBBY && lobbyInitialized) {
                     finalizarLobby();
                     lobbyInitialized = false;
@@ -64,7 +63,6 @@ int main() {
 
                 playGame(&currentScreen);
 
-                // Se o currentScreen mudou para fora do jogo, finalize os recursos
                 if (currentScreen != GAME && gameInitialized) {
                     finalizarGame();
                     gameInitialized = false;
