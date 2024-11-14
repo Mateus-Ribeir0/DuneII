@@ -472,6 +472,90 @@ void drawLobby() {
             } else if (IsKeyPressed(KEY_TWO)) {
                 isInteractingWithMerchant = 2;
             } else if (IsKeyPressed(KEY_THREE)) {
+                isInteractingWithMerchant = 3;  // Opção de compra de garrafa de água
+            }
+        } else {
+            // Lógica de interação com o mercador para venda de especiarias, compra de bolsa e garrafa de água
+            if (isInteractingWithMerchant == 1) {
+                if (itemsCollected > 0) {
+                    playerMoney += itemsCollected * 300;
+                    itemsCollected = 0;
+                    showThankYouMessage = true;
+                    errorMessageTimer = GetTime();
+                } else {
+                    DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
+                    errorMessage = "Saia daqui, você não tem nenhuma especiaria para negociar!";
+                    showErrorMessage = true;
+                    errorMessageTimer = GetTime();
+                }
+            } else if (isInteractingWithMerchant == 2) {
+                DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
+                DrawDialogBox("Qual bolsa deseja comprar?\n\n[1] Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                if (IsKeyPressed(KEY_ONE)) {
+                    if (playerMoney >= 5000) {
+                        MAX_ESPECIARIAS = 12;
+                        playerMoney -= 5000;
+                    } else {
+                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
+                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
+                        showErrorMessage = true;
+                        errorMessageTimer = GetTime();
+                    }
+                } else if (IsKeyPressed(KEY_TWO)) {
+                    if (playerMoney >= 10000) {
+                        MAX_ESPECIARIAS = 24;
+                        playerMoney -= 10000;
+                    } else {
+                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
+                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
+                        showErrorMessage = true;
+                        errorMessageTimer = GetTime();
+                    }
+                } else if (IsKeyPressed(KEY_THREE)) {
+                    if (playerMoney >= 15000) {
+                        MAX_ESPECIARIAS = 32;
+                        playerMoney -= 15000;
+                    } else {
+                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
+                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
+                        showErrorMessage = true;
+                        errorMessageTimer = GetTime();
+                    }
+                }
+            } else if (isInteractingWithMerchant == 3) {
+                DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
+                DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1] Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                if (IsKeyPressed(KEY_ONE)) {
+                    if (playerMoney >= 3000) {
+                        playerWater = fmin(playerWater + GARRAFA_PEQUENA_CAPACIDADE, 100);
+                        playerMoney -= 3000;
+                    } else {
+                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
+                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
+                        showErrorMessage = true;
+                        errorMessageTimer = GetTime();
+                    }
+                } else if (IsKeyPressed(KEY_TWO)) {
+                    if (playerMoney >= 5000) {
+                        playerWater = fmin(playerWater + GARRAFA_MEDIA_CAPACIDADE, 100);
+                        playerMoney -= 5000;
+                    } else {
+                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
+                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
+                        showErrorMessage = true;
+                        errorMessageTimer = GetTime();
+                    }
+                } else if (IsKeyPressed(KEY_THREE)) {
+                    if (playerMoney >= 7000) {
+                        playerWater = fmin(playerWater + GARRAFA_GRANDE_CAPACIDADE, 100);
+                        playerMoney -= 7000;
+                    } else {
+                        DrawTexturePro(velho, sourceRec, destRec, origin, 0.0f, WHITE);
+                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
+                        showErrorMessage = true;
+                        errorMessageTimer = GetTime();
+                    }
+                }
                 isInteractingWithMerchant = 3;
             }
         }

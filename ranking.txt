@@ -6,7 +6,7 @@ Pro Player|4300
 Amanda|4000
 Malu|3900
 Gianny|2000
-Perguntinha|1800
+José|1800
 Tomate|1800
 Pistoleiro|1000
 Carol|300
