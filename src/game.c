@@ -373,9 +373,30 @@ void drawGame() {
             DrawTexturePro(environment2_1, sourceRect, destRect, origin, 0.0f, WHITE);
         }
 
-        Vector2 safezonePosition = {10 * TILE_SIZE, 10 * TILE_SIZE};
-        Rectangle safezoneRec = {376, 136, 32, 32};
-        DrawTextureRec(safezone, safezoneRec, safezonePosition, RAYWHITE);
+    Vector2 baseSafezonePosition1 = {20 * TILE_SIZE, 20 * TILE_SIZE}; 
+    Vector2 baseSafezonePosition2 = {10 * TILE_SIZE, 15 * TILE_SIZE}; 
+    Vector2 baseSafezonePosition3 = {30 * TILE_SIZE, 5 * TILE_SIZE};  
+    Vector2 baseSafezonePosition4 = {25 * TILE_SIZE, 10 * TILE_SIZE}; 
+    Rectangle safezoneRec = {376, 136, 32, 32}; 
+
+    Rectangle destRect1 = {baseSafezonePosition1.x, baseSafezonePosition1.y, 96, 64};
+    Vector2 origin1 = {0, 0};
+    DrawTexturePro(safezone, safezoneRec, destRect1, origin1, 0.0f, RAYWHITE);
+
+    Rectangle destRect2 = {baseSafezonePosition2.x, baseSafezonePosition2.y, 64, 64};
+    Vector2 origin2 = {0, 0};
+    DrawTexturePro(safezone, safezoneRec, destRect2, origin2, 0.0f, RAYWHITE);
+
+    Rectangle destRect3 = {baseSafezonePosition3.x, baseSafezonePosition3.y, 64, 64};
+    Vector2 origin3 = {0, 0};
+    DrawTexturePro(safezone, safezoneRec, destRect3, origin3, 0.0f, RAYWHITE);
+
+    Rectangle destRect4 = {baseSafezonePosition4.x, baseSafezonePosition4.y, 64, 96};
+    Vector2 origin4 = {0, 0};
+    DrawTexturePro(safezone, safezoneRec, destRect4, origin4, 0.0f, RAYWHITE);
+
+
+
 
     } else if (mapaAtual == 1) {
         for (int y = 0; y < MAPA_ALTURA; y++) {
@@ -393,9 +414,21 @@ void drawGame() {
             DrawTexturePro(environment1_1, sourceRect, destRect, origin, 0.0f, WHITE); 
         }
 
-        Vector2 safezonePosition = {15 * TILE_SIZE, 12 * TILE_SIZE};
+       
+        Vector2 baseSafezonePosition1_Map1 = {5 * TILE_SIZE, 10 * TILE_SIZE};   
+        Vector2 baseSafezonePosition2_Map1 = {35 * TILE_SIZE, 15 * TILE_SIZE}; 
         Rectangle safezoneRec = {376, 136, 32, 32}; 
-        DrawTextureRec(safezone, safezoneRec, safezonePosition, RAYWHITE);
+
+        
+        Rectangle destRect1_Map1 = {baseSafezonePosition1_Map1.x, baseSafezonePosition1_Map1.y, 96, 64}; 
+        Vector2 origin1_Map1 = {0, 0};
+        DrawTexturePro(safezone, safezoneRec, destRect1_Map1, origin1_Map1, 0.0f, RAYWHITE);
+
+        
+        Rectangle destRect2_Map1 = {baseSafezonePosition2_Map1.x, baseSafezonePosition2_Map1.y, 64, 96};
+        Vector2 origin2_Map1 = {0, 0};
+        DrawTexturePro(safezone, safezoneRec, destRect2_Map1, origin2_Map1, 0.0f, RAYWHITE);
+
 
     } else if (mapaAtual == 2) {
         for (int y = 0; y < MAPA_ALTURA; y++) {
