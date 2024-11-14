@@ -642,7 +642,6 @@ bool isPlayerNearPortal() {
 }
 
 void playGame(GameScreen *currentScreen) {
-
     ClearBackground(BLACK);
     BeginDrawing();
     EndDrawing();
@@ -736,10 +735,25 @@ void playGame(GameScreen *currentScreen) {
             movePlayer(dx, dy);
             checkItemCollection();
 
-            size_t len = strlen(historico);
-            if (len < MAX_HISTORICO - 1) {
-                historico[len] = movimento;
-                historico[len + 1] = '\0';
+            // Verifica se o jogador está em uma safezone antes de adicionar ao histórico
+            bool emSafeZone = (
+                (mapaAtual == 0 && ((player_x >= 20 && player_x < 23 && player_y >= 20 && player_y < 22) || 
+                                    (player_x >= 10 && player_x < 12 && player_y >= 15 && player_y < 17) ||
+                                    (player_x >= 30 && player_x < 32 && player_y >= 5 && player_y < 7) ||
+                                    (player_x >= 25 && player_x < 27 && player_y >= 10 && player_y < 13))) ||
+                (mapaAtual == 1 && ((player_x >= 5 && player_x < 8 && player_y >= 10 && player_y < 12) ||
+                                    (player_x >= 35 && player_x < 37 && player_y >= 15 && player_y < 18))) ||
+                (mapaAtual == 2 && (player_x >= 20 && player_x < 22 && player_y >= 15 && player_y < 17))
+            );
+
+            if (!emSafeZone) {
+                size_t len = strlen(historico);
+                if (len < MAX_HISTORICO - 1) {
+                    historico[len] = movimento;
+                    historico[len + 1] = '\0';
+                }
+            } else {
+                memset(historico, 0, sizeof(historico));
             }
 
             char padrao_encontrado[MAX_PADRAO + 1] = "";
@@ -791,11 +805,6 @@ void playGame(GameScreen *currentScreen) {
                     sleep(1);
                 }
 
-                //UnloadSound(gameOverSound);
-                //UnloadSound(barulhoMonstro);
-                //UnloadTexture(characterBack);
-                //UnloadTexture(sandworm);
-
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
                 float tempoPorCaractere = 0.3f;
@@ -832,5 +841,5 @@ void playGame(GameScreen *currentScreen) {
         drawGame();
         EndDrawing();
     }
-
 }
+
