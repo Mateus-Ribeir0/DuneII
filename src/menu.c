@@ -1,9 +1,11 @@
 #include "menu.h"
+#include "raylib.h"
 
 // Variáveis para elementos visuais
 static Texture2D background, logo, objetivoImage;
 static Music titleMusic;
 static float backgroundPosX;
+static Sound swordsfx;
 
 void recebeNomeDoPlayer(GameScreen *currentScreen) {
     static char nameBuffer[MAX_NAME_LENGTH] = "";
@@ -191,15 +193,19 @@ void atualizarMenu(GameScreen *currentScreen) {
         if (backgroundPosX >= background.width) {
             backgroundPosX = 0;
         }
-
+        swordsfx = LoadSound("static/music/swordsfx.wav");
         if (IsKeyPressed(KEY_ENTER)) {
+            PlaySound(swordsfx);
             *currentScreen = GAME;
         } else if (IsKeyPressed(KEY_C)) {
+            PlaySound(swordsfx);
             *currentScreen = OBJETIVO;  // Abre a tela do objetivo
         } else if (IsKeyPressed(KEY_R)) {
+            PlaySound(swordsfx);
             *currentScreen = RANKINGS;  // Continua levando para a tela de rankings
         }
     } else if (*currentScreen == RANKINGS && IsKeyPressed(KEY_Q)) {
+        PlaySound(swordsfx);
         *currentScreen = TITLE;
         ResumeMusicStream(titleMusic);
     }
