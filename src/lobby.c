@@ -243,6 +243,9 @@ void drawLobby() {
     Rectangle sourceRec13 = { 222, 147, 33, 51 };
     Rectangle sourceRec14 = { 324, 264, 126, 48 };
     Rectangle sourceRec15 = { 102, 363, 123, 126 };
+    Rectangle sourceRec16 = { 102, 363, 123, 126 };
+    Rectangle sourceRec17 = { 345, 369, 108, 126 };
+    Rectangle sourceRec18 = { 1167, 108, 132, 120 };
     
 
 
@@ -261,6 +264,9 @@ void drawLobby() {
     Vector2 positionCity13 = { 1000, 280 };
     Vector2 positionCity14 = { 1140, 150 }; 
     Vector2 positionCity15 = { 1, 630 };
+    Vector2 positionCity16 = { 140, 36 };
+    Vector2 positionCity17 = { 64, 280 };
+    Vector2 positionCity18 = { 576, 38 }; 
 
 
     Rectangle destRec = { positionCity1.x, positionCity1.y, 108 * 0.8, 162 * 0.8 };
@@ -278,6 +284,9 @@ void drawLobby() {
     Rectangle destRec13 = { positionCity13.x, positionCity13.y, 33 * 0.5, 51 * 0.5};
     Rectangle destRec14 = { positionCity14.x, positionCity14.y, 126 * 0.8, 48 * 0.8};
     Rectangle destRec15 = { positionCity15.x, positionCity15.y, 123 * 0.6, 126 * 0.6};
+    Rectangle destRec16 = { positionCity16.x, positionCity16.y, 123 * 0.6, 126 * 0.6};
+    Rectangle destRec17 = { positionCity17.x, positionCity17.y, 108 * 0.6, 126 * 0.6};
+    Rectangle destRec18 = { positionCity18.x, positionCity18.y, 132 * 0.8, 120 * 0.8 };
 
     DrawTexturePro(cityTexture, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(cityTexture, sourceRec2, destRec2, (Vector2){0, 0}, 0.0f, WHITE);
@@ -294,6 +303,9 @@ void drawLobby() {
     DrawTexturePro(cityTexture, sourceRec13, destRec13, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(cityTexture, sourceRec14, destRec14, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(cityTexture, sourceRec15, destRec15, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec16, destRec16, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec17, destRec17, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, sourceRec18, destRec18, (Vector2){0, 0}, 0.0f, WHITE);
 
     static int lastDirection = 3;
     static float walkingTimer = 0.0f;
