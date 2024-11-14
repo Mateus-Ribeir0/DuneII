@@ -61,27 +61,35 @@ int isPlayerNearMerchant() {
 
 bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
     if (mapaAtual == -1) { // No lobby
-        // Verifica o portal do mapa 1 (lobby) com uma linha a mais de colisão e uma coluna a menos
-        if (new_x >= PORTAL_LOBBY_MAPA1_X && new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA - 1 &&
-            new_y >= PORTAL_LOBBY_MAPA1_Y && new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1) {
+        // Verifica o portal do mapa 1 no lobby
+        if (new_x >= PORTAL_LOBBY_MAPA1_X && 
+            new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
+            new_y >= PORTAL_LOBBY_MAPA1_Y && 
+            new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) {
             return true;
         }
 
-        // Verifica o portal do mapa 2 (lobby) com uma coluna a mais de colisão
-        if (new_x >= PORTAL_LOBBY_MAPA2_X && new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1 &&
-            new_y >= PORTAL_LOBBY_MAPA2_Y && new_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) {
+        // Verifica o portal do mapa 2 no lobby
+        if (new_x >= PORTAL_LOBBY_MAPA2_X && 
+            new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
+            new_y >= PORTAL_LOBBY_MAPA2_Y && 
+            new_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) {
             return true;
         }
 
-        // Verifica o portal do mapa 3 com uma linha a mais de colisão e uma coluna a menos
-        if (new_x >= PORTAL_LOBBY_MAPA3_X && new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA - 1 &&
-            new_y >= PORTAL_LOBBY_MAPA3_Y && new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1) {
+        // Verifica o portal do mapa 3 no lobby
+        if (new_x >= PORTAL_LOBBY_MAPA3_X && 
+            new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
+            new_y >= PORTAL_LOBBY_MAPA3_Y && 
+            new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA) {
             return true;
         }
 
     } else { // Nos mapas, verifica o portal de retorno ao lobby
-        if (new_x >= PORTAL_RETORNO_X && new_x < PORTAL_RETORNO_X + PORTAL_RETORNO_LARGURA &&
-            new_y >= PORTAL_RETORNO_Y && new_y < PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA) {
+        if (new_x >= PORTAL_RETORNO_X && 
+            new_x < PORTAL_RETORNO_X + PORTAL_RETORNO_LARGURA &&
+            new_y >= PORTAL_RETORNO_Y && 
+            new_y < PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA) {
             return true;
         }
     }
@@ -113,10 +121,10 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     bool pertoDePortal = false;
 
     // Verifica proximidade com o portal para o mapa 1 com uma linha extra abaixo
-    if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
-         player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 2)) {
+    if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
+        (player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
-        mensagem = "Você deseja viajar para o Zamirat?\nPressione [P]\n\nDificuldade: ***";
+        mensagem = "Você deseja viajar para Zamirat?\nPressione [P]\n\nDificuldade: ***";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -125,10 +133,10 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
         }
     }
     // Verifica proximidade com o portal para o mapa 2
-    else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1 &&
-              player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA)) {
+    else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1) &&
+        (player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA + 1)) {
         
-        mensagem = "Você deseja viajar para o Bashir'har?\nPressione [P]\n\nDificuldade: ****";
+        mensagem = "Você deseja viajar para Bashir'har?\nPressione [P]\n\nDificuldade: ****";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -137,10 +145,10 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
         }
     }
     // Verifica proximidade com o portal para o mapa 3
-    else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
-              player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
+    else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
+            (player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
-        mensagem = "Você deseja viajar para o Qasr'Rahim?\nPressione [P]\n\nDificuldade: *****";
+        mensagem = "Você deseja viajar para Qasr'Rahim?\nPressione [P]\n\nDificuldade: *****";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -356,9 +364,26 @@ void drawLobby() {
 
     // Carrega e desenha a textura do portal nas posições especificadas dos portais do lobby
     Rectangle portalSourceRec = { 0, 0, 32, 32 };
-    Rectangle portalDestRec1 = { PORTAL_LOBBY_MAPA1_X * TILE_SIZE, PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 32 * (PORTAL_HORIZONTAL_LARGURA - 1), 32 * (PORTAL_HORIZONTAL_ALTURA + 1) };
-    Rectangle portalDestRec2 = { PORTAL_LOBBY_MAPA2_X * TILE_SIZE, PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 32 * (PORTAL_HORIZONTAL_LARGURA - 1), 32 * (PORTAL_HORIZONTAL_ALTURA + 1) };
-    Rectangle portalDestRec3 = { PORTAL_LOBBY_MAPA3_X * TILE_SIZE, PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 32 * (PORTAL_HORIZONTAL_LARGURA - 1), 32 * (PORTAL_HORIZONTAL_ALTURA + 1) };
+    Rectangle portalDestRec1 = { 
+        PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 
+        TILE_SIZE * PORTAL_HORIZONTAL_LARGURA,  
+        TILE_SIZE * PORTAL_HORIZONTAL_ALTURA 
+    };
+
+    Rectangle portalDestRec2 = { 
+        PORTAL_LOBBY_MAPA2_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 
+        TILE_SIZE * PORTAL_VERTICAL_LARGURA,  
+        TILE_SIZE * PORTAL_VERTICAL_ALTURA 
+    };
+
+    Rectangle portalDestRec3 = { 
+        PORTAL_LOBBY_MAPA3_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 
+        TILE_SIZE * PORTAL_HORIZONTAL_LARGURA,  
+        TILE_SIZE * PORTAL_HORIZONTAL_ALTURA 
+    };
 
     Vector2 origin = { 0, 0 };
 
@@ -412,6 +437,7 @@ void drawLobby() {
         DrawDialogBox(errorMessage, 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
         return;
     }
+
 
     if (showThankYouMessage) {
         if (!soundPlayed) {
