@@ -8,7 +8,6 @@ Malu|3900
 Gianny|2000
 José|1800
 Tomate|1800
-Pistoleiro|1000
 Carol|300
 Zelda|290
 Gabriel|280
@@ -24,4 +23,3 @@ Cláudio|235
 Camila|230
 Júlia|225
 Fábio|220
-cadh|0

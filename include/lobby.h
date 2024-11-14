@@ -4,7 +4,6 @@
 #include "config.h"
 #include "game.h"
 
-// Funções de inicialização e gerenciamento do lobby
 void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized);
 void desenharLobbyDetalhado();
 void drawLobby();
