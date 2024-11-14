@@ -251,23 +251,28 @@ Point posicoesDunasMapa3[DUNAS_MAPA3] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, 
 Rectangle vendinhaCollisionBox = {20 + (123 * 0.8) / 4, 20 + (120 * 0.8) / 4, (123 * 0.8) / 2, (120 * 0.8) / 2};
 // Ajustando zonas de colisão para ficarem mais precisas
 Rectangle cityCollisionBoxes[] = {
-    {800 + 10, 4 + 20, 108 * 0.8, 162 * 0.4},        // Ajuste para o sprite 1
-    {890 + 5, 36 + 10, 132 * 0.8, 120 * 0.4},        // Ajuste para o sprite 2
-    {1000 + 10, 36 + 10, 150 * 0.8, 126 * 0.4},      // Ajuste para o sprite 3
+    {800 + 10, 4 + 30, 90 * 0.5, 162 * 0.2},       // Ajuste para o sprite 1
+    {890 + 5, 36 + 10, 132 * 0.5, 120 * 0.4},        // Ajuste para o sprite 2
+    {1000 + 10, 36 + 10, 150 * 0.7, 126 * 0.4},      // Ajuste para o sprite 3
     {300 + 5, 380 + 5 + (138 * 0.8) * 0.85, 90 * 0.7, (138 * 0.8) * 0.1},
 
+    {200 + 5, 376 + 10 + (144 * 0.6) * 0.85, 96 * 0.6, (144 * 0.7) * 0.3},
+    // Ajuste para o sprite 6
+    {100 + 5, 354 + 10 + (168 * 0.6) * 0.85, 96 * 0.6, (168 * 0.7) * 0.3},
+      // Ajuste para o sprite 7
+    {120 + 10 + (55 * 0.7) * 0.1, 600 + 5 + (55 * 0.7) * 0.1, (55 * 0.7) * 0.6, (55 * 0.7) * 0.6},
+    // Ajuste para o sprite 8
+    {18 + 15, 478 + 5, 84 * 0.7, 72 * 0.4},
+    
 
+    // Ajuste para o sprite 9
+    {684 + 15, 2 + 30, 138 * 0.8, 168 * 0.3},
 
-    {200 + 5, 376 + 10, 96 * 0.6, 144 * 0.6},        // Ajuste para o sprite 6
-    {100 + 5, 354 + 10, 96 * 0.6, 168 * 0.6},        // Ajuste para o sprite 7
-    {120 + 10, 600 + 5, 81 * 0.7, 51 * 0.7},         // Ajuste para o sprite 8
-    {18 + 10, 478 + 5, 84 * 0.7, 72 * 0.7},          // Ajuste para o sprite 9
-    {684 + 5, 2 + 10, 138 * 0.6, 168 * 0.6},         // Ajuste para o sprite 10
-    {760 + 5, 200 + 5, 90 * 0.6, 63 * 0.6},          // Ajuste para o sprite 11
-    {700 + 5, 180 + 5, 33 * 0.7, 51 * 0.7},          // Ajuste para o sprite 12
-    {1000 + 5, 280 + 5, 33 * 0.7, 51 * 0.7},         // Ajuste para o sprite 13
-    {1140 + 10, 150 + 5, 126 * 0.6, 48 * 0.6},       // Ajuste para o sprite 14
-    {1 + 10, 630 + 5, 123 * 0.7, 126 * 0.7}          // Ajuste para o sprite 15
+        // Ajuste para o sprite 10
+    {760 + 10, 200 + 5, 90 * 0.3, 63 * 0.3},
+      // Ajuste para o sprite 11
+      // Ajuste para o sprite 14
+
 };
 
 
