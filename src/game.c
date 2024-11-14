@@ -25,6 +25,7 @@ static Sound gameOverSound;
 static Sound barulhoMonstro;
 static Sound deathEmotiva;
 static Texture2D portal;
+static Texture2D sombra;
 
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
@@ -120,6 +121,7 @@ void iniciarGame() {
     characterBack = LoadTexture("static/image/characterback.png");
     sandworm = LoadTexture("static/image/sandworm.png");
     portal = LoadTexture("static/image/portal.png");
+    sombra = LoadTexture("static/image/sombras.png");
 
     // Carrega sons
     musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
@@ -525,8 +527,10 @@ void drawGame() {
 
     // Se estiver "andando", desenha o sprite de "andando"; caso contrário, desenha o sprite de direção final
     if (isWalking) {
+        DrawTexturePro(sombra, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
         DrawTexturePro(personagemAndando, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
     } else {
+        DrawTexturePro(sombra, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
         DrawTexturePro(personagem, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
@@ -549,7 +553,6 @@ void drawGame() {
     DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){101, 67, 33, 255});
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, (Color){101, 67, 33, 255});
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 2, infoBoxY + 2, infoBoxWidth - 4, infoBoxHeight - 4}, 0.1f, 16, (Color){101, 67, 33, 255});
-
 
     // Posiciona a imagem da especiaria (cerealsTexture) e o texto "Especiarias"
     int especiariaIconY = infoBoxY + 1;
