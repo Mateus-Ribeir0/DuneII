@@ -352,7 +352,7 @@ void desenharAnimacaoMorte(Texture2D personagem, Texture2D personagemMorto) {
 
     // Posição exata do jogador, ajustando para centralizar o sprite de 96x96 pixels
     Vector2 posicao = {player_x * TILE_SIZE, player_y * TILE_SIZE};
-    Rectangle destRec = {posicao.x - 32, posicao.y, 96, 96};  // 96x96 para centralizar como em drawGame
+    Rectangle destRec = {posicao.x - 32, posicao.y - 32, 96, 96};  // 96x96 para centralizar como em drawGame
 
     // Duração de cada frame em segundos
     const float duracaoFramePrimeiro = 0.5f; // Duração estendida para o primeiro quadro
