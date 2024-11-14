@@ -43,12 +43,12 @@ extern char playerName[MAX_NAME_LENGTH];
 #define PORTAL_VERTICAL_ALTURA 3
 
 // Coordenadas para os três portais no lobby
-#define PORTAL_LOBBY_MAPA1_X 12
-#define PORTAL_LOBBY_MAPA1_Y 0
-#define PORTAL_LOBBY_MAPA2_X 18
-#define PORTAL_LOBBY_MAPA2_Y 0
-#define PORTAL_LOBBY_MAPA3_X 24
-#define PORTAL_LOBBY_MAPA3_Y 0
+#define PORTAL_LOBBY_MAPA1_X 22
+#define PORTAL_LOBBY_MAPA1_Y 14
+#define PORTAL_LOBBY_MAPA2_X 28
+#define PORTAL_LOBBY_MAPA2_Y 14
+#define PORTAL_LOBBY_MAPA3_X 34
+#define PORTAL_LOBBY_MAPA3_Y 14
 
 // Coordenadas para o portal de retorno ao lobby
 #define PORTAL_RETORNO_LARGURA 3
