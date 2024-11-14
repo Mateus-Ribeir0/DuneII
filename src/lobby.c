@@ -12,6 +12,7 @@ static Texture2D cerealsTexture;
 static Texture2D goldTexture;
 static Texture2D aguaTexture;
 static Texture2D cityTexture;
+static Texture2D monstersTexture;
 static Sound troca;
 
 // Variáveis Globias
@@ -51,11 +52,13 @@ void iniciarLobby() {
     goldTexture = LoadTexture("static/image/gold.png");
     aguaTexture = LoadTexture("static/image/agua.png");
     troca = LoadSound("static/music/trocaDeDinheiro.wav");
+    monstersTexture = LoadTexture("static/image/monsters.png");
 }
 
 void finalizarLobby() {
     UnloadTexture(velho);
     UnloadTexture(cityTexture);
+    UnloadTexture(monstersTexture);
     UnloadTexture(desertTileset);
     UnloadTexture(personagem);
     UnloadTexture(personagemAndando);
@@ -225,6 +228,18 @@ void drawLobby() {
         }
     }
 
+    // Defina a região da imagem que deseja desenhar (ajuste as coordenadas conforme necessário)
+    Rectangle sourceRecMonster = { 282, 13, 106, 116 };  // Exemplo de um monstro de 64x64 pixels na posição inicial da spritesheet
+
+    // Defina a posição onde a imagem será exibida no lobby
+    Vector2 positionMonster = { 180, 20 };  // Posição x e y no lobby, ajuste conforme desejado
+
+    // Desenhe o monstro no lobby usando a função DrawTexturePro
+    DrawTexturePro(monstersTexture, sourceRecMonster, 
+                (Rectangle){ positionMonster.x, positionMonster.y, 106, 116 },  // Tamanho de destino
+                (Vector2){ 0, 0 }, 0.0f, WHITE);
+
+
     DrawTexturePro(cityTexture, hitboxVendinha, destRecVendinha, (Vector2){0, 0}, 0.0f, WHITE);
 
     
@@ -264,7 +279,7 @@ void drawLobby() {
     Vector2 positionCity13 = { 1000, 280 };
     Vector2 positionCity14 = { 1140, 150 }; 
     Vector2 positionCity15 = { 1, 630 };
-    Vector2 positionCity16 = { 140, 36 };
+    Vector2 positionCity16 = { 950, 400 };
     Vector2 positionCity17 = { 64, 280 };
     Vector2 positionCity18 = { 576, 38 }; 
 
