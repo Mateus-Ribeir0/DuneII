@@ -37,24 +37,24 @@ extern char playerName[MAX_NAME_LENGTH];
 #define PRECO_BOLSA_SUPER 12000
 
 // Dimensões para os portais
-#define PORTAL_HORIZONTAL_LARGURA 4
-#define PORTAL_HORIZONTAL_ALTURA 2
-#define PORTAL_VERTICAL_LARGURA 2
-#define PORTAL_VERTICAL_ALTURA 4
+#define PORTAL_HORIZONTAL_LARGURA 3
+#define PORTAL_HORIZONTAL_ALTURA 3
+#define PORTAL_VERTICAL_LARGURA 3
+#define PORTAL_VERTICAL_ALTURA 3
 
 // Coordenadas para os três portais no lobby
-#define PORTAL_LOBBY_MAPA1_X 22
-#define PORTAL_LOBBY_MAPA1_Y 19
-#define PORTAL_LOBBY_MAPA2_X 28
-#define PORTAL_LOBBY_MAPA2_Y 19
-#define PORTAL_LOBBY_MAPA3_X 34
-#define PORTAL_LOBBY_MAPA3_Y 19
+#define PORTAL_LOBBY_MAPA1_X 12
+#define PORTAL_LOBBY_MAPA1_Y 0
+#define PORTAL_LOBBY_MAPA2_X 18
+#define PORTAL_LOBBY_MAPA2_Y 0
+#define PORTAL_LOBBY_MAPA3_X 24
+#define PORTAL_LOBBY_MAPA3_Y 0
 
 // Coordenadas para o portal de retorno ao lobby
-#define PORTAL_RETORNO_LARGURA 2
-#define PORTAL_RETORNO_ALTURA 4
-#define PORTAL_RETORNO_X 37
-#define PORTAL_RETORNO_Y 9
+#define PORTAL_RETORNO_LARGURA 3
+#define PORTAL_RETORNO_ALTURA 3
+#define PORTAL_RETORNO_X 18
+#define PORTAL_RETORNO_Y 0
 
 // Variáveis globais mutáveis
 extern int player_x;

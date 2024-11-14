@@ -122,7 +122,7 @@ void cutsceneArrakis(Music titleMusic) {
 
     float speed = 30.0f; 
     float scale = 0.6f;
-    float duration = 7.0f;
+    float duration = 7.9f;
 
     // Exibindo cada cutscene com as imagens e textos correspondentes
     Texture2D cutsceneImage1 = LoadTexture("static/image/cutscene2.png");

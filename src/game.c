@@ -24,6 +24,7 @@ static Sound spellCastSound;
 static Sound gameOverSound;
 static Sound barulhoMonstro;
 static Sound deathEmotiva;
+static Texture2D portal;
 
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
@@ -118,6 +119,7 @@ void iniciarGame() {
     aguaTexture = LoadTexture("static/image/agua.png");
     characterBack = LoadTexture("static/image/characterback.png");
     sandworm = LoadTexture("static/image/sandworm.png");
+    portal = LoadTexture("static/image/portal.png");
 
     // Carrega sons
     musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
@@ -149,6 +151,7 @@ void finalizarGame() {
     UnloadTexture(aguaTexture);
     UnloadTexture(characterBack);
     UnloadTexture(sandworm);
+    UnloadTexture(portal);
 
     // Descarrega sons
     UnloadSound(musicaMapa0);
@@ -574,8 +577,16 @@ void drawGame() {
     DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
 
     // Desenha o portal de retorno ao lobby
-    DrawRectangle(PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE,
-                  TILE_SIZE * PORTAL_RETORNO_LARGURA, TILE_SIZE * PORTAL_RETORNO_ALTURA, ORANGE);
+    Rectangle portalSourceRec = { 0, 0, 32, 32 };
+    Rectangle portalDestRec = {
+        PORTAL_RETORNO_X * TILE_SIZE,
+        PORTAL_RETORNO_Y * TILE_SIZE,
+        TILE_SIZE * PORTAL_RETORNO_LARGURA,
+        TILE_SIZE * PORTAL_RETORNO_ALTURA
+    };
+    
+    // Desenha o portal de retorno ao lobby usando a mesma textura
+    DrawTexturePro(portal, portalSourceRec, portalDestRec, origin, 0.0f, WHITE);
 
     // Desenha a mensagem centralizada, se existir
     if (mensagem != NULL) {
@@ -688,8 +699,8 @@ void playGame(GameScreen *currentScreen) {
         inicializarEspeciaria();
     }
 
-    player_x = MAPA_LARGURA / 2;
-    player_y = MAPA_ALTURA / 2;
+    player_x = PORTAL_RETORNO_X + (PORTAL_RETORNO_LARGURA / 2);
+    player_y = PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA;
     memset(historico, 0, sizeof(historico));
     bool pertoDoPortal = false;
 
@@ -722,10 +733,24 @@ void playGame(GameScreen *currentScreen) {
         }
 
         if (pertoDoPortal && IsKeyPressed(KEY_P)) {
-            player_x = MAPA_LARGURA / 2;
-            player_y = MAPA_ALTURA / 2;
+            if (mapaAtual == 0) {
+                // Retornando do mapa 0 (Zamirat)
+                player_x = PORTAL_LOBBY_MAPA1_X + (PORTAL_HORIZONTAL_LARGURA / 2);
+                player_y = PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA;
+            } else if (mapaAtual == 1) {
+                // Retornando do mapa 1 (Bashir'har)
+                player_x = PORTAL_LOBBY_MAPA2_X + (PORTAL_VERTICAL_LARGURA / 2);
+                player_y = PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA;
+            } else if (mapaAtual == 2) {
+                // Retornando do mapa 2 (Qasr'Rahim)
+                player_x = PORTAL_LOBBY_MAPA3_X + (PORTAL_HORIZONTAL_LARGURA / 2);
+                player_y = PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA;
+            }
 
             ClearBackground(BLACK);
+            StopSound(musicaMapa0);
+            StopSound(musicaMapa1);
+            StopSound(musicaMapa2);
             PlaySound(spellCastSound);
             sleep(2);
 
