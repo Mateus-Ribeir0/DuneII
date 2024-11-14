@@ -6,8 +6,8 @@ Bem-vindo ao Dune Game! Siga estas instruções para compilar e jogar o jogo.
 
 1. **Clone o repositório** (caso ainda não tenha feito):
     ```bash
-    git clone <link-do-repositorio>
-    cd <nome-da-pasta-do-repositorio>
+    git clone https://github.com/Mateus-Ribeir0/DuneII.git
+    cd DuneII
     ```
 
 2. **Compile o jogo** usando o comando `make`:
