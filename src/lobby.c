@@ -15,6 +15,7 @@ static Texture2D cityTexture;
 static Texture2D bonesTexture;
 static Texture2D monstersTexture;
 static Sound troca;
+static Music lobbyMusic; 
 
 // Variáveis Globias
 int isInteractingWithMerchant = 0;
@@ -29,6 +30,7 @@ const int widthMercador = 620;
 const int heigthMercador = 140;
 static float portalAnimationTimer = 0.0f;
 static int portalFrameIndex = 0;
+static bool isMusicPlaying = false;
 
 bool isPlayerOnVendinha(int player_x, int player_y) {
     // Ajuste para a posição e tamanho corretos da vendinha
@@ -55,9 +57,21 @@ void iniciarLobby() {
     troca = LoadSound("static/music/trocaDeDinheiro.wav");
     monstersTexture = LoadTexture("static/image/monsters.png");
     bonesTexture = LoadTexture("static/image/bones.png");
+
+    if (!isMusicPlaying) {
+        lobbyMusic = LoadMusicStream("static/music/musica_lobby.mp3");
+        PlayMusicStream(lobbyMusic);
+        isMusicPlaying = true;
+    } else {
+        ResumeMusicStream(lobbyMusic);
+    }
 }
 
 void finalizarLobby() {
+    if (isMusicPlaying) {
+        PauseMusicStream(lobbyMusic);
+    }
+
     UnloadTexture(velho);
     UnloadTexture(cityTexture);
     UnloadTexture(monstersTexture);
@@ -125,6 +139,8 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
         return;
     }
 
+    UpdateMusicStream(lobbyMusic);
+
     if (IsKeyPressed(KEY_D)) dx = 1;
     if (IsKeyPressed(KEY_A)) dx = -1;
     if (IsKeyPressed(KEY_W)) dy = -1;
@@ -137,7 +153,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
         (player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
-        mensagem = "Você deseja viajar para Zamirat?\nPressione [P]\n\nDificuldade: ***";
+        mensagem = "Você deseja viajar para Zamirat?\nPressione [P]\n\nDificuldade: Fácil";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -148,7 +164,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1) &&
         (player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA + 1)) {
         
-        mensagem = "Você deseja viajar para Bashir'har?\nPressione [P]\n\nDificuldade: ****";
+        mensagem = "Você deseja viajar para Bashir'har?\nPressione [P]\n\nDificuldade: Média";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
@@ -159,7 +175,7 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
             (player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
-        mensagem = "Você deseja viajar para Qasr'Rahim?\nPressione [P]\n\nDificuldade: *****";
+        mensagem = "Você deseja viajar para Qasr'Rahim?\nPressione [P]\n\nDificuldade: Difícil";
         pertoDePortal = true;
         if (IsKeyPressed(KEY_P)) {
             *currentScreen = GAME;
