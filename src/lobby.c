@@ -510,140 +510,197 @@ void drawLobby() {
     DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
 
     if (!isPlayerNearMerchant() && showErrorMessage) {
-        showErrorMessage = false;
+    showErrorMessage = false;
+    isInteractingWithMerchant = 0;
+} else if (showErrorMessage && (GetTime() - errorMessageTimer >= MESSAGE_DURATION)) {
+    showErrorMessage = false;
+    isInteractingWithMerchant = 0;
+}
+
+if (showErrorMessage) {
+    DrawDialogBox(errorMessage, 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+    return;
+}
+
+if (showThankYouMessage) {
+    if (!soundPlayed) {
+        PlaySound(troca);
+        soundPlayed = true;
+    }
+    DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+
+    if (GetTime() - errorMessageTimer >= MESSAGE_DURATION) {
+        showThankYouMessage = false;
         isInteractingWithMerchant = 0;
-    } else if (showErrorMessage && (GetTime() - errorMessageTimer >= MESSAGE_DURATION)) {
-        showErrorMessage = false;
-        isInteractingWithMerchant = 0;
-    }
-
-    if (showErrorMessage) {
-        DrawDialogBox(errorMessage, 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-        return;
-    }
-
-
-    if (showThankYouMessage) {
-        if (!soundPlayed) {
-            PlaySound(troca);
-            soundPlayed = true;
-        }
-        DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-
-        if (GetTime() - errorMessageTimer >= MESSAGE_DURATION) {
-            showThankYouMessage = false;
-            isInteractingWithMerchant = 0;
-            soundPlayed = false;
-        }
-        return;
-    }
-
-    if (!showThankYouMessage) {
         soundPlayed = false;
     }
+    return;
+}
 
-    if (isPlayerNearMerchant()) {
-        Rectangle sourceRecVelho = { 62, 54, 509, 485 };
-        Rectangle sourceRecVelhoPuto = { 1084, 108, 510, 484 };
-        Rectangle destRecVelho = { 150, 350, 256, 256 };
-        Vector2 originVelho = { 32, 32 };
-        if (!isInteractingWithMerchant) {
+if (!showThankYouMessage) {
+    soundPlayed = false;
+}
 
-            DrawTexturePro(velho, sourceRecVelho, destRecVelho, originVelho, 0.0f, WHITE);
-            DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1] para vender especiarias\n[2] para comprar uma bolsa nova\n[3] para comprar garrafa de água", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-            
-            if (IsKeyPressed(KEY_ONE)) {
-                isInteractingWithMerchant = 1;
-            } else if (IsKeyPressed(KEY_TWO)) {
-                isInteractingWithMerchant = 2;
-            } else if (IsKeyPressed(KEY_THREE)) {
-                isInteractingWithMerchant = 3; 
-            }
-        } else {
-            if (isInteractingWithMerchant == 1) {
-                DrawTexturePro(velho, sourceRecVelho, destRecVelho, originVelho, 0.0f, WHITE);
+if (isPlayerNearMerchant()) {
+    // Configurações do sprite do mercador
+    Rectangle sourceRecVelho = { 62, 54, 509, 485 };
+    Rectangle sourceRecVelhoPuto = { 1084, 108, 510, 484 };
+    Rectangle destRecVelho = { 150, 350, 256, 256 };
+    Vector2 originVelho = { 32, 32 };
+
+    // Sempre desenha o sprite do mercador
+    DrawTexturePro(
+        velho, 
+        (isInteractingWithMerchant == 2) ? sourceRecVelhoPuto : sourceRecVelho, 
+        destRecVelho, originVelho, 0.0f, WHITE
+    );
+
+    if (!isInteractingWithMerchant) {
+        // Diálogo inicial
+        DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1] para vender especiarias\n[2] para comprar uma bolsa nova\n[3] para comprar garrafa de água",
+                      100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+
+        if (IsKeyPressed(KEY_ONE)) isInteractingWithMerchant = 1;
+        else if (IsKeyPressed(KEY_TWO)) isInteractingWithMerchant = 2;
+        else if (IsKeyPressed(KEY_THREE)) isInteractingWithMerchant = 3;
+    } else {
+        // Lógica de interação
+        switch (isInteractingWithMerchant) {
+            case 1: // Vender especiarias
+            static int merchantMessage = 0; // Variável auxiliar para rastrear a mensagem a ser exibida
+
+            // Lógica de venda de especiarias
+            if (merchantMessage == 0) { // Verifica se a interação acabou de começar
                 if (itemsCollected > 0) {
-                    playerMoney += itemsCollected * 300;
-                    itemsCollected = 0;
-                    showThankYouMessage = true;
-                    errorMessageTimer = GetTime();
+                    playerMoney += itemsCollected * 300; // Calcula o dinheiro recebido
+                    itemsCollected = 0; // Reseta as especiarias coletadas
+                    merchantMessage = 1; // Define a mensagem de sucesso
+                } else {
+                    merchantMessage = -1; // Define a mensagem de erro
                 }
-                else {
-                    errorMessage = "Saia daqui, você não tem nenhuma especiaria para negociar!";
-                    showErrorMessage = true;
-                    errorMessageTimer = GetTime();
-                }
-            } else if (isInteractingWithMerchant == 2) {
-                DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
-                DrawDialogBox("Qual bolsa deseja comprar?\n\n[1] Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+            }
+
+            // Exibe a mensagem apropriada
+            if (merchantMessage == 1) {
+                DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+            } else if (merchantMessage == -1) {
+                DrawDialogBox("Saia daqui, você não tem nenhuma especiaria para negociar!", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+            }
+
+            // Aguarda o jogador pressionar qualquer tecla ou WASD para retornar ao menu anterior
+            if (GetKeyPressed() != 0 || 
+                IsKeyPressed(KEY_W) || IsKeyPressed(KEY_A) || IsKeyPressed(KEY_S) || IsKeyPressed(KEY_D)) {
+                isInteractingWithMerchant = 0; // Sai da interação com o mercador
+                merchantMessage = 0; // Reseta a variável para a próxima interação
+            }
+            break;
+
+
+            case 2: // Comprar bolsa
+                DrawDialogBox("Qual bolsa deseja comprar?\n\n[1] Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000",
+                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+
                 if (IsKeyPressed(KEY_ONE)) {
                     if (playerMoney >= 5000) {
                         MAX_ESPECIARIAS = 12;
                         playerMoney -= 5000;
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
                     } else {
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
+                        // Mensagem para aguardar a ação do usuário
+                        while (!IsKeyPressed(KEY_ENTER)) {
+                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                            EndDrawing(); // Finaliza o frame atual
+                            BeginDrawing(); // Inicia um novo frame
+                        }
+                        isInteractingWithMerchant = 0; // Finaliza interação após tecla pressionada
                     }
                 } else if (IsKeyPressed(KEY_TWO)) {
                     if (playerMoney >= 10000) {
                         MAX_ESPECIARIAS = 24;
                         playerMoney -= 10000;
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
                     } else {
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
+                        while (!IsKeyPressed(KEY_ENTER)) {
+                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                            EndDrawing();
+                            BeginDrawing();
+                        }
+                        isInteractingWithMerchant = 0;
                     }
                 } else if (IsKeyPressed(KEY_THREE)) {
                     if (playerMoney >= 15000) {
                         MAX_ESPECIARIAS = 32;
                         playerMoney -= 15000;
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
                     } else {
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
+                        while (!IsKeyPressed(KEY_ENTER)) {
+                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                            EndDrawing();
+                            BeginDrawing();
+                        }
+                        isInteractingWithMerchant = 0;
                     }
                 }
-            } else if (isInteractingWithMerchant == 3) {
-                DrawTexturePro(velho, sourceRecVelho, destRecVelho, originVelho, 0.0f, WHITE);
-                DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1] Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                
+                if (IsKeyPressed(KEY_ENTER)) isInteractingWithMerchant = 0;
+                break;
+
+            case 3: // Comprar água
+                DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1] Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000",
+                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+
                 if (IsKeyPressed(KEY_ONE)) {
                     if (playerMoney >= 3000) {
                         playerWater = fmin(playerWater + GARRAFA_PEQUENA_CAPACIDADE, 100);
                         playerMoney -= 3000;
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
                     } else {
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
+                        // Mensagem para aguardar a ação do usuário
+                        while (!IsKeyPressed(KEY_ENTER)) {
+                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                            EndDrawing();
+                            BeginDrawing();
+                        }
+                        isInteractingWithMerchant = 0; // Finaliza interação após tecla pressionada
                     }
                 } else if (IsKeyPressed(KEY_TWO)) {
                     if (playerMoney >= 5000) {
                         playerWater = fmin(playerWater + GARRAFA_MEDIA_CAPACIDADE, 100);
                         playerMoney -= 5000;
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
                     } else {
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
+                        while (!IsKeyPressed(KEY_ENTER)) {
+                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                            EndDrawing();
+                            BeginDrawing();
+                        }
+                        isInteractingWithMerchant = 0;
                     }
                 } else if (IsKeyPressed(KEY_THREE)) {
                     if (playerMoney >= 7000) {
                         playerWater = fmin(playerWater + GARRAFA_GRANDE_CAPACIDADE, 100);
                         playerMoney -= 7000;
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
                     } else {
-                        errorMessage = "Você não tem dinheiro suficiente para essa compra.";
-                        showErrorMessage = true;
-                        errorMessageTimer = GetTime();
+                        while (!IsKeyPressed(KEY_ENTER)) {
+                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                            EndDrawing();
+                            BeginDrawing();
+                        }
+                        isInteractingWithMerchant = 0;
                     }
                 }
-                isInteractingWithMerchant = 3;
-            }
+                if (IsKeyPressed(KEY_ENTER)) isInteractingWithMerchant = 0;
+                break;
+
         }
-    } else if (mensagem != NULL) {
-        DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, true);
-    } else {
-        isInteractingWithMerchant = 0;
     }
+} else if (mensagem != NULL) {
+    DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, true);
+} else {
+    isInteractingWithMerchant = 0;
+}
+
+
 }
 
 
