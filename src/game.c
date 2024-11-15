@@ -108,7 +108,7 @@ void iniciarGame() {
     environment1_2 = LoadTexture("static/image/Rock6_3.png");
     environment2_1 = LoadTexture("static/image/Rock2_1.png");
     environment2_2 = LoadTexture("static/image/Rock2_3.png");
-    environment3_1 = LoadTexture("static/image/Rock8_1.png");
+    environment3_1 = LoadTexture("static/image/finallevel.png");
     environment3_2 = LoadTexture("static/image/Rock8_3.png");
     safezone = LoadTexture ("static/image/desert_tileset2.png");
     ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
@@ -257,7 +257,19 @@ Vector2 posicoesPedras[NUM_PEDRAS] = {
 
 Point posicoesDunasMapa1[DUNAS_MAPA1] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5} };
 Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}};
-Point posicoesDunasMapa3[DUNAS_MAPA3] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {20, 10}, {12, 14}, {28, 6}, {7, 19}, {17, 3} };
+// Posições ajustadas para as zonas de colisão no mapa 2, baseadas nas posições e tamanhos das sprites
+Point posicoesDunasMapa3[DUNAS_MAPA3] = {
+    {8, 8},   // Ajustado para o sprite 1 de 67x80 na posição (10, 9)
+    {14, 12}, // Ajustado para o sprite 1 de 67x80 na posição (15, 12)
+    {22, 16}, // Ajustado para o sprite 2 de 66x54 na posição (25, 18)
+    {4, 18},  // Ajustado para o sprite 2 de 66x54 na posição (5, 17)
+    {28, 6},  // Ajustado para o sprite 3 de 46x46 na posição (35, 5)
+    {18, 10}, // Ajustado para o sprite 3 de 46x46 na posição (20, 10)
+    {10, 14}, // Ajustado para o sprite 3 de 46x46 na posição (12, 14)
+    {26, 4},  // Ajustado para o sprite 4 de 40x39 na posição (28, 6)
+    {6, 20},  // Ajustado para o sprite 4 de 40x39 na posição (7, 19)
+    {16, 2}   // Ajustado para o sprite 2 de 66x54 na posição (17, 3)
+};
 
 Rectangle vendinhaCollisionBox = {20 + (123 * 0.8) / 4, 20 + (120 * 0.8) / 4, (123 * 0.8) / 2, (120 * 0.8) / 2};
 Rectangle cityCollisionBoxes[] = {
@@ -527,24 +539,93 @@ void drawGame() {
     DrawTexturePro(safezone, safezoneRec, destRect2_Map1, origin2_Map1, 0.0f, RAYWHITE);
 }
  else if (mapaAtual == 2) {
-        for (int y = 0; y < MAPA_ALTURA; y++) {
-            for (int x = 0; x < MAPA_LARGURA; x++) {
-                Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
-                DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map2Color);
-            }
+    for (int y = 0; y < MAPA_ALTURA; y++) {
+        for (int x = 0; x < MAPA_LARGURA; x++) {
+            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+            DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map2Color);
         }
-        DrawTexture(environment3_2, 20, 20, RAYWHITE);
-        for (int i = 0; i < DUNAS_MAPA3; i++) {
-            Vector2 posicaoDuna = { posicoesDunasMapa3[i].x * TILE_SIZE, posicoesDunasMapa3[i].y * TILE_SIZE };
-            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 };
-            DrawTexturePro(environment3_1, sourceRect, destRect, origin, 0.0f, WHITE);
-        }
-
-        Vector2 safezonePosition = {20 * TILE_SIZE, 15 * TILE_SIZE};
-        Rectangle safezoneRec = {376, 136, 32, 32}; 
-        DrawTextureRec(safezone, safezoneRec, safezonePosition, RAYWHITE);
-
     }
+
+    // Configuração das sub-regiões da textura para cada sprite, do arquivo 'finallevel.png'
+    Rectangle sprite1 = { 19, 8, 67, 80 };   // Sprite para as primeiras zonas
+    Rectangle sprite2 = { 105, 34, 66, 54 }; // Sprite para as segundas zonas
+    Rectangle sprite3 = { 188, 41, 46, 46 }; // Sprite para as terceiras zonas
+    Rectangle sprite4 = { 82, 101, 40, 39 }; // Sprite para as últimas zonas
+
+    // Posições atualizadas de colisão no mapa 2
+    Vector2 collisionPositions[10] = { 
+        {8 * TILE_SIZE, 8 * TILE_SIZE}, {14 * TILE_SIZE, 12 * TILE_SIZE},
+        {22 * TILE_SIZE, 16 * TILE_SIZE}, {4 * TILE_SIZE, 18 * TILE_SIZE},
+        {28 * TILE_SIZE, 6 * TILE_SIZE}, {18 * TILE_SIZE, 10 * TILE_SIZE},
+        {10 * TILE_SIZE, 14 * TILE_SIZE}, {26 * TILE_SIZE, 4 * TILE_SIZE},
+        {6 * TILE_SIZE, 20 * TILE_SIZE}, {16 * TILE_SIZE, 2 * TILE_SIZE}
+    };
+
+    // Renderizando cada sprite, dimensionando-o para preencher 64x64 pixels (2x2 tiles)
+    for (int i = 0; i < 10; i++) {
+        Rectangle destRect = { collisionPositions[i].x, collisionPositions[i].y, 76, 76 };
+        Rectangle sourceRect;
+
+        if (i < 2) {
+            sourceRect = sprite1;  // Usa o sprite 1 para as primeiras duas zonas
+        } else if (i < 4) {
+            sourceRect = sprite2;  // Usa o sprite 2 para as próximas duas zonas
+        } else if (i < 7) {
+            sourceRect = sprite3;  // Usa o sprite 3 para as três zonas seguintes
+        } else {
+            sourceRect = sprite4;  // Usa o sprite 4 para as zonas finais
+        }
+
+        DrawTexturePro(environment3_1, sourceRect, destRect, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    // Adicionando bones.png ao mapa 2
+    Rectangle bonesSourceRect = {145, 426, 42, 41};  // Fonte da imagem bones.png
+    Vector2 bonesPosition = {30 * TILE_SIZE, 10 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect = {bonesPosition.x, bonesPosition.y, 42, 41};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect, bonesDestRect, (Vector2){0, 0}, 0.0f, WHITE); 
+
+    Rectangle bonesSourceRect2 = {229, 436, 30, 30};  // Fonte da imagem bones.png
+    Vector2 bonesPosition2 = {10 * TILE_SIZE, 6 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect2 = {bonesPosition2.x, bonesPosition2.y, 30, 30};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect2, bonesDestRect2, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle bonesSourceRect3 = {229, 436, 30, 30};  // Fonte da imagem bones.png
+    Vector2 bonesPosition3 = {15 * TILE_SIZE, 2 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect3 = {bonesPosition3.x, bonesPosition3.y, 30, 30};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect3, bonesDestRect3, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle bonesSourceRect4 = {387, 387, 38, 30};  // Fonte da imagem bones.png
+    Vector2 bonesPosition4 = {34 * TILE_SIZE, 7 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect4 = {bonesPosition4.x, bonesPosition4.y, 38, 30};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect4, bonesDestRect4, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle bonesSourceRect5 = {194, 428, 24, 38};  // Fonte da imagem bones.png
+    Vector2 bonesPosition5 = {38 * TILE_SIZE, 18 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect5 = {bonesPosition5.x, bonesPosition5.y, 24, 38};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect5, bonesDestRect5, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle bonesSourceRect6 = {194, 428, 24, 38};  // Fonte da imagem bones.png
+    Vector2 bonesPosition6 = {29 * TILE_SIZE, 20 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect6 = {bonesPosition6.x, bonesPosition6.y, 24, 38};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect6, bonesDestRect6, (Vector2){0, 0}, 0.0f, WHITE);
+}
+
+
+
+
 
     static int lastDirection = 3;
     static float walkingTimer = 0.0f;
