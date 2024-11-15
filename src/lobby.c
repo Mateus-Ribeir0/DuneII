@@ -59,9 +59,10 @@ void iniciarLobby() {
     bonesTexture = LoadTexture("static/image/bones.png");
 
     if (!isMusicPlaying) {
-        lobbyMusic = LoadMusicStream("static/music/musica_lobby.mp3");
+        lobbyMusic = LoadMusicStream("static/music/Musica_lobby.mp3");
         PlayMusicStream(lobbyMusic);
-        isMusicPlaying = true;
+        SetMusicVolume(lobbyMusic, 2.0f);
+        isMusicPlaying = true; 
     } else {
         ResumeMusicStream(lobbyMusic);
     }

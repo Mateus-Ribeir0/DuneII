@@ -61,6 +61,8 @@ typedef struct {
 Item items[NUM_ITEMS];
 char historico[MAX_HISTORICO] = "";
 int passosRepetidosMax = 3;
+static float portalAnimationTimer = 0.0f;
+static int portalFrameIndex = 0;
 
 int frameAtual = 0;
 float tempoAnimacao = 0;
@@ -755,15 +757,21 @@ void drawGame() {
     DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, (Vector2){0, 0}, 0.0f, WHITE);
     DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
 
-    Rectangle portalSourceRec = { 0, 0, 32, 32 };
-    Rectangle portalDestRec = {
-        PORTAL_RETORNO_X * TILE_SIZE,
-        PORTAL_RETORNO_Y * TILE_SIZE,
-        TILE_SIZE * PORTAL_RETORNO_LARGURA,
-        TILE_SIZE * PORTAL_RETORNO_ALTURA
-    };
-    
-    DrawTexturePro(portal, portalSourceRec, portalDestRec, origin, 0.0f, WHITE);
+    //Animação do portal
+    portalAnimationTimer += GetFrameTime();
+    if (portalAnimationTimer >= 0.1) {
+        portalAnimationTimer = 0.0f;
+        portalFrameIndex++;
+        if (portalFrameIndex > 3) {
+            portalFrameIndex = 0;
+        }
+    }
+
+    Rectangle portalSourceRec = {portalFrameIndex * 32, 0, 32, 32};
+    Rectangle portalDestRec = {PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE, TILE_SIZE * PORTAL_RETORNO_LARGURA, TILE_SIZE * PORTAL_RETORNO_ALTURA};
+
+    DrawTexturePro(portal, portalSourceRec, portalDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+    //Fim do portal
 
     if (mensagem != NULL) {
         DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, false);
