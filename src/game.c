@@ -568,7 +568,7 @@ void drawGame() {
         int screenWidth = GetScreenWidth();
         int textWidth = MeasureText(mensagem, 20);
         int xPosition = (screenWidth - textWidth) / 2;
-        DrawText(mensagem, xPosition, GetScreenHeight() / 2, 20, BLACK);
+        DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, false);
     }
 }
 
@@ -672,7 +672,7 @@ void playGame(GameScreen *currentScreen) {
     }
 
     player_x = PORTAL_RETORNO_X + (PORTAL_RETORNO_LARGURA / 2);
-    player_y = PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA;
+    player_y = PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA + 1;
     memset(historico, 0, sizeof(historico));
     bool pertoDoPortal = false;
 
@@ -715,13 +715,13 @@ void playGame(GameScreen *currentScreen) {
         if (pertoDoPortal && IsKeyPressed(KEY_P)) {
             if (mapaAtual == 0) {
                 player_x = PORTAL_LOBBY_MAPA1_X + (PORTAL_HORIZONTAL_LARGURA / 2);
-                player_y = PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA;
+                player_y = PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1;
             } else if (mapaAtual == 1) {
                 player_x = PORTAL_LOBBY_MAPA2_X + (PORTAL_VERTICAL_LARGURA / 2);
-                player_y = PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA;
+                player_y = PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA + 1;
             } else if (mapaAtual == 2) {
                 player_x = PORTAL_LOBBY_MAPA3_X + (PORTAL_HORIZONTAL_LARGURA / 2);
-                player_y = PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA;
+                player_y = PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1;
             }
 
             ClearBackground(BLACK);

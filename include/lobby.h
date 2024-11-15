@@ -12,5 +12,6 @@ void updateWaterLevel(GameScreen *currentScreen);
 void resetarJogo();
 void iniciarLobby();
 void finalizarLobby();
+void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool isPortalDialog);
 
 #endif

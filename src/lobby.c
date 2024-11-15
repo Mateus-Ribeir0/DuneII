@@ -119,10 +119,10 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
         return;
     }
 
-    if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) dx = 1;
-    if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) dx = -1;
-    if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) dy = -1;
-    if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) dy = 1;
+    if (IsKeyPressed(KEY_D)) dx = 1;
+    if (IsKeyPressed(KEY_A)) dx = -1;
+    if (IsKeyPressed(KEY_W)) dy = -1;
+    if (IsKeyPressed(KEY_S)) dy = 1;
 
     movePlayer(dx, dy);
 
