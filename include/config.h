@@ -16,7 +16,7 @@ typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RA
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 704
 
-#define MAX_NAME_LENGTH 50
+#define MAX_NAME_LENGTH 30
 extern char playerName[MAX_NAME_LENGTH];
 
 #define MERCHANT_X 2

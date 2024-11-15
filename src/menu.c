@@ -20,10 +20,12 @@ void recebeNomeDoPlayer(GameScreen *currentScreen) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
         desenharBackgroundComLogo();
-        DrawText("Digite seu nome:", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 50, 20, WHITE);
-        DrawRectangle(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 100, 350, 30, WHITE);
-        DrawText(nameBuffer, SCREEN_WIDTH / 2 - 95, SCREEN_HEIGHT / 2 + 105, 20, BLACK);
-        DrawText("Pressione ENTER para continuar", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 150, 20, WHITE);
+
+        DrawText("Digite seu nome:", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 50, 20, WHITE);
+        DrawRectangle(SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 100, 350, 30, WHITE);
+        DrawText(nameBuffer, SCREEN_WIDTH / 2 - 195, SCREEN_HEIGHT / 2 + 105, 20, BLACK);
+        DrawText("Pressione ENTER para continuar", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 150, 20, WHITE);
+
         EndDrawing();
 
         letra = GetCharPressed();
