@@ -814,26 +814,59 @@ void playGame(GameScreen *currentScreen) {
                 desenharAnimacaoMorte(personagem, personagemMorto);
                 DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
                 sleep(3);
-                PlaySound(barulhoMonstro);
-                sleep(1);
 
                 deathEmotivaTocando = 1;
                 PlaySound(deathEmotiva);
 
-                int sandwormPosY = GetScreenHeight() / 2 - sandworm.height / 2;
-                int startTime = GetTime();
+                Vector2 spritePos = {GetScreenWidth() / 2, GetScreenHeight() / 2}; // Posição inicial do sprite no centro
+                float scale = 10.0f; // Fator de escala para aumentar o sprite
+                Rectangle frames[3] = {
+                    {128, 192, 64, 64},
+                    {64, 192, 64, 64},
+                    {0, 192, 64, 64}
+                };
+                int frameIndex = 0;
+                float frameTime = 1.0f; // Tempo para trocar de frame
+                float moveSpeed = 20.0f; // Velocidade de movimento para a esquerda
+                float startTime = GetTime(); // Tempo inicial
+                float elapsedTime = 0.0f;
+                float maxScreenTime = 5.0f; // Duração máxima da tela em segundos
 
-                while ((GetTime() - startTime < 5) && !WindowShouldClose()) {
-                    sandwormPosY -= 1;
+                PlaySound(barulhoMonstro);
 
+                while ((GetTime() - startTime < maxScreenTime) && !WindowShouldClose()) { // Tela termina após 5 segundos
                     BeginDrawing();
                     ClearBackground(BLACK);
-                    DrawTexture(sandworm, GetScreenWidth() / 2 - sandworm.width / 2, sandwormPosY + 40, WHITE);
-                    DrawTexture(characterBack, 0, GetScreenHeight() - characterBack.height, WHITE);
+
+                    // Atualiza o tempo decorrido para controlar o frame atual
+                    elapsedTime = GetTime() - startTime;
+
+                    // Calcule a posição de destino e dimensões para o DrawTexturePro
+                    Rectangle dest = {
+                        spritePos.x, spritePos.y,
+                        frames[frameIndex].width * scale,
+                        frames[frameIndex].height * scale
+                    };
+                    Vector2 origin = {frames[frameIndex].width / 2, frames[frameIndex].height / 2};
+
+                    // Desenha o frame atual
+                    DrawTexturePro(personagemMorto, frames[frameIndex], dest, origin, 0.0f, WHITE);
+
+                    // Atualiza a posição do sprite para a esquerda continuamente
+                    spritePos.x -= moveSpeed * GetFrameTime();
+
+                    // Atualiza o frame apenas uma vez a cada 0.2 segundos, até o último frame
+                    if (elapsedTime >= frameTime * (frameIndex + 1) && frameIndex < 2) {
+                        frameIndex++;
+                    }
+
                     EndDrawing();
 
-                    sleep(1);
+                    sleep(0.5);
                 }
+                ClearBackground(BLACK);
+
+                sleep(2);
 
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
