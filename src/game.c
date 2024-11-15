@@ -404,92 +404,86 @@ void drawGame() {
     Color map1Color = (Color){210, 178, 104, 255};
     Color map2Color = (Color){228, 162, 68, 255};
 
-    Rectangle sourceRect = {64, 64, 64, 64};
-
     Vector2 origin = {0, 0};
 
     Rectangle ruinasSourceRec = {0, 0, ruinasDeAreiaGrandes.width, ruinasDeAreiaGrandes.height};
     Rectangle ruinasDestRec = {20, 20, 256, 256};
 
     if (mapaAtual == 0) {
-        for (int y = 0; y < MAPA_ALTURA; y++) {
-            for (int x = 0; x < MAPA_LARGURA; x++) {
-                Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
-                DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map0Color);
-            }
+    for (int y = 0; y < MAPA_ALTURA; y++) {
+        for (int x = 0; x < MAPA_LARGURA; x++) {
+            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+            DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map0Color);
         }
+    }
 
-        for (int i = 0; i < NUM_PEDRAS; i++) {
-            Vector2 posicaoPedra = { posicoesPedras[i].x * TILE_SIZE, posicoesPedras[i].y * TILE_SIZE };
-            DrawTexture(environment2_2, posicaoPedra.x, posicaoPedra.y, RAYWHITE);
-        }
+    for (int i = 0; i < NUM_PEDRAS; i++) {
+        Vector2 posicaoPedra = { posicoesPedras[i].x * TILE_SIZE, posicoesPedras[i].y * TILE_SIZE };
+        DrawTexture(sandRuins2, posicaoPedra.x, posicaoPedra.y, RAYWHITE); // Substituído por sandRuins2
+    }
 
-        for (int i = 0; i < DUNAS_MAPA1; i++) {
-            Vector2 posicaoDuna = { posicoesDunasMapa2[i].x * TILE_SIZE, posicoesDunasMapa2[i].y * TILE_SIZE };
-            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 };
-            DrawTexturePro(environment2_1, sourceRect, destRect, origin, 0.0f, WHITE);
-        }
+    for (int i = 0; i < DUNAS_MAPA1; i++) {
+        Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
+        Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 };
+        Rectangle sourceRect = { 0, 0, sandRuins3.width, sandRuins3.height }; // Substituído por sandRuins3
+        DrawTexturePro(sandRuins3, sourceRect, destRect, origin, 0.0f, WHITE);
+    }
 
-        Vector2 baseSafezonePosition1 = {20 * TILE_SIZE, 20 * TILE_SIZE}; 
-        Vector2 baseSafezonePosition2 = {10 * TILE_SIZE, 15 * TILE_SIZE}; 
-        Vector2 baseSafezonePosition3 = {30 * TILE_SIZE, 5 * TILE_SIZE};  
-        Vector2 baseSafezonePosition4 = {25 * TILE_SIZE, 10 * TILE_SIZE}; 
-        Rectangle safezoneRec = {376, 136, 32, 32}; 
+    Vector2 baseSafezonePosition1 = {20 * TILE_SIZE, 20 * TILE_SIZE}; 
+    Vector2 baseSafezonePosition2 = {10 * TILE_SIZE, 15 * TILE_SIZE}; 
+    Vector2 baseSafezonePosition3 = {30 * TILE_SIZE, 5 * TILE_SIZE};  
+    Vector2 baseSafezonePosition4 = {25 * TILE_SIZE, 10 * TILE_SIZE}; 
+    Rectangle safezoneRec = {376, 136, 32, 32}; 
 
-        Rectangle destRect1 = {baseSafezonePosition1.x, baseSafezonePosition1.y, 96, 64};
-        Vector2 origin1 = {0, 0};
-        DrawTexturePro(safezone, safezoneRec, destRect1, origin1, 0.0f, RAYWHITE);
+    Rectangle destRect1 = {baseSafezonePosition1.x, baseSafezonePosition1.y, 96, 64};
+    Vector2 origin1 = {0, 0};
+    DrawTexturePro(safezone, safezoneRec, destRect1, origin1, 0.0f, RAYWHITE);
 
-        Rectangle destRect2 = {baseSafezonePosition2.x, baseSafezonePosition2.y, 64, 64};
-        Vector2 origin2 = {0, 0};
-        DrawTexturePro(safezone, safezoneRec, destRect2, origin2, 0.0f, RAYWHITE);
+    Rectangle destRect2 = {baseSafezonePosition2.x, baseSafezonePosition2.y, 64, 64};
+    Vector2 origin2 = {0, 0};
+    DrawTexturePro(safezone, safezoneRec, destRect2, origin2, 0.0f, RAYWHITE);
 
-        Rectangle destRect3 = {baseSafezonePosition3.x, baseSafezonePosition3.y, 64, 64};
-        Vector2 origin3 = {0, 0};
-        DrawTexturePro(safezone, safezoneRec, destRect3, origin3, 0.0f, RAYWHITE);
+    Rectangle destRect3 = {baseSafezonePosition3.x, baseSafezonePosition3.y, 64, 64};
+    Vector2 origin3 = {0, 0};
+    DrawTexturePro(safezone, safezoneRec, destRect3, origin3, 0.0f, RAYWHITE);
 
-        Rectangle destRect4 = {baseSafezonePosition4.x, baseSafezonePosition4.y, 64, 96};
-        Vector2 origin4 = {0, 0};
-        DrawTexturePro(safezone, safezoneRec, destRect4, origin4, 0.0f, RAYWHITE);
+    Rectangle destRect4 = {baseSafezonePosition4.x, baseSafezonePosition4.y, 64, 96};
+    Vector2 origin4 = {0, 0};
+    DrawTexturePro(safezone, safezoneRec, destRect4, origin4, 0.0f, RAYWHITE);
 
+    // Defina o retângulo de origem para bones.png com as coordenadas e tamanho especificados
+    Rectangle map0SourceRect = {51, 59, 24, 24}; 
+    Vector2 map0Position = {20 * TILE_SIZE, 10 * TILE_SIZE}; 
+    Rectangle map0DestRect = {map0Position.x, map0Position.y, 24, 24}; 
+    DrawTexturePro(map0, map0SourceRect, map0DestRect, origin, 0.0f, WHITE);
 
-        // Defina o retângulo de origem para bones.png com as coordenadas e tamanho especificados
-        Rectangle map0SourceRect = {51, 59, 24, 24}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-        Vector2 map0Position = {20 * TILE_SIZE, 10 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
-        Rectangle map0DestRect = {map0Position.x, map0Position.y, 24, 24}; 
-        DrawTexturePro(map0, map0SourceRect, map0DestRect, origin, 0.0f, WHITE);
+    Rectangle map0SourceRect2 = {70, 322, 133, 53}; 
+    Vector2 map0Position2 = {30 * TILE_SIZE, 16 * TILE_SIZE}; 
+    Rectangle map0DestRect2 = {map0Position2.x, map0Position2.y, 133, 53}; 
+    DrawTexturePro(map0, map0SourceRect2, map0DestRect2, origin, 0.0f, WHITE);
 
+    Rectangle map0SourceRect3 = {106, 122, 31, 23}; 
+    Vector2 map0Position3 = {8 * TILE_SIZE, 5 * TILE_SIZE}; 
+    Rectangle map0DestRect3 = {map0Position3.x, map0Position3.y, 31, 23}; 
+    DrawTexturePro(map0, map0SourceRect3, map0DestRect3, origin, 0.0f, WHITE);
 
-        // Defina o retângulo de origem para bones.png com as coordenadas e tamanho especificados
-        Rectangle map0SourceRect2 = {70, 322, 133, 53}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-        Vector2 map0Position2 = {30 * TILE_SIZE, 16 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
-        Rectangle map0DestRect2 = {map0Position2.x, map0Position2.y, 133, 53}; 
-        DrawTexturePro(map0, map0SourceRect2, map0DestRect2, origin, 0.0f, WHITE);
+    Rectangle map0SourceRect4 = {76, 118, 22, 30}; 
+    Vector2 map0Position4 = {7 * TILE_SIZE, 4 * TILE_SIZE}; 
+    Rectangle map0DestRect4 = {map0Position4.x, map0Position4.y, 22, 30}; 
+    DrawTexturePro(map0, map0SourceRect4, map0DestRect4, origin, 0.0f, WHITE);
 
-        // Defina o retângulo de origem para bones.png com as coordenadas e tamanho especificados
-        Rectangle map0SourceRect3 = {106, 122, 31, 23}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-        Vector2 map0Position3 = {8 * TILE_SIZE, 5 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
-        Rectangle map0DestRect3 = {map0Position3.x, map0Position3.y, 31, 23}; 
-        DrawTexturePro(map0, map0SourceRect3, map0DestRect3, origin, 0.0f, WHITE);
+    Rectangle map0SourceRect5 = {191, 80, 20, 50}; 
+    Vector2 map0Position5 = {28 * TILE_SIZE, 6 * TILE_SIZE}; 
+    Rectangle map0DestRect5 = {map0Position5.x, map0Position5.y, 20, 50}; 
+    DrawTexturePro(map0, map0SourceRect5, map0DestRect5, origin, 0.0f, WHITE);
 
-        // Defina o retângulo de origem para bones.png com as coordenadas e tamanho especificados
-        Rectangle map0SourceRect4 = {76, 118, 22, 30}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-        Vector2 map0Position4 = {7 * TILE_SIZE, 4 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
-        Rectangle map0DestRect4 = {map0Position4.x, map0Position4.y, 22, 30}; 
-        DrawTexturePro(map0, map0SourceRect4, map0DestRect4, origin, 0.0f, WHITE);
+    Rectangle map0SourceRect6 = {19, 59, 28, 26}; 
+    Vector2 map0Position6 = {3 * TILE_SIZE, 19 * TILE_SIZE}; 
+    Rectangle map0DestRect6 = {map0Position6.x, map0Position6.y, 28, 26}; 
+    DrawTexturePro(map0, map0SourceRect6, map0DestRect6, origin, 0.0f, WHITE);
+}
 
-        Rectangle map0SourceRect5 = {191, 80, 20, 50}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-        Vector2 map0Position5 = {28 * TILE_SIZE, 6 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
-        Rectangle map0DestRect5 = {map0Position5.x, map0Position5.y, 20, 50}; 
-        DrawTexturePro(map0, map0SourceRect5, map0DestRect5, origin, 0.0f, WHITE);
-
-        Rectangle map0SourceRect6 = {19, 59, 28, 26}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-        Vector2 map0Position6 = {3 * TILE_SIZE, 19 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
-        Rectangle map0DestRect6 = {map0Position6.x, map0Position6.y, 28, 26}; 
-        DrawTexturePro(map0, map0SourceRect6, map0DestRect6, origin, 0.0f, WHITE);
-
-
-    } else if (mapaAtual == 1) {
+ else if (mapaAtual == 1) {
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
             Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
