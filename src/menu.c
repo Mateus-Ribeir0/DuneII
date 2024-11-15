@@ -15,7 +15,8 @@ void recebeNomeDoPlayer(GameScreen *currentScreen) {
     memset(nameBuffer, 0, sizeof(nameBuffer));
 
     while (!WindowShouldClose()) {
-
+        
+        UpdateMusicStream(titleMusic);
         BeginDrawing();
         ClearBackground(RAYWHITE);
         desenharBackgroundComLogo();
@@ -103,8 +104,8 @@ void displayCutscene(Texture2D image, const char* text, Music titleMusic, float 
     }
 }
 
-void cutsceneArrakis(Music titleMusic) {
-    SetMusicVolume(titleMusic, 1.0f);
+void cutsceneArrakis() {
+    //SetMusicVolume(titleMusic, 1.0f);
 
     const char* text1 = "Arrakis. Um vasto deserto, onde a areia carrega\ncicatrizes das guerras travadas pela raras especiarias.";
     const char* text2 = "E eu vim em busca desse raro tesouro, mas cada\npasso é uma batalha. As especiarias não são fáceis\nde conquistar.";
@@ -165,7 +166,6 @@ void cutsceneArrakis(Music titleMusic) {
 
 void iniciarMenu(GameScreen *currentScreen) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "DuneII");
-    InitAudioDevice();
 
     background = LoadTexture("static/image/fundo2.png");
     logo = LoadTexture("static/image/logonova.png");
@@ -207,23 +207,26 @@ void atualizarMenu(GameScreen *currentScreen) {
     }
 }
 
+void exibirObjetivo(GameScreen *currentScreen) {
+    objetivoImage = LoadTexture("static/image/objetivo.png");
 
-void exibirObjetivo() {
-    static bool objetivoLoaded = false;
+    while (!WindowShouldClose()) {
+        UpdateMusicStream(titleMusic);
 
-    if (!objetivoLoaded) {
-        objetivoImage = LoadTexture("static/image/objetivo.png");
-        objetivoLoaded = true;
+        Rectangle source = { 0.0f, 0.0f, (float)objetivoImage.width, (float)objetivoImage.height };
+        Rectangle dest = { 0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT };
+        Vector2 origin = { 0.0f, 0.0f };
+
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+        DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE);
+        EndDrawing();
+
+        if (IsKeyPressed(KEY_Q)) {
+            *currentScreen = TITLE;
+            break;
+        }
     }
-
-    Rectangle source = { 0.0f, 0.0f, (float)objetivoImage.width, (float)objetivoImage.height }; // Área completa da imagem
-    Rectangle dest = { 0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT };
-    Vector2 origin = { 0.0f, 0.0f };
-
-    BeginDrawing();
-    ClearBackground(RAYWHITE);
-    DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE); 
-    EndDrawing();
 }
 
 void desenharMenu(GameScreen currentScreen) {

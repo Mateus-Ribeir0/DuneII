@@ -735,9 +735,6 @@ void drawGame() {
     DrawTexturePro(portal, portalSourceRec, portalDestRec, origin, 0.0f, WHITE);
 
     if (mensagem != NULL) {
-        int screenWidth = GetScreenWidth();
-        int textWidth = MeasureText(mensagem, 20);
-        int xPosition = (screenWidth - textWidth) / 2;
         DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, false);
     }
 }

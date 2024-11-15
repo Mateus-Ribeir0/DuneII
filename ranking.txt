@@ -5,9 +5,11 @@ Mateus|5000
 Pro Player|4300
 Amanda|4000
 Malu|3900
+fava eh bom|3600
 Gianny|2000
 José|1800
 Tomate|1800
+buchada|1800
 Carol|300
 Zelda|290
 Gabriel|280
@@ -23,17 +25,3 @@ Cláudio|235
 Camila|230
 Júlia|225
 Fábio|220
-mamede|0
-mamede|0
-mamede|0
-mamede|0
-mamede|0
-mamede|0
-mamede|0
-mamede|0
-mamede|0
-mamede|0
-mamede|0
-mamede|0
-mamede|0
-mamede|0

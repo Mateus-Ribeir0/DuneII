@@ -9,15 +9,9 @@ int main() {
     bool gameInitialized = false;
 
     InitAudioDevice();
-    Music titleMusic = LoadMusicStream("static/music/epicversion3.wav");
-    PlayMusicStream(titleMusic);
-    SetMusicVolume(titleMusic, 1.0f);
-
     iniciarMenu(&currentScreen);
 
     while (!WindowShouldClose()) {
-    UpdateMusicStream(titleMusic);
-
         switch (currentScreen) {
             case TITLE:
                 atualizarMenu(&currentScreen);
@@ -30,14 +24,10 @@ int main() {
                 recebeNomeDoPlayer(&currentScreen);
                 break;
             case OBJETIVO:
-                if (IsKeyPressed(KEY_Q)) {
-                    currentScreen = TITLE;
-                } else {
-                    exibirObjetivo();
-                }
+                exibirObjetivo(&currentScreen);
                 break;
             case CUTSCENE:
-                cutsceneArrakis(titleMusic);
+                cutsceneArrakis();
                 currentScreen = LOBBY;
                 break;
             case LOBBY:
@@ -74,10 +64,7 @@ int main() {
         }
     }
 
-    StopMusicStream(titleMusic);
-    UnloadMusicStream(titleMusic);
     CloseAudioDevice();
-
     finalizarMenu();
     return 0;
 }
