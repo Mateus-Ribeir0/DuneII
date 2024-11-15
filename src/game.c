@@ -2,6 +2,9 @@
 #include "lobby.h"
 
 static Texture2D personagem;
+static Texture2D sandRuins2;
+static Texture2D sandRuins3;
+static Texture2D sandRuins4;
 static Texture2D personagemAndando;
 static Texture2D cerealsTexture;
 static Texture2D ruinasDeAreiaGrandes;
@@ -12,6 +15,7 @@ static Texture2D environment2_2;
 static Texture2D environment3_1;
 static Texture2D environment3_2;
 static Texture2D safezone;
+static Texture2D bonesTexture;
 static Texture2D ruinasDeAreiaPequenas;
 static Texture2D goldTexture;
 static Texture2D aguaTexture;
@@ -93,6 +97,10 @@ void initializeLoadingScreen() {
 
 void iniciarGame() {
     personagem = LoadTexture("static/image/newstoppedsprites.png");
+    sandRuins2 = LoadTexture("static/image/Sand_ruins2.png");
+    sandRuins3 = LoadTexture("static/image/Sand_ruins3.png");
+    bonesTexture = LoadTexture("static/image/bones.png");
+    sandRuins4 = LoadTexture("static/image/Sand_ruins4.png");
     personagemAndando = LoadTexture("static/image/newwalkingsprites.png");
     cerealsTexture = LoadTexture("static/image/Cereals.png");
     ruinasDeAreiaGrandes = LoadTexture("static/image/Sand_ruins1.png");
@@ -100,7 +108,7 @@ void iniciarGame() {
     environment1_2 = LoadTexture("static/image/Rock6_3.png");
     environment2_1 = LoadTexture("static/image/Rock2_1.png");
     environment2_2 = LoadTexture("static/image/Rock2_3.png");
-    environment3_1 = LoadTexture("static/image/Rock8_1.png");
+    environment3_1 = LoadTexture("static/image/finallevel.png");
     environment3_2 = LoadTexture("static/image/Rock8_3.png");
     safezone = LoadTexture ("static/image/desert_tileset2.png");
     ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
@@ -124,6 +132,9 @@ void iniciarGame() {
 
 void finalizarGame() {
     UnloadTexture(personagem);
+    UnloadTexture(sandRuins2);
+    UnloadTexture(sandRuins3);
+    UnloadTexture(sandRuins4);
     UnloadTexture(personagemAndando);
     UnloadTexture(cerealsTexture);
     UnloadTexture(ruinasDeAreiaGrandes);
@@ -245,10 +256,37 @@ Vector2 posicoesPedras[NUM_PEDRAS] = {
 #define DUNAS_MAPA3 10
 
 Point posicoesDunasMapa1[DUNAS_MAPA1] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5} };
-Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {12, 14} };
-Point posicoesDunasMapa3[DUNAS_MAPA3] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {20, 10}, {12, 14}, {28, 6}, {7, 19}, {17, 3} };
+Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}};
+// Posições ajustadas para as zonas de colisão no mapa 2, baseadas nas posições e tamanhos das sprites
+Point posicoesDunasMapa3[DUNAS_MAPA3] = {
+    {8, 8},   // Ajustado para o sprite 1 de 67x80 na posição (10, 9)
+    {14, 12}, // Ajustado para o sprite 1 de 67x80 na posição (15, 12)
+    {22, 16}, // Ajustado para o sprite 2 de 66x54 na posição (25, 18)
+    {4, 18},  // Ajustado para o sprite 2 de 66x54 na posição (5, 17)
+    {28, 6},  // Ajustado para o sprite 3 de 46x46 na posição (35, 5)
+    {18, 10}, // Ajustado para o sprite 3 de 46x46 na posição (20, 10)
+    {10, 14}, // Ajustado para o sprite 3 de 46x46 na posição (12, 14)
+    {26, 4},  // Ajustado para o sprite 4 de 40x39 na posição (28, 6)
+    {6, 20},  // Ajustado para o sprite 4 de 40x39 na posição (7, 19)
+    {16, 2}   // Ajustado para o sprite 2 de 66x54 na posição (17, 3)
+};
 
 Rectangle vendinhaCollisionBox = {20 + (123 * 0.8) / 4, 20 + (120 * 0.8) / 4, (123 * 0.8) / 2, (120 * 0.8) / 2};
+Rectangle cityCollisionBoxes[] = {
+    {800 + 10, 4 + 30, 90 * 0.5, 162 * 0.2},      
+    {890 + 5, 36 + 10, 132 * 0.5, 120 * 0.4},
+    {572 + 5, 38 + 10, 132 * 0.5, 120 * 0.4},         
+    {1000 + 10, 36 + 10, 150 * 0.7, 126 * 0.4},    
+    {300 + 5, 380 + 5 + (138 * 0.8) * 0.85, 90 * 0.7, (138 * 0.8) * 0.1},
+    {200 + 5, 376 + 10 + (144 * 0.6) * 0.85, 96 * 0.6, (144 * 0.7) * 0.3},
+    {100 + 5, 354 + 10 + (168 * 0.6) * 0.85, 96 * 0.6, (168 * 0.7) * 0.3},
+    {120 + 10 + (55 * 0.7) * 0.1, 600 + 5 + (55 * 0.7) * 0.1, (55 * 0.7) * 0.6, (55 * 0.7) * 0.6},
+    {18 + 15, 478 + 5, 84 * 0.7, 72 * 0.4},
+    {684 + 15, 2 + 30, 138 * 0.8, 168 * 0.3},
+    {760 + 10, 200 + 5, 90 * 0.3, 63 * 0.3},
+
+
+};
 
 
 void movePlayer(int dx, int dy) {
@@ -257,12 +295,12 @@ void movePlayer(int dx, int dy) {
 
     Rectangle playerRect = { new_x * TILE_SIZE, new_y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
 
-    Rectangle ruinasCollisionBox = { 30, 40, 190, 180 };
-
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool colidiuComDuna = false;
         bool colidiuComPedra = false;
+        bool colidiuComCidade = false;
 
+        Rectangle ruinasCollisionBox = { 30, 40, 190, 180 };
         if (mapaAtual == 1 && CheckCollisionRecs(playerRect, ruinasCollisionBox)) {
             return;
         }
@@ -271,8 +309,17 @@ void movePlayer(int dx, int dy) {
             return;
         }
 
-        if (mapaAtual == -1 && CheckCollisionRecs(playerRect, vendinhaCollisionBox)) {
-            return;
+        if (mapaAtual == -1) {
+            if (CheckCollisionRecs(playerRect, vendinhaCollisionBox)) {
+                return;
+            }
+
+            for (int i = 0; i < sizeof(cityCollisionBoxes) / sizeof(cityCollisionBoxes[0]); i++) {
+                if (CheckCollisionRecs(playerRect, cityCollisionBoxes[i])) {
+                    colidiuComCidade = true;
+                    break;
+                }
+            }
         }
 
         if (mapaAtual == 0) {
@@ -308,8 +355,7 @@ void movePlayer(int dx, int dy) {
             }
         }
 
-        // Atualiza posição do jogador se não houver colisão
-        if (!colidiuComDuna && !colidiuComPedra) {
+        if (!colidiuComDuna && !colidiuComPedra && !colidiuComCidade) {
             player_x = new_x;
             player_y = new_y;
         }
@@ -356,6 +402,7 @@ void drawGame() {
     Color map2Color = (Color){228, 162, 68, 255};
 
     Rectangle sourceRect = {64, 64, 64, 64};
+
     Vector2 origin = {0, 0};
 
     Rectangle ruinasSourceRec = {0, 0, ruinasDeAreiaGrandes.width, ruinasDeAreiaGrandes.height};
@@ -406,56 +453,179 @@ void drawGame() {
 
 
     } else if (mapaAtual == 1) {
-        for (int y = 0; y < MAPA_ALTURA; y++) {
-            for (int x = 0; x < MAPA_LARGURA; x++) {
-                Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
-                DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map1Color);
-            }
+    for (int y = 0; y < MAPA_ALTURA; y++) {
+        for (int x = 0; x < MAPA_LARGURA; x++) {
+            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+            DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map1Color);
         }
-        DrawTexture(environment1_2, 20, 20, RAYWHITE);
-        DrawTexturePro(ruinasDeAreiaGrandes, ruinasSourceRec, ruinasDestRec, origin, 0.0f, WHITE);
-        DrawTexture(ruinasDeAreiaPequenas, 20, 20, RAYWHITE);
-        for (int i = 0; i < DUNAS_MAPA2; i++) {
-            Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
-            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 };
-            DrawTexturePro(environment1_1, sourceRect, destRect, origin, 0.0f, WHITE); 
-        }
-
-       
-        Vector2 baseSafezonePosition1_Map1 = {5 * TILE_SIZE, 10 * TILE_SIZE};   
-        Vector2 baseSafezonePosition2_Map1 = {35 * TILE_SIZE, 15 * TILE_SIZE}; 
-        Rectangle safezoneRec = {376, 136, 32, 32}; 
-
-        
-        Rectangle destRect1_Map1 = {baseSafezonePosition1_Map1.x, baseSafezonePosition1_Map1.y, 96, 64}; 
-        Vector2 origin1_Map1 = {0, 0};
-        DrawTexturePro(safezone, safezoneRec, destRect1_Map1, origin1_Map1, 0.0f, RAYWHITE);
-
-        
-        Rectangle destRect2_Map1 = {baseSafezonePosition2_Map1.x, baseSafezonePosition2_Map1.y, 64, 96};
-        Vector2 origin2_Map1 = {0, 0};
-        DrawTexturePro(safezone, safezoneRec, destRect2_Map1, origin2_Map1, 0.0f, RAYWHITE);
-
-
-    } else if (mapaAtual == 2) {
-        for (int y = 0; y < MAPA_ALTURA; y++) {
-            for (int x = 0; x < MAPA_LARGURA; x++) {
-                Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
-                DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map2Color);
-            }
-        }
-        DrawTexture(environment3_2, 20, 20, RAYWHITE);
-        for (int i = 0; i < DUNAS_MAPA3; i++) {
-            Vector2 posicaoDuna = { posicoesDunasMapa3[i].x * TILE_SIZE, posicoesDunasMapa3[i].y * TILE_SIZE };
-            Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 };
-            DrawTexturePro(environment3_1, sourceRect, destRect, origin, 0.0f, WHITE);
-        }
-
-        Vector2 safezonePosition = {20 * TILE_SIZE, 15 * TILE_SIZE};
-        Rectangle safezoneRec = {376, 136, 32, 32}; 
-        DrawTextureRec(safezone, safezoneRec, safezonePosition, RAYWHITE);
-
     }
+    // Defina o retângulo de origem para bones.png com as coordenadas e tamanho especificados
+    Rectangle bonesSourceRect = {774, 113, 38, 33}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
+    Vector2 bonesPosition = {30 * TILE_SIZE, 10 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesDestRect = {bonesPosition.x, bonesPosition.y, 38, 33}; 
+    
+    Rectangle bonesSourceRect2 = {739, 117, 25, 28}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
+    Vector2 bonesPosition2 = {20 * TILE_SIZE, 18 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesDestRect2 = {bonesPosition2.x, bonesPosition2.y, 25, 28};
+
+    Rectangle bonesSourceRect3 = {117, 142, 27, 22}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
+    Vector2 bonesPosition3 = {10 * TILE_SIZE, 6 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesDestRect3 = {bonesPosition3.x, bonesPosition3.y, 27, 22};
+
+    Rectangle bonesSourceRect4 = {557, 60, 45, 37}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
+    Vector2 bonesPosition4 = {30 * TILE_SIZE, 3 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesDestRect4 = {bonesPosition4.x, bonesPosition4.y, 45, 37};
+
+    Rectangle bonesSourceRect5 = {557, 60, 45, 37}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
+    Vector2 bonesPosition5 = {12 * TILE_SIZE, 18 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesDestRect5 = {bonesPosition5.x, bonesPosition5.y, 45, 37};
+
+    Rectangle bonesSourceRect6 = {739, 203, 32, 27}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
+    Vector2 bonesPosition6 = {22 * TILE_SIZE, 6 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesDestRect6 = {bonesPosition6.x, bonesPosition6.y, 32, 27};
+
+    Rectangle bonesSourceRect7 = {739, 203, 32, 27}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
+    Vector2 bonesPosition7 = {17 * TILE_SIZE, 12 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesDestRect7 = {bonesPosition7.x, bonesPosition7.y, 32, 27};
+
+    DrawTexturePro(bonesTexture, bonesSourceRect, bonesDestRect, origin, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, bonesSourceRect2, bonesDestRect2, origin, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, bonesSourceRect3, bonesDestRect3, origin, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, bonesSourceRect4, bonesDestRect4, origin, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, bonesSourceRect5, bonesDestRect5, origin, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, bonesSourceRect6, bonesDestRect6, origin, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, bonesSourceRect7, bonesDestRect7, origin, 0.0f, WHITE);
+
+    // Desenha o environment1_2 e a ruina grande
+    DrawTexture(environment1_2, 20, 20, RAYWHITE);
+    DrawTexturePro(ruinasDeAreiaGrandes, ruinasSourceRec, ruinasDestRec, origin, 0.0f, WHITE);
+    DrawTexture(ruinasDeAreiaPequenas, 20, 20, RAYWHITE);
+    
+    // Alterna as dunas entre Sand_ruins2 e Sand_ruins3
+    // Alterna as dunas entre Sand_ruins2, Sand_ruins3 e Sand_ruins4
+    for (int i = 0; i < DUNAS_MAPA2; i++) {
+        Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
+        Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 64, 64 }; // Ajuste o tamanho se necessário
+
+        if (i % 5 == 0) {
+            // 1 bloco com sandRuins3
+            Rectangle sandRuinsSourceRect3 = {3, 0, 64, 64};  // Coordenadas ajustadas da ruína completa
+            DrawTexturePro(sandRuins3, sandRuinsSourceRect3, destRect, origin, 0.0f, WHITE);
+        } else if (i % 5 == 1 || i % 5 == 2) {
+            // 2 blocos com sandRuins2
+            Rectangle sandRuinsSourceRect2 = {4, 3, 53, 57};  // Coordenadas ajustadas da ruína completa
+            DrawTexturePro(sandRuins2, sandRuinsSourceRect2, destRect, origin, 0.0f, WHITE);
+
+
+        } else {
+            // 2 blocos com sandRuins4
+            Rectangle sandRuinsSourceRect4 = {3, 1, 43, 43};  // Coordenadas ajustadas da ruína completa
+            DrawTexturePro(sandRuins4, sandRuinsSourceRect4, destRect, origin, 0.0f, WHITE);
+        }
+    }
+
+
+    // Desenha as safezones no mapa 1
+    Vector2 baseSafezonePosition1_Map1 = {5 * TILE_SIZE, 10 * TILE_SIZE};   
+    Vector2 baseSafezonePosition2_Map1 = {35 * TILE_SIZE, 15 * TILE_SIZE}; 
+    Rectangle safezoneRec = {376, 136, 32, 32}; 
+
+    Rectangle destRect1_Map1 = {baseSafezonePosition1_Map1.x, baseSafezonePosition1_Map1.y, 96, 64}; 
+    Vector2 origin1_Map1 = {0, 0};
+    DrawTexturePro(safezone, safezoneRec, destRect1_Map1, origin1_Map1, 0.0f, RAYWHITE);
+
+    Rectangle destRect2_Map1 = {baseSafezonePosition2_Map1.x, baseSafezonePosition2_Map1.y, 64, 96};
+    Vector2 origin2_Map1 = {0, 0};
+    DrawTexturePro(safezone, safezoneRec, destRect2_Map1, origin2_Map1, 0.0f, RAYWHITE);
+}
+ else if (mapaAtual == 2) {
+    for (int y = 0; y < MAPA_ALTURA; y++) {
+        for (int x = 0; x < MAPA_LARGURA; x++) {
+            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+            DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map2Color);
+        }
+    }
+
+    // Configuração das sub-regiões da textura para cada sprite, do arquivo 'finallevel.png'
+    Rectangle sprite1 = { 19, 8, 67, 80 };   // Sprite para as primeiras zonas
+    Rectangle sprite2 = { 105, 34, 66, 54 }; // Sprite para as segundas zonas
+    Rectangle sprite3 = { 188, 41, 46, 46 }; // Sprite para as terceiras zonas
+    Rectangle sprite4 = { 82, 101, 40, 39 }; // Sprite para as últimas zonas
+
+    // Posições atualizadas de colisão no mapa 2
+    Vector2 collisionPositions[10] = { 
+        {8 * TILE_SIZE, 8 * TILE_SIZE}, {14 * TILE_SIZE, 12 * TILE_SIZE},
+        {22 * TILE_SIZE, 16 * TILE_SIZE}, {4 * TILE_SIZE, 18 * TILE_SIZE},
+        {28 * TILE_SIZE, 6 * TILE_SIZE}, {18 * TILE_SIZE, 10 * TILE_SIZE},
+        {10 * TILE_SIZE, 14 * TILE_SIZE}, {26 * TILE_SIZE, 4 * TILE_SIZE},
+        {6 * TILE_SIZE, 20 * TILE_SIZE}, {16 * TILE_SIZE, 2 * TILE_SIZE}
+    };
+
+    // Renderizando cada sprite, dimensionando-o para preencher 64x64 pixels (2x2 tiles)
+    for (int i = 0; i < 10; i++) {
+        Rectangle destRect = { collisionPositions[i].x, collisionPositions[i].y, 76, 76 };
+        Rectangle sourceRect;
+
+        if (i < 2) {
+            sourceRect = sprite1;  // Usa o sprite 1 para as primeiras duas zonas
+        } else if (i < 4) {
+            sourceRect = sprite2;  // Usa o sprite 2 para as próximas duas zonas
+        } else if (i < 7) {
+            sourceRect = sprite3;  // Usa o sprite 3 para as três zonas seguintes
+        } else {
+            sourceRect = sprite4;  // Usa o sprite 4 para as zonas finais
+        }
+
+        DrawTexturePro(environment3_1, sourceRect, destRect, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    // Adicionando bones.png ao mapa 2
+    Rectangle bonesSourceRect = {145, 426, 42, 41};  // Fonte da imagem bones.png
+    Vector2 bonesPosition = {30 * TILE_SIZE, 10 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect = {bonesPosition.x, bonesPosition.y, 42, 41};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect, bonesDestRect, (Vector2){0, 0}, 0.0f, WHITE); 
+
+    Rectangle bonesSourceRect2 = {229, 436, 30, 30};  // Fonte da imagem bones.png
+    Vector2 bonesPosition2 = {10 * TILE_SIZE, 6 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect2 = {bonesPosition2.x, bonesPosition2.y, 30, 30};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect2, bonesDestRect2, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle bonesSourceRect3 = {229, 436, 30, 30};  // Fonte da imagem bones.png
+    Vector2 bonesPosition3 = {15 * TILE_SIZE, 2 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect3 = {bonesPosition3.x, bonesPosition3.y, 30, 30};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect3, bonesDestRect3, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle bonesSourceRect4 = {387, 387, 38, 30};  // Fonte da imagem bones.png
+    Vector2 bonesPosition4 = {34 * TILE_SIZE, 7 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect4 = {bonesPosition4.x, bonesPosition4.y, 38, 30};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect4, bonesDestRect4, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle bonesSourceRect5 = {194, 428, 24, 38};  // Fonte da imagem bones.png
+    Vector2 bonesPosition5 = {38 * TILE_SIZE, 18 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect5 = {bonesPosition5.x, bonesPosition5.y, 24, 38};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect5, bonesDestRect5, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle bonesSourceRect6 = {194, 428, 24, 38};  // Fonte da imagem bones.png
+    Vector2 bonesPosition6 = {29 * TILE_SIZE, 20 * TILE_SIZE};  // Posição no mapa 2
+    Rectangle bonesDestRect6 = {bonesPosition6.x, bonesPosition6.y, 24, 38};  // Destino com as dimensões da imagem
+
+    // Desenha bones.png no mapa 2
+    DrawTexturePro(bonesTexture, bonesSourceRect6, bonesDestRect6, (Vector2){0, 0}, 0.0f, WHITE);
+}
+
+
+
+
 
     static int lastDirection = 3;
     static float walkingTimer = 0.0f;
@@ -791,26 +961,59 @@ void playGame(GameScreen *currentScreen) {
                 desenharAnimacaoMorte(personagem, personagemMorto);
                 DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
                 sleep(3);
-                PlaySound(barulhoMonstro);
-                sleep(1);
 
                 deathEmotivaTocando = 1;
                 PlaySound(deathEmotiva);
 
-                int sandwormPosY = GetScreenHeight() / 2 - sandworm.height / 2;
-                int startTime = GetTime();
+                Vector2 spritePos = {GetScreenWidth() / 2, GetScreenHeight() / 2}; // Posição inicial do sprite no centro
+                float scale = 10.0f; // Fator de escala para aumentar o sprite
+                Rectangle frames[3] = {
+                    {128, 192, 64, 64},
+                    {64, 192, 64, 64},
+                    {0, 192, 64, 64}
+                };
+                int frameIndex = 0;
+                float frameTime = 1.0f; // Tempo para trocar de frame
+                float moveSpeed = 20.0f; // Velocidade de movimento para a esquerda
+                float startTime = GetTime(); // Tempo inicial
+                float elapsedTime = 0.0f;
+                float maxScreenTime = 5.0f; // Duração máxima da tela em segundos
 
-                while ((GetTime() - startTime < 5) && !WindowShouldClose()) {
-                    sandwormPosY -= 1;
+                PlaySound(barulhoMonstro);
 
+                while ((GetTime() - startTime < maxScreenTime) && !WindowShouldClose()) { // Tela termina após 5 segundos
                     BeginDrawing();
                     ClearBackground(BLACK);
-                    DrawTexture(sandworm, GetScreenWidth() / 2 - sandworm.width / 2, sandwormPosY + 40, WHITE);
-                    DrawTexture(characterBack, 0, GetScreenHeight() - characterBack.height, WHITE);
+
+                    // Atualiza o tempo decorrido para controlar o frame atual
+                    elapsedTime = GetTime() - startTime;
+
+                    // Calcule a posição de destino e dimensões para o DrawTexturePro
+                    Rectangle dest = {
+                        spritePos.x, spritePos.y,
+                        frames[frameIndex].width * scale,
+                        frames[frameIndex].height * scale
+                    };
+                    Vector2 origin = {frames[frameIndex].width / 2, frames[frameIndex].height / 2};
+
+                    // Desenha o frame atual
+                    DrawTexturePro(personagemMorto, frames[frameIndex], dest, origin, 0.0f, WHITE);
+
+                    // Atualiza a posição do sprite para a esquerda continuamente
+                    spritePos.x -= moveSpeed * GetFrameTime();
+
+                    // Atualiza o frame apenas uma vez a cada 0.2 segundos, até o último frame
+                    if (elapsedTime >= frameTime * (frameIndex + 1) && frameIndex < 2) {
+                        frameIndex++;
+                    }
+
                     EndDrawing();
 
-                    sleep(1);
+                    sleep(0.5);
                 }
+                ClearBackground(BLACK);
+
+                sleep(2);
 
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;

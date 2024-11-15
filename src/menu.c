@@ -5,6 +5,8 @@ static Texture2D background, logo, objetivoImage;
 static Music titleMusic;
 static float backgroundPosX;
 static Sound swordsfx;
+static Sound rankingssfx;
+static Sound controlssfx;
 
 void recebeNomeDoPlayer(GameScreen *currentScreen) {
     static char nameBuffer[MAX_NAME_LENGTH] = "";
@@ -178,19 +180,23 @@ void iniciarMenu(GameScreen *currentScreen) {
 void atualizarMenu(GameScreen *currentScreen) {
     UpdateMusicStream(titleMusic);
 
+    controlssfx = LoadSound("static/music/controls.wav");
+    rankingssfx = LoadSound("static/music/rankings.wav");
+
     if (*currentScreen == TITLE) {
         backgroundPosX += 0.2f;
         if (backgroundPosX >= background.width) {
             backgroundPosX = 0;
-        }
-        swordsfx = LoadSound("static/music/swordsfx.wav");
+        }       
         if (IsKeyPressed(KEY_ENTER)) {
             PlaySound(swordsfx);
             *currentScreen = GAME;
         } else if (IsKeyPressed(KEY_C)) {
             PlaySound(swordsfx);
+            PlaySound(controlssfx);
             *currentScreen = OBJETIVO;  
         } else if (IsKeyPressed(KEY_R)) {
+            PlaySound(rankingssfx);
             PlaySound(swordsfx);
             *currentScreen = RANKINGS;  
         }
