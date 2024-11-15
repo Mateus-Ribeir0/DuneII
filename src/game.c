@@ -865,7 +865,6 @@ void playGame(GameScreen *currentScreen) {
             resetarJogo();
             return;
         }
-
         if (IsKeyPressed(KEY_W)) { dy = -1; movimento = 'w'; }
         if (IsKeyPressed(KEY_S)) { dy = 1; movimento = 's'; }
         if (IsKeyPressed(KEY_A)) { dx = -1; movimento = 'a'; }
