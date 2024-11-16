@@ -31,6 +31,15 @@ static Sound deathEmotiva;
 static Texture2D portal;
 static Texture2D sombra;
 static Texture2D map0;
+static Sound monsterGrowl2;
+static bool isMonsterActive = false; // Se o evento do monstro está ativo
+static double monsterStartTime = 0.0; // Quando o som começou
+static double lastEPressTime = 0.0; // Último tempo em que o jogador pressionou 'E'
+static int ePressCount = 0; // Contador de pressionamentos da tecla 'E'
+static Texture2D EpressSprite;
+static float spriteAnimationTimer = 0.0f;
+static int spriteFrameIndex = 0; // 0 ou 1 para alternar entre os dois frames
+static double mapaEntradaTime = 0.0;
 
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
@@ -122,6 +131,7 @@ void iniciarGame() {
     portal = LoadTexture("static/image/portal.png");
     sombra = LoadTexture("static/image/sombras.png");
     map0 = LoadTexture("static/image/map0.png");
+    EpressSprite = LoadTexture("static/image/Epress.png");
 
     musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
     musicaMapa1 = LoadSound("static/music/mapa1musica.wav");
@@ -130,6 +140,7 @@ void iniciarGame() {
     gameOverSound = LoadSound("static/music/deathsfx2.wav");
     barulhoMonstro = LoadSound("static/music/monster.mp3");
     deathEmotiva = LoadSound("static/music/deathemotiva.wav");
+    monsterGrowl2 = LoadSound("static/music/monsterGrowl2.wav");
 
     initializeLoadingScreen();
 }
@@ -155,6 +166,7 @@ void finalizarGame() {
     UnloadTexture(sandworm);
     UnloadTexture(portal);
     UnloadTexture(map0);
+    UnloadTexture(EpressSprite);
 
     UnloadSound(musicaMapa0);
     UnloadSound(musicaMapa1);
@@ -163,6 +175,7 @@ void finalizarGame() {
     UnloadSound(gameOverSound);
     UnloadSound(barulhoMonstro);
     UnloadSound(deathEmotiva);
+    UnloadSound(monsterGrowl2);
 
     for (int i = 0; i < 4; i++) {
         UnloadTexture(loadingImagesMap0[i]);
@@ -855,6 +868,7 @@ bool isPlayerNearPortal() {
 }
 
 void playGame(GameScreen *currentScreen) {
+    mapaEntradaTime = GetTime();
     ClearBackground(BLACK);
     BeginDrawing();
     EndDrawing();
@@ -1080,6 +1094,120 @@ void playGame(GameScreen *currentScreen) {
                 *currentScreen = RANKINGS;
                 return;
             }
+        }
+
+        if (!isMonsterActive && GetTime() - mapaEntradaTime >= 5.0 && GetTime() - monsterStartTime >= 20.0) {
+            // Verificar se o evento do monstro será ativado
+            if (GetRandomValue(1, 5) == 1) {
+                PlaySound(monsterGrowl2);
+                SetSoundVolume(monsterGrowl2, 1.0f); // Volume máximo
+                isMonsterActive = true;
+                monsterStartTime = GetTime();
+                lastEPressTime = 0.0;
+                ePressCount = 0;
+                spriteFrameIndex = 0; // Reiniciar o frame
+                spriteAnimationTimer = 0.0f;
+            } else {
+                monsterStartTime = GetTime(); // Resetar o temporizador se não ativou
+            }
+        }
+
+        if (isMonsterActive) {
+            BeginDrawing();
+
+            // Alternar os frames do sprite a cada 0.5 segundos
+            spriteAnimationTimer += GetFrameTime();
+            if (spriteAnimationTimer >= 0.2f) {
+                spriteFrameIndex = (spriteFrameIndex + 1) % 2; // Alternar entre 0 e 1
+                spriteAnimationTimer = 0.0f;
+            }
+
+            // Calcular a posição ao lado direito do jogador
+            Vector2 spritePosition = { player_x * TILE_SIZE + TILE_SIZE, player_y * TILE_SIZE };
+            Rectangle sourceRec = (spriteFrameIndex == 0)
+                                    ? (Rectangle){160, 192, 704, 656}
+                                    : (Rectangle){160, 2336, 704, 560};
+            Rectangle destRec = { spritePosition.x, spritePosition.y, 48, 48 }; // Reduzido para 48x48
+            Vector2 origin = {0, 0};
+
+            DrawTexturePro(EpressSprite, sourceRec, destRec, origin, 0.0f, WHITE);
+
+            // Verifica pressionamentos de 'E'
+            if (IsKeyPressed(KEY_E)) {
+                double currentTime = GetTime();
+
+                if (lastEPressTime == 0.0 || currentTime - lastEPressTime <= 0.5) {
+                    ePressCount++;
+                    lastEPressTime = currentTime;
+                } else {
+                    ePressCount = 1; // Reinicia o contador se demorou demais
+                    lastEPressTime = currentTime;
+                }
+            }
+
+            // Jogador escapa se pressionou 'E' 10 vezes dentro do limite
+            if (ePressCount >= 10) {
+                isMonsterActive = false; // Monstro é desativado
+                StopSound(monsterGrowl2);
+            }
+
+            // Caso o jogador falhe
+            if (GetTime() - monsterStartTime > 4.0f) { // Tempo limite para escapar é de 4 segundos
+                isMonsterActive = false;
+                StopSound(monsterGrowl2);
+
+                // Parar a música atual
+                StopSound(musicaMapa0);
+                StopSound(musicaMapa1);
+                StopSound(musicaMapa2);
+
+                // Tocar sons de morte
+                PlaySound(gameOverSound);
+                sleep(1);
+                PlaySound(deathEmotiva);
+
+                // Exibir animação de morte
+                Texture2D personagemMorto = LoadTexture("static/image/dead.png");
+                ClearBackground(BLACK);
+                desenharAnimacaoMorte(personagem, personagemMorto);
+                DrawText("GAME OVER - Você foi pego pelo monstro!", 10, 40, 20, RED);
+                sleep(3);
+
+                atualizarRanking(playerName, playerMoney);
+                zerarMonetaria();
+                resetarJogo();
+                ClearBackground(RAYWHITE);
+                *currentScreen = RANKINGS;
+                return;
+            }
+
+            if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_A) || IsKeyPressed(KEY_S) || IsKeyPressed(KEY_D)) {
+                // Parar a música atual
+                StopSound(musicaMapa0);
+                StopSound(musicaMapa1);
+                StopSound(musicaMapa2);
+
+                // Tocar sons de morte
+                PlaySound(gameOverSound);
+                sleep(1);
+                PlaySound(deathEmotiva);
+
+                // Exibir animação de morte
+                Texture2D personagemMorto = LoadTexture("static/image/dead.png");
+                ClearBackground(BLACK);
+                desenharAnimacaoMorte(personagem, personagemMorto);
+                DrawText("GAME OVER - Você tentou se mover durante o ataque do monstro!", 10, 40, 20, RED);
+                sleep(3);
+
+                atualizarRanking(playerName, playerMoney);
+                zerarMonetaria();
+                resetarJogo();
+                ClearBackground(RAYWHITE);
+                *currentScreen = RANKINGS;
+                return;
+            }
+
+            EndDrawing();
         }
 
         BeginDrawing();

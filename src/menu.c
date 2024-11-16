@@ -194,16 +194,13 @@ void atualizarMenu(GameScreen *currentScreen) {
             PlaySound(swordsfx);
             *currentScreen = GAME;
         } else if (IsKeyPressed(KEY_C)) {
-            PlaySound(swordsfx);
             PlaySound(controlssfx);
             *currentScreen = OBJETIVO;  
         } else if (IsKeyPressed(KEY_R)) {
             PlaySound(rankingssfx);
-            PlaySound(swordsfx);
             *currentScreen = RANKINGS;  
         }
     } else if (*currentScreen == RANKINGS && IsKeyPressed(KEY_Q)) {
-        PlaySound(swordsfx);
         *currentScreen = TITLE;
         ResumeMusicStream(titleMusic);
     }
