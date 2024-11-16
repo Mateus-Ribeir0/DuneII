@@ -8,6 +8,36 @@ static Sound swordsfx;
 static Sound rankingssfx;
 static Sound controlssfx;
 
+void showFadingImage(Texture2D image, float duration) {
+    float startTime = GetTime(); // Tempo inicial
+    float opacity = 1.0f;        // Opacidade inicial (100%)
+
+    while (opacity > 0.0f && !WindowShouldClose()) {
+        float elapsedTime = GetTime() - startTime; // Tempo decorrido
+        if (elapsedTime >= duration) {
+            opacity = 0.0f; // A imagem desaparece completamente após a duração
+        } else {
+            opacity = 1.0f - (elapsedTime / duration); // Reduz a opacidade gradualmente
+        }
+
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        // Desenha a imagem com opacidade ajustada
+        Rectangle destRect = { 
+            GetScreenWidth() / 2 - image.width / 2, 
+            GetScreenHeight() / 2 - image.height / 2, 
+            image.width, 
+            image.height 
+        };
+
+        DrawTexturePro(image, (Rectangle){0, 0, image.width, image.height}, destRect, (Vector2){0, 0}, 0.0f, Fade(WHITE, opacity));
+
+        EndDrawing();
+    }
+}
+
+
 void recebeNomeDoPlayer(GameScreen *currentScreen) {
     static char nameBuffer[MAX_NAME_LENGTH] = "";
     int letra;
@@ -167,6 +197,7 @@ void cutsceneArrakis() {
 }
 
 void iniciarMenu(GameScreen *currentScreen) {
+
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "DuneII");
 
     background = LoadTexture("static/image/fundo2.png");
@@ -175,7 +206,13 @@ void iniciarMenu(GameScreen *currentScreen) {
 
     PlayMusicStream(titleMusic);
     SetTargetFPS(60);
-
+    Texture2D introImage = LoadTexture("static/image/intro.png");
+    showFadingImage(introImage, 3.0f);
+    sleep(1);
+    Texture2D introImage2 = LoadTexture("static/image/intro2.png");
+    showFadingImage(introImage2, 3.0f);
+    sleep(1);
+    UnloadTexture(introImage);
     *currentScreen = TITLE;
 }
 
