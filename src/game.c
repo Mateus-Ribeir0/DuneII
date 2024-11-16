@@ -1095,65 +1095,79 @@ void playGame(GameScreen *currentScreen) {
                 return;
             }
         }
+        static double nextMonsterCheckTime = 0.0;
 
-        if (!isMonsterActive && GetTime() - mapaEntradaTime >= 5.0 && GetTime() - monsterStartTime >= 20.0) {
-            // Verificar se o evento do monstro será ativado
-            if (GetRandomValue(1, 5) == 1) {
-                PlaySound(monsterGrowl2);
-                SetSoundVolume(monsterGrowl2, 1.0f); // Volume máximo
-                isMonsterActive = true;
-                monsterStartTime = GetTime();
-                lastEPressTime = 0.0;
-                ePressCount = 0;
-                spriteFrameIndex = 0; // Reiniciar o frame
-                spriteAnimationTimer = 0.0f;
-            } else {
-                monsterStartTime = GetTime(); // Resetar o temporizador se não ativou
+        if (!isMonsterActive && GetTime() >= nextMonsterCheckTime) {
+            // Verificar se passaram 20 segundos desde o início do jogo
+            if (GetTime() > 20.0) {
+                // Reduzindo a chance para 33%
+                if (GetRandomValue(1, 100) <= 33) {
+                    PlaySound(monsterGrowl2);
+                    SetSoundVolume(monsterGrowl2, 1.0f); // Volume máximo
+                    isMonsterActive = true;
+                    monsterStartTime = GetTime();
+                    lastEPressTime = 0.0;
+                    ePressCount = 0;
+                    spriteFrameIndex = 0; // Reiniciar o frame
+                    spriteAnimationTimer = 0.0f;
+                }
             }
+            // Atualizar o próximo tempo de verificação
+            nextMonsterCheckTime = GetTime() + 20.0; // Checar novamente em 20 segundos
         }
 
         if (isMonsterActive) {
-            BeginDrawing();
+            double elapsedTime = GetTime() - monsterStartTime;
 
-            // Alternar os frames do sprite a cada 0.5 segundos
-            spriteAnimationTimer += GetFrameTime();
-            if (spriteAnimationTimer >= 0.2f) {
-                spriteFrameIndex = (spriteFrameIndex + 1) % 2; // Alternar entre 0 e 1
-                spriteAnimationTimer = 0.0f;
-            }
+            if (elapsedTime >= 1.0) { // Lógica e sprite só começam 1 segundo depois
+                BeginDrawing();
 
-            // Calcular a posição ao lado direito do jogador
-            Vector2 spritePosition = { player_x * TILE_SIZE + TILE_SIZE, player_y * TILE_SIZE };
-            Rectangle sourceRec = (spriteFrameIndex == 0)
-                                    ? (Rectangle){160, 192, 704, 656}
-                                    : (Rectangle){160, 2336, 704, 560};
-            Rectangle destRec = { spritePosition.x, spritePosition.y, 48, 48 }; // Reduzido para 48x48
-            Vector2 origin = {0, 0};
-
-            DrawTexturePro(EpressSprite, sourceRec, destRec, origin, 0.0f, WHITE);
-
-            // Verifica pressionamentos de 'E'
-            if (IsKeyPressed(KEY_E)) {
-                double currentTime = GetTime();
-
-                if (lastEPressTime == 0.0 || currentTime - lastEPressTime <= 0.5) {
-                    ePressCount++;
-                    lastEPressTime = currentTime;
-                } else {
-                    ePressCount = 1; // Reinicia o contador se demorou demais
-                    lastEPressTime = currentTime;
+                // Alternar os frames do sprite a cada 0.2 segundos
+                spriteAnimationTimer += GetFrameTime();
+                if (spriteAnimationTimer >= 0.2f) {
+                    spriteFrameIndex = (spriteFrameIndex + 1) % 2; // Alternar entre 0 e 1
+                    spriteAnimationTimer = 0.0f;
                 }
+
+                // Calcular a posição ao lado direito do jogador
+                Vector2 spritePosition = { player_x * TILE_SIZE + TILE_SIZE, player_y * TILE_SIZE };
+                Rectangle sourceRec = (spriteFrameIndex == 0)
+                                        ? (Rectangle){160, 192, 704, 656}
+                                        : (Rectangle){160, 2336, 704, 560};
+                Rectangle destRec = { spritePosition.x, spritePosition.y, 48, 48 }; // Reduzido para 48x48
+                Vector2 origin = {0, 0};
+
+                DrawTexturePro(EpressSprite, sourceRec, destRec, origin, 0.0f, WHITE);
+
+                // Verifica pressionamentos de 'E'
+                if (IsKeyPressed(KEY_E)) {
+                    double currentTime = GetTime();
+
+                    if (lastEPressTime == 0.0 || currentTime - lastEPressTime <= 0.5) {
+                        ePressCount++;
+                        lastEPressTime = currentTime;
+                    } else {
+                        ePressCount = 1; // Reinicia o contador se demorou demais
+                        lastEPressTime = currentTime;
+                    }
+
+                    // Jogador escapa após pressionar 'E' 3 vezes
+                    if (ePressCount >= 3) {
+                        // O jogador está salvo, mas o som e o sprite permanecem até o som terminar
+                        isMonsterActive = false; // Evita mortes subsequentes
+                    }
+                }
+
+                EndDrawing();
             }
 
-            // Jogador escapa se pressionou 'E' 10 vezes dentro do limite
-            if (ePressCount >= 10) {
-                isMonsterActive = false; // Monstro é desativado
-                StopSound(monsterGrowl2);
-            }
-
-            // Caso o jogador falhe
-            if (GetTime() - monsterStartTime > 4.0f) { // Tempo limite para escapar é de 4 segundos
+            // Remove sprite e lógica somente após o som parar de tocar
+            if (!IsSoundPlaying(monsterGrowl2)) {
                 isMonsterActive = false;
+            }
+
+            // Caso o jogador não aperte `E` 3 vezes em tempo suficiente
+            if (GetTime() - monsterStartTime > 4.5f && ePressCount < 3) { // Tempo limite para escapar é de 4 segundos
                 StopSound(monsterGrowl2);
 
                 // Parar a música atual
@@ -1180,34 +1194,6 @@ void playGame(GameScreen *currentScreen) {
                 *currentScreen = RANKINGS;
                 return;
             }
-
-            if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_A) || IsKeyPressed(KEY_S) || IsKeyPressed(KEY_D)) {
-                // Parar a música atual
-                StopSound(musicaMapa0);
-                StopSound(musicaMapa1);
-                StopSound(musicaMapa2);
-
-                // Tocar sons de morte
-                PlaySound(gameOverSound);
-                sleep(1);
-                PlaySound(deathEmotiva);
-
-                // Exibir animação de morte
-                Texture2D personagemMorto = LoadTexture("static/image/dead.png");
-                ClearBackground(BLACK);
-                desenharAnimacaoMorte(personagem, personagemMorto);
-                DrawText("GAME OVER - Você tentou se mover durante o ataque do monstro!", 10, 40, 20, RED);
-                sleep(3);
-
-                atualizarRanking(playerName, playerMoney);
-                zerarMonetaria();
-                resetarJogo();
-                ClearBackground(RAYWHITE);
-                *currentScreen = RANKINGS;
-                return;
-            }
-
-            EndDrawing();
         }
 
         BeginDrawing();
