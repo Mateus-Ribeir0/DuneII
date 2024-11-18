@@ -136,12 +136,16 @@ void iniciarGame() {
     monsters = LoadTexture("static/image/monsters.png");
 
     musicaMapa0 = LoadSound("static/music/mapa0musica.mp3");
+    SetSoundVolume(musicaMapa0, 0.7f);
     musicaMapa1 = LoadSound("static/music/mapa1musica.mp3");
+    SetSoundVolume(musicaMapa1, 0.6f);
     musicaMapa2 = LoadSound("static/music/mapa2musica.mp3");
+    SetSoundVolume(musicaMapa2, 0.6f);
     spellCastSound = LoadSound("static/music/spellcast.mp3");
     gameOverSound = LoadSound("static/music/deathsfx2.wav");
     barulhoMonstro = LoadSound("static/music/monster.mp3");
     deathEmotiva = LoadSound("static/music/deathemotiva.mp3");
+    SetSoundVolume(musicaMapa2, 0.8f);
     monsterGrowl2 = LoadSound("static/music/monsterGrowl2.wav");
 
     initializeLoadingScreen();
@@ -1074,7 +1078,7 @@ void playGame(GameScreen *currentScreen) {
 
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
-                float tempoPorCaractere = 0.3f;
+                float tempoPorCaractere = 0.5f;
                 float timer = 0;
 
                 while (caractereExibido < strlen(euFalhei) && !WindowShouldClose()) {
@@ -1093,7 +1097,7 @@ void playGame(GameScreen *currentScreen) {
                     EndDrawing();
                 }
 
-                sleep(2);
+                sleep(7.7);
 
                 atualizarRanking(playerName, playerMoney);
                 zerarMonetaria();

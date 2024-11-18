@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "lobby.h": "c",
-        "config.h": "c",
-        "raylib.h": "c",
-        "typeinfo": "c"
-    }
-}
