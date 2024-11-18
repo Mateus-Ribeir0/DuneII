@@ -6,6 +6,8 @@ Nele, você é um cidadão de Arrakis, cujo deve coletar especiarias de modo a s
 
 Para isso, você vai numa missão no deserto de Arrakis, podendo se deslocar para 3 localidades diferentes do seu planeta, sendo um mais difícil de sobreviver que o outro.
 
+Os vermes de areias são ativados por movimentos rítmicos, então tente não repetir seus passos no deserto, para que você não morra.
+
 Sua água acaba com o tempo, e você pode morrer por isso. Troque suas especiarias por mais água para que consiga sobreviver.
 
 O que lhe dá pontuação é vender suas especiarias, então concilie bem sua sobrevivência, com suas recompensas.
