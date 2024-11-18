@@ -610,10 +610,15 @@ if (isPlayerNearMerchant()) {
             if (merchantMessage == 1) {
                 // Exibe mensagem de sucesso com o velho feliz
                 while (!IsKeyPressed(KEY_ENTER)) {
-                    EndDrawing();
+                    // Atualiza a música do lobby continuamente
+                    UpdateMusicStream(lobbyMusic);
+
+                    // Atualiza a tela
                     BeginDrawing();
                     DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite para velho feliz
-                    DrawDialogBox("Obrigado pela venda, espero que prospere!\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                    DrawDialogBox("Obrigado pela venda, espero que prospere!\n\n\nAperte[ENTER] para voltar.", 
+                                100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                    EndDrawing();
                 }
                 merchantMessage = 0;
                 merchantMood = 0; // Reseta o humor para neutro
@@ -621,10 +626,15 @@ if (isPlayerNearMerchant()) {
             } else if (merchantMessage == -1) {
                 // Exibe mensagem de erro com o velho puto
                 while (!IsKeyPressed(KEY_ENTER)) {
-                    EndDrawing();
+                    // Atualiza a música do lobby continuamente
+                    UpdateMusicStream(lobbyMusic);
+
+                    // Atualiza a tela
                     BeginDrawing();
                     DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite para velho puto
-                    DrawDialogBox("Saia daqui, você não tem nenhuma especiaria para\nnegociar!\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                    DrawDialogBox("Saia daqui, você não tem nenhuma especiaria para\nnegociar!\n\n\nAperte[ENTER] para voltar.", 
+                                100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                    EndDrawing();
                 }
                 merchantMessage = 0;
                 merchantMood = 0; // Reseta o humor para neutro
@@ -644,20 +654,24 @@ if (isPlayerNearMerchant()) {
                     merchantMood = 1; // Velho feliz
 
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
                 } else {
                     merchantMood = 2; // Velho puto
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
@@ -669,20 +683,24 @@ if (isPlayerNearMerchant()) {
                     merchantMood = 1; // Velho feliz
 
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
                 } else {
                     merchantMood = 2; // Velho puto
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
@@ -694,26 +712,31 @@ if (isPlayerNearMerchant()) {
                     merchantMood = 1; // Velho feliz
 
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
                 } else {
                     merchantMood = 2; // Velho puto
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
                 }
             }
             break;
+
 
             case 3: // Comprar água
             DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1] Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000",
@@ -726,20 +749,24 @@ if (isPlayerNearMerchant()) {
                     merchantMood = 1; // Velho feliz
 
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
                 } else {
                     merchantMood = 2; // Velho puto
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
@@ -751,20 +778,24 @@ if (isPlayerNearMerchant()) {
                     merchantMood = 1; // Velho feliz
 
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
                 } else {
                     merchantMood = 2; // Velho puto
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
@@ -776,26 +807,31 @@ if (isPlayerNearMerchant()) {
                     merchantMood = 1; // Velho feliz
 
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
                 } else {
                     merchantMood = 2; // Velho puto
                     while (!IsKeyPressed(KEY_ENTER)) {
-                        EndDrawing();
+                        UpdateMusicStream(lobbyMusic); // Atualiza a música do lobby continuamente
                         BeginDrawing();
                         DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); // Atualiza sprite
-                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                    100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
                     }
                     isInteractingWithMerchant = 0;
                     merchantMood = 0; // Reseta o humor para neutro
                 }
             }
-            break;}
+            break;
+}
     }
 } else if (mensagem != NULL) {
     DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, true);
