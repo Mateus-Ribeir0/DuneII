@@ -46,7 +46,7 @@ static double mapaEntradaTime = 0.0;
 #define MAX_PADRAO 9
 #define TOTAL_ESPECIARIAS 15
 
-int playerMoney = 0;
+int playerMoney = 30000;
 int deathEmotivaTocando;
 
 Rectangle cerealsSourceRec = { 64, 64, 32, 32 };

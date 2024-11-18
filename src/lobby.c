@@ -586,7 +586,6 @@ if (isPlayerNearMerchant()) {
             case 1: // Vender especiarias
             static int merchantMessage = 0; // Variável auxiliar para rastrear a mensagem a ser exibida
 
-            // Lógica de venda de especiarias
             if (merchantMessage == 0) { // Verifica se a interação acabou de começar
                 if (itemsCollected > 0) {
                     playerMoney += itemsCollected * 300; // Calcula o dinheiro recebido
@@ -597,117 +596,160 @@ if (isPlayerNearMerchant()) {
                 }
             }
 
-            // Exibe a mensagem apropriada
             if (merchantMessage == 1) {
                 DrawDialogBox("Obrigado pela venda, espero que prospere!", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+
+                if (IsKeyPressed(KEY_ENTER)) {
+                    merchantMessage = 0; // Reseta a variável para a próxima interação
+                    isInteractingWithMerchant = 0; // Sai da interação com o mercador
+                }
             } else if (merchantMessage == -1) {
                 DrawDialogBox("Saia daqui, você não tem nenhuma especiaria para negociar!", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-            }
 
-            // Aguarda o jogador pressionar qualquer tecla ou WASD para retornar ao menu anterior
-            if (GetKeyPressed() != 0 || 
-                IsKeyPressed(KEY_W) || IsKeyPressed(KEY_A) || IsKeyPressed(KEY_S) || IsKeyPressed(KEY_D)) {
-                isInteractingWithMerchant = 0; // Sai da interação com o mercador
+                // Bloqueia as outras teclas até que 'ENTER' seja pressionado
+                while (!IsKeyPressed(KEY_ENTER)) {
+                    EndDrawing();
+                    BeginDrawing();
+                    DrawDialogBox("Saia daqui, você não tem nenhuma especiaria para negociar!", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                }
                 merchantMessage = 0; // Reseta a variável para a próxima interação
+                isInteractingWithMerchant = 0; // Sai da interação com o mercador
             }
             break;
 
 
-            case 2: // Comprar bolsa
-                DrawDialogBox("Qual bolsa deseja comprar?\n\n[1] Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000",
-                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
 
-                if (IsKeyPressed(KEY_ONE)) {
-                    if (playerMoney >= 5000) {
-                        MAX_ESPECIARIAS = 12;
-                        playerMoney -= 5000;
+            case 2: // Comprar bolsa
+            DrawDialogBox("Qual bolsa deseja comprar?\n\n[1] Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000",
+                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+
+            if (IsKeyPressed(KEY_ONE)) {
+                if (playerMoney >= 5000) {
+                    MAX_ESPECIARIAS = 12;
+                    playerMoney -= 5000;
+
+                    // Aguarda o jogador pressionar ENTER após a mensagem de sucesso
+                    while (!IsKeyPressed(KEY_ENTER)) {
                         DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                    } else {
-                        // Mensagem para aguardar a ação do usuário
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing(); // Finaliza o frame atual
-                            BeginDrawing(); // Inicia um novo frame
-                        }
-                        isInteractingWithMerchant = 0; // Finaliza interação após tecla pressionada
+                        EndDrawing();
+                        BeginDrawing();
                     }
-                } else if (IsKeyPressed(KEY_TWO)) {
-                    if (playerMoney >= 10000) {
-                        MAX_ESPECIARIAS = 24;
-                        playerMoney -= 10000;
-                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                    } else {
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                            BeginDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
+                    isInteractingWithMerchant = 0; // Finaliza interação após tecla pressionada
+                } else {
+                    // Mensagem para aguardar a ação do usuário
+                    while (!IsKeyPressed(KEY_ENTER)) {
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
+                        BeginDrawing();
                     }
-                } else if (IsKeyPressed(KEY_THREE)) {
-                    if (playerMoney >= 15000) {
-                        MAX_ESPECIARIAS = 32;
-                        playerMoney -= 15000;
-                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                    } else {
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                            BeginDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                    }
+                    isInteractingWithMerchant = 0; // Finaliza interação após tecla pressionada
                 }
-                if (IsKeyPressed(KEY_ENTER)) isInteractingWithMerchant = 0;
-                break;
+            } else if (IsKeyPressed(KEY_TWO)) {
+                if (playerMoney >= 10000) {
+                    MAX_ESPECIARIAS = 24;
+                    playerMoney -= 10000;
+
+                    while (!IsKeyPressed(KEY_ENTER)) {
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        EndDrawing();
+                        BeginDrawing();
+                    }
+                    isInteractingWithMerchant = 0;
+                } else {
+                    while (!IsKeyPressed(KEY_ENTER)) {
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
+                        BeginDrawing();
+                    }
+                    isInteractingWithMerchant = 0;
+                }
+            } else if (IsKeyPressed(KEY_THREE)) {
+                if (playerMoney >= 15000) {
+                    MAX_ESPECIARIAS = 32;
+                    playerMoney -= 15000;
+
+                    while (!IsKeyPressed(KEY_ENTER)) {
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        EndDrawing();
+                        BeginDrawing();
+                    }
+                    isInteractingWithMerchant = 0;
+                } else {
+                    while (!IsKeyPressed(KEY_ENTER)) {
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
+                        BeginDrawing();
+                    }
+                    isInteractingWithMerchant = 0;
+                }
+            }
+            break;
 
             case 3: // Comprar água
-                DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1] Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000",
-                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+            DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1] Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000",
+                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
 
-                if (IsKeyPressed(KEY_ONE)) {
-                    if (playerMoney >= 3000) {
-                        playerWater = fmin(playerWater + GARRAFA_PEQUENA_CAPACIDADE, 100);
-                        playerMoney -= 3000;
+            if (IsKeyPressed(KEY_ONE)) {
+                if (playerMoney >= 3000) {
+                    playerWater = fmin(playerWater + GARRAFA_PEQUENA_CAPACIDADE, 100);
+                    playerMoney -= 3000;
+
+                    // Aguarda o jogador pressionar ENTER após a mensagem de sucesso
+                    while (!IsKeyPressed(KEY_ENTER)) {
                         DrawDialogBox("Obrigado pela compra! Aproveite sua água.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                    } else {
-                        // Mensagem para aguardar a ação do usuário
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                            BeginDrawing();
-                        }
-                        isInteractingWithMerchant = 0; // Finaliza interação após tecla pressionada
+                        EndDrawing();
+                        BeginDrawing();
                     }
-                } else if (IsKeyPressed(KEY_TWO)) {
-                    if (playerMoney >= 5000) {
-                        playerWater = fmin(playerWater + GARRAFA_MEDIA_CAPACIDADE, 100);
-                        playerMoney -= 5000;
-                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                    } else {
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                            BeginDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
+                    isInteractingWithMerchant = 0; // Finaliza interação após tecla pressionada
+                } else {
+                    // Mensagem para aguardar a ação do usuário
+                    while (!IsKeyPressed(KEY_ENTER)) {
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
+                        BeginDrawing();
                     }
-                } else if (IsKeyPressed(KEY_THREE)) {
-                    if (playerMoney >= 7000) {
-                        playerWater = fmin(playerWater + GARRAFA_GRANDE_CAPACIDADE, 100);
-                        playerMoney -= 7000;
-                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                    } else {
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                            BeginDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                    }
+                    isInteractingWithMerchant = 0; // Finaliza interação após tecla pressionada
                 }
-                if (IsKeyPressed(KEY_ENTER)) isInteractingWithMerchant = 0;
-                break;
+            } else if (IsKeyPressed(KEY_TWO)) {
+                if (playerMoney >= 5000) {
+                    playerWater = fmin(playerWater + GARRAFA_MEDIA_CAPACIDADE, 100);
+                    playerMoney -= 5000;
+
+                    while (!IsKeyPressed(KEY_ENTER)) {
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        EndDrawing();
+                        BeginDrawing();
+                    }
+                    isInteractingWithMerchant = 0;
+                } else {
+                    while (!IsKeyPressed(KEY_ENTER)) {
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
+                        BeginDrawing();
+                    }
+                    isInteractingWithMerchant = 0;
+                }
+            } else if (IsKeyPressed(KEY_THREE)) {
+                if (playerMoney >= 7000) {
+                    playerWater = fmin(playerWater + GARRAFA_GRANDE_CAPACIDADE, 100);
+                    playerMoney -= 7000;
+
+                    while (!IsKeyPressed(KEY_ENTER)) {
+                        DrawDialogBox("Obrigado pela compra! Aproveite sua água.", 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                        EndDrawing();
+                        BeginDrawing();
+                    }
+                    isInteractingWithMerchant = 0;
+                } else {
+                    while (!IsKeyPressed(KEY_ENTER)) {
+                        DrawDialogBox("Você não tem dinheiro suficiente para essa compra.", 100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                        EndDrawing();
+                        BeginDrawing();
+                    }
+                    isInteractingWithMerchant = 0;
+                }
+            }
+            break;
 
         }
     }
