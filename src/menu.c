@@ -271,13 +271,25 @@ void desenharMenu(GameScreen currentScreen) {
 
     if (currentScreen == TITLE) {
         desenharBackgroundComLogo();
-        DrawText("Pressione ENTER para Jogar", SCREEN_WIDTH / 2 - 150, 400, 20, WHITE);
-        DrawText("Pressione R para Rankings", SCREEN_WIDTH / 2 - 150, 650, 20, WHITE);
-        DrawText("Pressione C para Controles", SCREEN_WIDTH / 2 - 150, 600, 20, WHITE);
-    } 
+
+        // Texto principal centralizado, agora mais para baixo
+        int mainTextY = 400; // Linha base para "Pressione ENTER para Jogar"
+        DrawText("Pressione [ENTER] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 30) / 2, mainTextY, 30, WHITE);
+
+        // Alinhamento e espaçamento para Rankings e Controles
+        int optionsY = mainTextY + 100; // Mais abaixo do texto principal
+        int spacingX = 50; // Espaço horizontal entre as opções
+        int textSize = 25; // Tamanho da fonte das opções
+
+        // Alinhamento horizontal das opções
+        int centerX = SCREEN_WIDTH / 2;
+        DrawText("[R] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, textSize, WHITE);
+        DrawText("[C] Controles", centerX + spacingX, optionsY, textSize, WHITE);
+    }
 
     EndDrawing();
 }
+
 
 void finalizarMenu() {
     UnloadTexture(background);
