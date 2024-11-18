@@ -202,7 +202,7 @@ void iniciarMenu(GameScreen *currentScreen) {
 
     background = LoadTexture("static/image/fundo2.png");
     logo = LoadTexture("static/image/logonova.png");
-    titleMusic = LoadMusicStream("static/music/epicversion3.wav");
+    titleMusic = LoadMusicStream("static/music/epicversion3.mp3");
 
     PlayMusicStream(titleMusic);
     SetTargetFPS(60);
@@ -254,7 +254,7 @@ void exibirObjetivo(GameScreen *currentScreen) {
         Vector2 origin = { 0.0f, 0.0f };
 
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        //ClearBackground(RAYWHITE);
         DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE);
         EndDrawing();
 
@@ -267,17 +267,29 @@ void exibirObjetivo(GameScreen *currentScreen) {
 
 void desenharMenu(GameScreen currentScreen) {
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+    //ClearBackground(RAYWHITE);
 
     if (currentScreen == TITLE) {
         desenharBackgroundComLogo();
-        DrawText("Pressione ENTER para Jogar", SCREEN_WIDTH / 2 - 150, 400, 20, WHITE);
-        DrawText("Pressione R para Rankings", SCREEN_WIDTH / 2 - 150, 650, 20, WHITE);
-        DrawText("Pressione C para Controles", SCREEN_WIDTH / 2 - 150, 600, 20, WHITE);
-    } 
+
+        // Texto principal centralizado, agora mais para baixo
+        int mainTextY = 400; // Linha base para "Pressione ENTER para Jogar"
+        DrawText("Pressione [ENTER] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 30) / 2, mainTextY, 30, WHITE);
+
+        // Alinhamento e espaçamento para Rankings e Controles
+        int optionsY = mainTextY + 100; // Mais abaixo do texto principal
+        int spacingX = 50; // Espaço horizontal entre as opções
+        int textSize = 25; // Tamanho da fonte das opções
+
+        // Alinhamento horizontal das opções
+        int centerX = SCREEN_WIDTH / 2;
+        DrawText("[R] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, textSize, WHITE);
+        DrawText("[C] Controles", centerX + spacingX, optionsY, textSize, WHITE);
+    }
 
     EndDrawing();
 }
+
 
 void finalizarMenu() {
     UnloadTexture(background);

@@ -133,13 +133,13 @@ void iniciarGame() {
     map0 = LoadTexture("static/image/map0.png");
     EpressSprite = LoadTexture("static/image/Epress.png");
 
-    musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
-    musicaMapa1 = LoadSound("static/music/mapa1musica.wav");
-    musicaMapa2 = LoadSound("static/music/mapa2musica.wav");
+    musicaMapa0 = LoadSound("static/music/mapa0musica.mp3");
+    musicaMapa1 = LoadSound("static/music/mapa1musica.mp3");
+    musicaMapa2 = LoadSound("static/music/mapa2musica.mp3");
     spellCastSound = LoadSound("static/music/spellcast.mp3");
     gameOverSound = LoadSound("static/music/deathsfx2.wav");
     barulhoMonstro = LoadSound("static/music/monster.mp3");
-    deathEmotiva = LoadSound("static/music/deathemotiva.wav");
+    deathEmotiva = LoadSound("static/music/deathemotiva.mp3");
     monsterGrowl2 = LoadSound("static/music/monsterGrowl2.wav");
 
     initializeLoadingScreen();
@@ -291,16 +291,16 @@ Point posicoesDunasMapa3[DUNAS_MAPA3] = {
 
 Rectangle vendinhaCollisionBox = {20 + (123 * 0.8) / 4, 20 + (120 * 0.8) / 4, (123 * 0.8) / 2, (120 * 0.8) / 2};
 Rectangle cityCollisionBoxes[] = {
-    {800 + 10, 4 + 30, 90 * 0.5, 162 * 0.2},      
-    {890 + 5, 36 + 10, 132 * 0.5, 120 * 0.4},
-    {572 + 5, 38 + 10, 132 * 0.5, 120 * 0.4},         
-    {1000 + 10, 36 + 10, 150 * 0.7, 126 * 0.4},    
+    {800 + 50, 4 + 30, 120 * 0.5, 200 * 0.4},      
+    {890 + 5, 36 + 10, 132 * 0.5, 200 * 0.4},
+    {572 + 5, 38 + 10, 132 * 0.5, 200 * 0.4},         
+    {1000 + 10, 36 + 10, 150 * 0.7, 200 * 0.4},    
     {300 + 5, 380 + 5 + (138 * 0.8) * 0.85, 90 * 0.7, (138 * 0.8) * 0.1},
     {200 + 5, 376 + 10 + (144 * 0.6) * 0.85, 96 * 0.6, (144 * 0.7) * 0.3},
     {100 + 5, 354 + 10 + (168 * 0.6) * 0.85, 96 * 0.6, (168 * 0.7) * 0.3},
     {120 + 10 + (55 * 0.7) * 0.1, 600 + 5 + (55 * 0.7) * 0.1, (55 * 0.7) * 0.6, (55 * 0.7) * 0.6},
     {18 + 15, 478 + 5, 84 * 0.7, 72 * 0.4},
-    {684 + 15, 2 + 30, 138 * 0.8, 168 * 0.3},
+    {684 + 15, 2 + 30, 138 * 0.8, 200 * 0.4},
     {760 + 10, 200 + 5, 90 * 0.3, 63 * 0.3},
 
 

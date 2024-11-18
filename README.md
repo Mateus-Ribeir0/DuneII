@@ -15,14 +15,7 @@ Bem-vindo ao Dune Game! Siga estas instruções para compilar e jogar o jogo.
     make
     ```
 
-3. **Execute o jogo** com o script automático:
+3. **Execute o jogo** com o comando `run`:
     ```bash
-    ./run.sh
+    ./dune_game
     ```
-
-O jogo tentará iniciar automaticamente e, se houver algum problema, ele tentará novamente até que tudo esteja funcionando corretamente.
-
-## Problemas Comuns
-
-- Se o jogo não rodar, verifique se todas as dependências estão instaladas corretamente.
-- Caso precise de ajuda, consulte o suporte ou a documentação para resolver problemas específicos.
