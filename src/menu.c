@@ -202,7 +202,7 @@ void iniciarMenu(GameScreen *currentScreen) {
 
     background = LoadTexture("static/image/fundo2.png");
     logo = LoadTexture("static/image/logonova.png");
-    titleMusic = LoadMusicStream("static/music/epicversion3.wav");
+    titleMusic = LoadMusicStream("static/music/epicversion3.mp3");
 
     PlayMusicStream(titleMusic);
     SetTargetFPS(60);
@@ -254,7 +254,7 @@ void exibirObjetivo(GameScreen *currentScreen) {
         Vector2 origin = { 0.0f, 0.0f };
 
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        //ClearBackground(RAYWHITE);
         DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE);
         EndDrawing();
 
@@ -267,7 +267,7 @@ void exibirObjetivo(GameScreen *currentScreen) {
 
 void desenharMenu(GameScreen currentScreen) {
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+    //ClearBackground(RAYWHITE);
 
     if (currentScreen == TITLE) {
         desenharBackgroundComLogo();

@@ -133,13 +133,13 @@ void iniciarGame() {
     map0 = LoadTexture("static/image/map0.png");
     EpressSprite = LoadTexture("static/image/Epress.png");
 
-    musicaMapa0 = LoadSound("static/music/mapa0musica.wav");
-    musicaMapa1 = LoadSound("static/music/mapa1musica.wav");
-    musicaMapa2 = LoadSound("static/music/mapa2musica.wav");
+    musicaMapa0 = LoadSound("static/music/mapa0musica.mp3");
+    musicaMapa1 = LoadSound("static/music/mapa1musica.mp3");
+    musicaMapa2 = LoadSound("static/music/mapa2musica.mp3");
     spellCastSound = LoadSound("static/music/spellcast.mp3");
     gameOverSound = LoadSound("static/music/deathsfx2.wav");
     barulhoMonstro = LoadSound("static/music/monster.mp3");
-    deathEmotiva = LoadSound("static/music/deathemotiva.wav");
+    deathEmotiva = LoadSound("static/music/deathemotiva.mp3");
     monsterGrowl2 = LoadSound("static/music/monsterGrowl2.wav");
 
     initializeLoadingScreen();

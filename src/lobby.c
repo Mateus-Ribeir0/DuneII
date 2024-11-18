@@ -16,6 +16,7 @@ static Texture2D bonesTexture;
 static Texture2D monstersTexture;
 static Sound troca;
 static Music lobbyMusic; 
+static Texture2D sombra;
 
 // Variáveis Globias
 int isInteractingWithMerchant = 0;
@@ -57,6 +58,7 @@ void iniciarLobby() {
     troca = LoadSound("static/music/trocaDeDinheiro.wav");
     monstersTexture = LoadTexture("static/image/monsters.png");
     bonesTexture = LoadTexture("static/image/bones.png");
+    sombra = LoadTexture("static/image/sombras.png");
 
     if (!isMusicPlaying) {
         lobbyMusic = LoadMusicStream("static/music/Musica_lobby.mp3");
@@ -442,8 +444,10 @@ void drawLobby() {
     Rectangle destRecPersonagem = { positionPersonagem.x - 32, positionPersonagem.y - 32, 96, 96 };
 
     if (isWalking) {
+        DrawTexturePro(sombra, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
         DrawTexturePro(personagemAndando, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
     } else {
+        DrawTexturePro(sombra, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
         DrawTexturePro(personagem, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
