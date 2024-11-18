@@ -120,7 +120,7 @@ void displayCutscene(Texture2D image, const char* text, Music titleMusic, float 
 
         if (charactersToShow < strlen(text)) {
             frameCount++;
-            charactersToShow = (frameCount / (duration * 50)) * strlen(text);
+            charactersToShow = (frameCount / (duration * 20)) * strlen(text);
             if (charactersToShow > strlen(text)) charactersToShow = strlen(text);
         }
 

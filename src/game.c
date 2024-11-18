@@ -1090,7 +1090,6 @@ void playGame(GameScreen *currentScreen) {
                 atualizarRanking(playerName, playerMoney);
                 zerarMonetaria();
                 resetarJogo();
-                ClearBackground(RAYWHITE);
                 *currentScreen = RANKINGS;
                 return;
             }
@@ -1119,7 +1118,7 @@ void playGame(GameScreen *currentScreen) {
         if (isMonsterActive) {
             double elapsedTime = GetTime() - monsterStartTime;
 
-            if (elapsedTime >= 1.0) { // Lógica e sprite só começam 1 segundo depois
+            if (elapsedTime >= 0.5) { // Lógica e sprite só começam 1 segundo depois
                 BeginDrawing();
 
                 // Alternar os frames do sprite a cada 0.2 segundos
@@ -1190,7 +1189,6 @@ void playGame(GameScreen *currentScreen) {
                 atualizarRanking(playerName, playerMoney);
                 zerarMonetaria();
                 resetarJogo();
-                ClearBackground(RAYWHITE);
                 *currentScreen = RANKINGS;
                 return;
             }
