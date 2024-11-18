@@ -63,7 +63,7 @@ void iniciarLobby() {
     if (!isMusicPlaying) {
         lobbyMusic = LoadMusicStream("static/music/Musica_lobby.mp3");
         PlayMusicStream(lobbyMusic);
-        SetMusicVolume(lobbyMusic, 2.0f);
+        //SetMusicVolume(lobbyMusic, 2.0f);
         isMusicPlaying = true; 
     } else {
         ResumeMusicStream(lobbyMusic);
@@ -367,7 +367,7 @@ void drawLobby() {
     Vector2 positionCity13 = { 1000, 280 };
     Vector2 positionCity14 = { 1140, 150 }; 
     Vector2 positionCity15 = { 1, 630 };
-    Vector2 positionCity16 = { 950, 400 };
+    Vector2 positionCity16 = { 300, 220 };
     Vector2 positionCity17 = { 64, 280 };
     Vector2 positionCity18 = { 576, 38 }; 
 

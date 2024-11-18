@@ -75,3 +75,7 @@ extern double lastWaterUpdateTime;
 
 
 #endif
+
+//SetMusicVolume(lobbyMusic, 0.5f);
+//SetMusicVolume(lobbyMusic, 0.5f);
+//SetSoundVolume(troca, 0.3f);

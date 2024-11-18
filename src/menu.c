@@ -153,7 +153,7 @@ void cutsceneArrakis() {
 
     float speed = 30.0f; 
     float scale = 0.6f;
-    float duration = 7.9f;
+    float duration = 7.0f;
 
     Texture2D cutsceneImage1 = LoadTexture("static/image/cutscene2.png");
     displayCutscene(cutsceneImage1, text1, titleMusic, speed, scale, duration);
@@ -221,6 +221,8 @@ void atualizarMenu(GameScreen *currentScreen) {
 
     controlssfx = LoadSound("static/music/controls.wav");
     rankingssfx = LoadSound("static/music/rankings.wav");
+    SetSoundVolume(controlssfx, 0.6f);
+    SetSoundVolume(rankingssfx, 0.6f);
 
     if (*currentScreen == TITLE) {
         backgroundPosX += 0.2f;

@@ -72,6 +72,7 @@ void exibirRankingScreen(GameScreen *currentScreen) {
 
     backgroundTexture = LoadTexture("static/image/fundo2.png");
     rankingMusic = LoadSound("static/music/musica.mp3");
+    SetSoundVolume(rankingMusic, 0.6f);
     PlaySound(rankingMusic);
 
     int paginaAtual = 0;
