@@ -8,6 +8,8 @@ Para isso, você vai numa missão no deserto de Arrakis, podendo se deslocar par
 
 Os vermes de areias são ativados por movimentos rítmicos, então tente não repetir seus passos no deserto, para que você não morra.
 
+Esporadicamente, há a chance de vermes se movimentando pelas profundezas da areia, sentirem sua presença. Para não ser detectado, se mantenha parado e pressione E repetidamente para se manter imóvel.
+
 Sua água acaba com o tempo, e você pode morrer por isso. Troque suas especiarias por mais água para que consiga sobreviver.
 
 O que lhe dá pontuação é vender suas especiarias, então concilie bem sua sobrevivência, com suas recompensas.
