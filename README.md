@@ -45,7 +45,15 @@ Este jogo utiliza a biblioteca gráfica **Raylib**. Veja como configurá-la no s
 
 2. Baixe e compile a Raylib:
    
-   git clone https://github.com/raysan5/raylib.git
+   ```git clone https://github.com/raysan5/raylib.git
    cd raylib/src
    make PLATFORM=PLATFORM_DESKTOP
    sudo make install
+
+3. Vá para o diretório do jogo:
+
+  ```cd DuneII```
+
+4. Compile o jogo e rode:
+   ```make
+   ./dune_game
