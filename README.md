@@ -33,71 +33,66 @@ Bem-vindo ao **Dune II**, um jogo inspirado no épico universo de Duna. Sua miss
 
 ---
 
-## **Como Configurar e Executar**
+## Para instalar no Linux:
 
-Este jogo utiliza a biblioteca gráfica **Raylib**. Veja como configurá-la no seu sistema
+1. Baixe os essenciais:
+```
+sudo apt install build-essential git
+```
 
-### **Linux**
-1. Instale as dependências:
-   ```bash
-   sudo apt update
-   sudo apt install build-essential libgl1-mesa-dev libopenal-dev libx11-dev
+2.  Instale as dependências:
+```
+ sudo apt update
+ sudo apt install build-essential libgl1-mesa-dev libopenal-dev libx11-dev
+```
 
-2. Baixe e compile a Raylib:
-   
-   ```git clone https://github.com/raysan5/raylib.git
-   cd raylib/src
-   make PLATFORM=PLATFORM_DESKTOP
-   sudo make install
+3.  Baixe o código-fonte do Raylib diretamente do GitHub e entre na pasta:
+```
+git clone https://github.com/raysan5/raylib.git
+cd raylib/src
+make PLATFORM=PLATFORM_DESKTOP
+sudo make install
+```
 
-3. Vá para o diretório do jogo:
+4.  Clone o repositório do jogo:
+```
+git clone https://github.com/Mateus-Ribeir0/DuneII
+cd DuneII
+```
 
-    ```cd DuneII```
+5.  Compile e rode o jogo:
+```
+make
+./dune_game
+```
+Caso houver algum imprevisto, consulte a documentação da Raylib para Linux: [Raylib em Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux).
 
-4. Compile o jogo e rode:
-   ```make```
-   ```./dune_game```
+<br>
 
+## Mac:
 
-### **Mac**
+1. Instale o HomeBrew:
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
-1. Caso não queira buildar por você mesmo, instale o HomeBrew:
+2. Use o Homebrew para instalar o compilador GCC e a Raylib:
+```
+brew install gcc
+brew install raylib
+```
 
-  ```/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"```
+3. Clone o repositório do jogo:
+```
+git clone https://github.com/Mateus-Ribeir0/DuneII
+cd DuneII
+```
 
-2. Assim que tiver instalado, coloque no terminal:
+4. Compile e rode o jogo:
+```
+make
+```
 
-  ```brew install raylib```
-  ```brew install gcc```
-  
-3. Clone o repositório:
-   ```git clone https://github.com/Mateus-Ribeir0/DuneII
-   cd DuneII
+Caso houver algum imprevisto, consulte a documentação da Raylib para Mac: [Raylib em Mac](https://github.com/raysan5/raylib/wiki/Working-on-macOS).
 
-3. Compile o jogo:
-
-  ```make```
-
-4. Execute o jogo:
-
-  ```./dune_game```
-
-Caso tenha alguma dúvida, siga o tutorial da própria documentação da Raylib: [Tutorial da Raylib](https://github.com/raysan5/raylib/wiki/Working-on-macOS)
-
-
-### **Windows**
-
-1. Instale o MinGW:
-  ```Certifique-se de instalar o pacote de compilador GCC.```
-
-2. Baixe os arquivos pré-compilados da Raylib:
-  [Binários da Raylib](https://github.com/raysan5/raylib/releases)
-
-3. Inclua os diretórios da Raylib no MinGW:
-   ```Adicione o caminho da biblioteca ao PATH ou especifique-o ao compilar```
-
-4. Compile e Execute:
-   ```gcc -o duna_game.exe main.c -lraylib -lopengl32 -lgdi32 -lwinmm
-   duna_game.exe
-
-
+---
