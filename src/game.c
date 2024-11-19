@@ -40,6 +40,7 @@ static Texture2D EpressSprite;
 static float spriteAnimationTimer = 0.0f;
 static int spriteFrameIndex = 0; // 0 ou 1 para alternar entre os dois frames
 static double mapaEntradaTime = 0.0;
+static Texture2D monsters;
 
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
@@ -132,6 +133,7 @@ void iniciarGame() {
     sombra = LoadTexture("static/image/sombras.png");
     map0 = LoadTexture("static/image/map0.png");
     EpressSprite = LoadTexture("static/image/Epress.png");
+    monsters = LoadTexture("static/image/monsters.png");
 
     musicaMapa0 = LoadSound("static/music/mapa0musica.mp3");
     SetSoundVolume(musicaMapa0, 0.7f);
@@ -651,25 +653,22 @@ void drawGame() {
     // Desenha bones.png no mapa 2
     DrawTexturePro(bonesTexture, bonesSourceRect3, bonesDestRect3, (Vector2){0, 0}, 0.0f, WHITE);
 
-    Rectangle bonesSourceRect4 = {387, 387, 38, 30};  // Fonte da imagem bones.png
-    Vector2 bonesPosition4 = {34 * TILE_SIZE, 7 * TILE_SIZE};  // Posição no mapa 2
-    Rectangle bonesDestRect4 = {bonesPosition4.x, bonesPosition4.y, 38, 30};  // Destino com as dimensões da imagem
+    Rectangle bonesSourceRect4 = {387, 387, 38, 30};
+    Vector2 bonesPosition4 = {34 * TILE_SIZE, 7 * TILE_SIZE};
+    Rectangle bonesDestRect4 = {bonesPosition4.x, bonesPosition4.y, 38, 30};
 
-    // Desenha bones.png no mapa 2
     DrawTexturePro(bonesTexture, bonesSourceRect4, bonesDestRect4, (Vector2){0, 0}, 0.0f, WHITE);
 
-    Rectangle bonesSourceRect5 = {194, 428, 24, 38};  // Fonte da imagem bones.png
-    Vector2 bonesPosition5 = {38 * TILE_SIZE, 18 * TILE_SIZE};  // Posição no mapa 2
-    Rectangle bonesDestRect5 = {bonesPosition5.x, bonesPosition5.y, 24, 38};  // Destino com as dimensões da imagem
+    Rectangle bonesSourceRect5 = {194, 428, 24, 38};
+    Vector2 bonesPosition5 = {38 * TILE_SIZE, 18 * TILE_SIZE};
+    Rectangle bonesDestRect5 = {bonesPosition5.x, bonesPosition5.y, 24, 38};
 
-    // Desenha bones.png no mapa 2
     DrawTexturePro(bonesTexture, bonesSourceRect5, bonesDestRect5, (Vector2){0, 0}, 0.0f, WHITE);
 
-    Rectangle bonesSourceRect6 = {194, 428, 24, 38};  // Fonte da imagem bones.png
-    Vector2 bonesPosition6 = {29 * TILE_SIZE, 20 * TILE_SIZE};  // Posição no mapa 2
-    Rectangle bonesDestRect6 = {bonesPosition6.x, bonesPosition6.y, 24, 38};  // Destino com as dimensões da imagem
+    Rectangle bonesSourceRect6 = {194, 428, 24, 38}; 
+    Vector2 bonesPosition6 = {29 * TILE_SIZE, 20 * TILE_SIZE};
+    Rectangle bonesDestRect6 = {bonesPosition6.x, bonesPosition6.y, 24, 38};
 
-    // Desenha bones.png no mapa 2
     DrawTexturePro(bonesTexture, bonesSourceRect6, bonesDestRect6, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
@@ -774,7 +773,6 @@ void drawGame() {
     DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, (Vector2){0, 0}, 0.0f, WHITE);
     DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
 
-    //Animação do portal
     portalAnimationTimer += GetFrameTime();
     if (portalAnimationTimer >= 0.1) {
         portalAnimationTimer = 0.0f;
@@ -788,12 +786,12 @@ void drawGame() {
     Rectangle portalDestRec = {PORTAL_RETORNO_X * TILE_SIZE, PORTAL_RETORNO_Y * TILE_SIZE, TILE_SIZE * PORTAL_RETORNO_LARGURA, TILE_SIZE * PORTAL_RETORNO_ALTURA};
 
     DrawTexturePro(portal, portalSourceRec, portalDestRec, (Vector2){0, 0}, 0.0f, WHITE);
-    //Fim do portal
 
     if (mensagem != NULL) {
         DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, false);
     }
 }
+
 
 int contar_ocorrencias_consecutivas(const char *historico, const char *padrao, size_t padrao_len) {
     int contagem = 0;
@@ -965,7 +963,6 @@ void playGame(GameScreen *currentScreen) {
             movePlayer(dx, dy);
             checkItemCollection();
 
-            // Verifica se o jogador está em uma safezone antes de adicionar ao histórico
             bool emSafeZone = (
                 (mapaAtual == 0 && ((player_x >= 20 && player_x < 23 && player_y >= 20 && player_y < 22) || 
                                     (player_x >= 10 && player_x < 12 && player_y >= 15 && player_y < 17) ||
@@ -1012,36 +1009,47 @@ void playGame(GameScreen *currentScreen) {
                 Texture2D personagemMorto = LoadTexture("static/image/dead.png");
                 ClearBackground(BLACK);
                 desenharAnimacaoMorte(personagem, personagemMorto);
-                DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
-                sleep(3);
-
                 deathEmotivaTocando = 1;
                 PlaySound(deathEmotiva);
+                sleep(3);
 
-                Vector2 spritePos = {GetScreenWidth() / 2, GetScreenHeight() / 2}; // Posição inicial do sprite no centro
-                float scale = 10.0f; // Fator de escala para aumentar o sprite
+                Vector2 spritePos = {GetScreenWidth() / 2, GetScreenHeight() / 2};
+                float scale = 10.0f;
                 Rectangle frames[3] = {
                     {128, 192, 64, 64},
                     {64, 192, 64, 64},
                     {0, 192, 64, 64}
                 };
                 int frameIndex = 0;
-                float frameTime = 1.0f; // Tempo para trocar de frame
-                float moveSpeed = 20.0f; // Velocidade de movimento para a esquerda
-                float startTime = GetTime(); // Tempo inicial
+                float frameTime = 1.0f;
+                float moveSpeed = 20.0f;
+                float startTime = GetTime();
                 float elapsedTime = 0.0f;
-                float maxScreenTime = 5.0f; // Duração máxima da tela em segundos
+                float maxScreenTime = 5.0f;
 
                 PlaySound(barulhoMonstro);
+                Vector2 monstersPos = {850, spritePos.y};
 
-                while ((GetTime() - startTime < maxScreenTime) && !WindowShouldClose()) { // Tela termina após 5 segundos
+                while ((GetTime() - startTime < maxScreenTime) && !WindowShouldClose()) {
                     BeginDrawing();
                     ClearBackground(BLACK);
 
-                    // Atualiza o tempo decorrido para controlar o frame atual
                     elapsedTime = GetTime() - startTime;
 
-                    // Calcule a posição de destino e dimensões para o DrawTexturePro
+                    Rectangle destMonsters = {monstersPos.x, monstersPos.y, 128 * scale, 128 * scale};
+                    Rectangle srcMonsters;
+                    Vector2 originMonsters = {64 * scale, 64 * scale};
+
+                    if (frameIndex == 0) {
+                        srcMonsters = (Rectangle){352, 320, 128, 128};
+                    } else if (frameIndex == 1) {
+                        srcMonsters = (Rectangle){240, 320, 128, 128};
+                    } else if (frameIndex == 2) {
+                        srcMonsters = (Rectangle){128, 320, 128, 128};
+                    }
+
+                    DrawTexturePro(monsters, srcMonsters, destMonsters, originMonsters, 0.0f, WHITE);
+
                     Rectangle dest = {
                         spritePos.x, spritePos.y,
                         frames[frameIndex].width * scale,
@@ -1049,16 +1057,16 @@ void playGame(GameScreen *currentScreen) {
                     };
                     Vector2 origin = {frames[frameIndex].width / 2, frames[frameIndex].height / 2};
 
-                    // Desenha o frame atual
                     DrawTexturePro(personagemMorto, frames[frameIndex], dest, origin, 0.0f, WHITE);
 
-                    // Atualiza a posição do sprite para a esquerda continuamente
                     spritePos.x -= moveSpeed * GetFrameTime();
+                    monstersPos.x -= moveSpeed * GetFrameTime();
 
-                    // Atualiza o frame apenas uma vez a cada 0.2 segundos, até o último frame
                     if (elapsedTime >= frameTime * (frameIndex + 1) && frameIndex < 2) {
                         frameIndex++;
                     }
+
+                    DrawText(TextFormat("GAME OVER - Padrão repetido: \"%s\" encontrado", padrao_encontrado), 10, 40, 20, RED);
 
                     EndDrawing();
 
@@ -1099,30 +1107,38 @@ void playGame(GameScreen *currentScreen) {
             }
         }
         static double nextMonsterCheckTime = 0.0;
+        static int lastMap = -1; // Variável para rastrear o último mapa
 
+        // Verifica se o jogador entrou em um novo mapa
+        if (mapaAtual != lastMap) { // Mudança de mapa detectada
+            lastMap = mapaAtual;    // Atualiza o mapa atual
+            // Define um intervalo aleatório entre 6 e 10 segundos antes de verificar a lógica do monstro
+            nextMonsterCheckTime = GetTime() + GetRandomValue(6, 10);
+            isMonsterActive = false; // Desativa qualquer monstro ativo
+        }
+
+        // Verifica a lógica do monstro
         if (!isMonsterActive && GetTime() >= nextMonsterCheckTime) {
-            // Verificar se passaram 20 segundos desde o início do jogo
-            if (GetTime() > 20.0) {
-                // Reduzindo a chance para 33%
-                if (GetRandomValue(1, 100) <= 33) {
-                    PlaySound(monsterGrowl2);
-                    SetSoundVolume(monsterGrowl2, 1.0f); // Volume máximo
-                    isMonsterActive = true;
-                    monsterStartTime = GetTime();
-                    lastEPressTime = 0.0;
-                    ePressCount = 0;
-                    spriteFrameIndex = 0; // Reiniciar o frame
-                    spriteAnimationTimer = 0.0f;
-                }
+            // Chance de 1/3 para ativar o monstro
+            if (GetRandomValue(1, 100) <= 33) {
+                PlaySound(monsterGrowl2);
+                SetSoundVolume(monsterGrowl2, 1.0f); // Volume máximo
+                isMonsterActive = true;
+                monsterStartTime = GetTime();
+                lastEPressTime = 0.0;
+                ePressCount = 0;
+                spriteFrameIndex = 0; // Reiniciar o frame
+                spriteAnimationTimer = 0.0f;
             }
-            // Atualizar o próximo tempo de verificação
+
+            // Atualizar o próximo tempo de verificação, mesmo se o monstro não ativar
             nextMonsterCheckTime = GetTime() + 20.0; // Checar novamente em 20 segundos
         }
 
         if (isMonsterActive) {
             double elapsedTime = GetTime() - monsterStartTime;
 
-            if (elapsedTime >= 0.5) { // Lógica e sprite só começam 1 segundo depois
+            if (elapsedTime >= 0.5) { // Lógica e sprite só começam 0.5 segundos depois
                 BeginDrawing();
 
                 // Alternar os frames do sprite a cada 0.2 segundos
@@ -1133,11 +1149,11 @@ void playGame(GameScreen *currentScreen) {
                 }
 
                 // Calcular a posição ao lado direito do jogador
-                Vector2 spritePosition = { player_x * TILE_SIZE + TILE_SIZE, player_y * TILE_SIZE };
+                Vector2 spritePosition = {player_x * TILE_SIZE + TILE_SIZE, player_y * TILE_SIZE};
                 Rectangle sourceRec = (spriteFrameIndex == 0)
                                         ? (Rectangle){160, 192, 704, 656}
                                         : (Rectangle){160, 2336, 704, 560};
-                Rectangle destRec = { spritePosition.x, spritePosition.y, 48, 48 }; // Reduzido para 48x48
+                Rectangle destRec = {spritePosition.x, spritePosition.y, 48, 48}; // Reduzido para 48x48
                 Vector2 origin = {0, 0};
 
                 DrawTexturePro(EpressSprite, sourceRec, destRec, origin, 0.0f, WHITE);
@@ -1156,7 +1172,6 @@ void playGame(GameScreen *currentScreen) {
 
                     // Jogador escapa após pressionar 'E' 3 vezes
                     if (ePressCount >= 3) {
-                        // O jogador está salvo, mas o som e o sprite permanecem até o som terminar
                         isMonsterActive = false; // Evita mortes subsequentes
                     }
                 }
@@ -1189,6 +1204,8 @@ void playGame(GameScreen *currentScreen) {
                 desenharAnimacaoMorte(personagem, personagemMorto);
                 DrawText("GAME OVER - Você foi pego pelo monstro!", 10, 40, 20, RED);
                 sleep(3);
+
+                
 
                 atualizarRanking(playerName, playerMoney);
                 zerarMonetaria();
