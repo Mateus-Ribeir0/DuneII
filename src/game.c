@@ -1106,7 +1106,7 @@ void playGame(GameScreen *currentScreen) {
 
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
-                float tempoPorCaractere = 0.5f;
+                float tempoPorCaractere = 0.2f;
                 float timer = 0;
 
                 while (caractereExibido < strlen(euFalhei) && !WindowShouldClose()) {
@@ -1283,7 +1283,7 @@ void playGame(GameScreen *currentScreen) {
 
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
-                float tempoPorCaractere = 0.5f;
+                float tempoPorCaractere = 0.2f;
                 float timer = 0;
 
                 while (caractereExibido < strlen(euFalhei) && !WindowShouldClose()) {
