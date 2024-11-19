@@ -67,7 +67,9 @@ Este jogo utiliza a biblioteca gráfica **Raylib**. Veja como configurá-la no s
 
 2. Assim que tiver instalado, coloque no terminal:
 
-  ```brew install raylib```
+  ```brew install gcc
+  brew install raylib
+  
 
 3. Clone o repositório:
    ```git clone https://github.com/Mateus-Ribeir0/DuneII```
