@@ -1,4 +1,4 @@
-# **Duna II**
+# **Dune II**
 
 Bem-vindo ao **Dune II**, um jogo inspirado no épico universo de Duna. Sua missão é sobreviver aos perigos do deserto de Arrakis enquanto coleta especiarias valiosas para prosperar sua casa.
 
@@ -76,3 +76,21 @@ Este jogo utiliza a biblioteca gráfica **Raylib**. Veja como configurá-la no s
 4. Execute o jogo:
 
   ```./dune_game```
+
+
+### **Windows**
+
+1. Instale o MinGW:
+  ```Certifique-se de instalar o pacote de compilador GCC.```
+
+2. Baixe os arquivos pré-compilados da Raylib:
+  [Binários da Raylib](https://github.com/raysan5/raylib/releases)
+
+3. Inclua os diretórios da Raylib no MinGW:
+   ```Adicione o caminho da biblioteca ao PATH ou especifique-o ao compilar```
+
+4. Compile e Execute:
+   ```gcc -o duna_game.exe main.c -lraylib -lopengl32 -lgdi32 -lwinmm
+   duna_game.exe
+
+
