@@ -32,15 +32,17 @@ static Texture2D portal;
 static Texture2D sombra;
 static Texture2D map0;
 static Sound monsterGrowl2;
-static bool isMonsterActive = false; // Se o evento do monstro está ativo
-static double monsterStartTime = 0.0; // Quando o som começou
-static double lastEPressTime = 0.0; // Último tempo em que o jogador pressionou 'E'
-static int ePressCount = 0; // Contador de pressionamentos da tecla 'E'
+static bool isMonsterActive = false;
+static double monsterStartTime = 0.0;
+static double lastEPressTime = 0.0;
+static int ePressCount = 0;
 static Texture2D EpressSprite;
 static float spriteAnimationTimer = 0.0f;
-static int spriteFrameIndex = 0; // 0 ou 1 para alternar entre os dois frames
+static int spriteFrameIndex = 0;
 static double mapaEntradaTime = 0.0;
 static Texture2D monsters;
+static double nextMonsterCheckTime = 0.0;
+static int lastMap = -1;
 
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
@@ -281,18 +283,17 @@ Vector2 posicoesPedras[NUM_PEDRAS] = {
 
 Point posicoesDunasMapa1[DUNAS_MAPA1] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5} };
 Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}};
-// Posições ajustadas para as zonas de colisão no mapa 2, baseadas nas posições e tamanhos das sprites
 Point posicoesDunasMapa3[DUNAS_MAPA3] = {
-    {8, 8},   // Ajustado para o sprite 1 de 67x80 na posição (10, 9)
-    {14, 12}, // Ajustado para o sprite 1 de 67x80 na posição (15, 12)
-    {22, 16}, // Ajustado para o sprite 2 de 66x54 na posição (25, 18)
-    {4, 18},  // Ajustado para o sprite 2 de 66x54 na posição (5, 17)
-    {28, 6},  // Ajustado para o sprite 3 de 46x46 na posição (35, 5)
-    {18, 10}, // Ajustado para o sprite 3 de 46x46 na posição (20, 10)
-    {10, 14}, // Ajustado para o sprite 3 de 46x46 na posição (12, 14)
-    {26, 4},  // Ajustado para o sprite 4 de 40x39 na posição (28, 6)
-    {6, 20},  // Ajustado para o sprite 4 de 40x39 na posição (7, 19)
-    {16, 2}   // Ajustado para o sprite 2 de 66x54 na posição (17, 3)
+    {8, 8}, 
+    {14, 12},
+    {22, 16},
+    {4, 18},
+    {28, 6},
+    {18, 10},
+    {10, 14},
+    {26, 4},
+    {6, 20},
+    {16, 2} 
 };
 
 Rectangle vendinhaCollisionBox = {20 + (123 * 0.8) / 4, 20 + (120 * 0.8) / 4, (123 * 0.8) / 2, (120 * 0.8) / 2};
@@ -474,13 +475,13 @@ void drawGame() {
 
     for (int i = 0; i < NUM_PEDRAS; i++) {
         Vector2 posicaoPedra = { posicoesPedras[i].x * TILE_SIZE, posicoesPedras[i].y * TILE_SIZE };
-        DrawTexture(sandRuins2, posicaoPedra.x, posicaoPedra.y, RAYWHITE); // Substituído por sandRuins2
+        DrawTexture(sandRuins2, posicaoPedra.x, posicaoPedra.y, RAYWHITE);
     }
 
     for (int i = 0; i < DUNAS_MAPA1; i++) {
         Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
         Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 96, 96 };
-        Rectangle sourceRect = { 0, 0, sandRuins3.width, sandRuins3.height }; // Substituído por sandRuins3
+        Rectangle sourceRect = { 0, 0, sandRuins3.width, sandRuins3.height };
         DrawTexturePro(sandRuins3, sourceRect, destRect, origin, 0.0f, WHITE);
     }
 
@@ -506,7 +507,6 @@ void drawGame() {
     Vector2 origin4 = {0, 0};
     DrawTexturePro(safezone, safezoneRec, destRect4, origin4, 0.0f, RAYWHITE);
 
-    // Defina o retângulo de origem para bones.png com as coordenadas e tamanho especificados
     Rectangle map0SourceRect = {51, 59, 24, 24}; 
     Vector2 map0Position = {20 * TILE_SIZE, 10 * TILE_SIZE}; 
     Rectangle map0DestRect = {map0Position.x, map0Position.y, 24, 24}; 
@@ -545,33 +545,32 @@ void drawGame() {
             DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map1Color);
         }
     }
-    // Defina o retângulo de origem para bones.png com as coordenadas e tamanho especificados
-    Rectangle bonesSourceRect = {774, 113, 38, 33}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-    Vector2 bonesPosition = {30 * TILE_SIZE, 10 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesSourceRect = {774, 113, 38, 33};
+    Vector2 bonesPosition = {30 * TILE_SIZE, 10 * TILE_SIZE};
     Rectangle bonesDestRect = {bonesPosition.x, bonesPosition.y, 38, 33}; 
     
-    Rectangle bonesSourceRect2 = {739, 117, 25, 28}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-    Vector2 bonesPosition2 = {20 * TILE_SIZE, 18 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesSourceRect2 = {739, 117, 25, 28};
+    Vector2 bonesPosition2 = {20 * TILE_SIZE, 18 * TILE_SIZE};
     Rectangle bonesDestRect2 = {bonesPosition2.x, bonesPosition2.y, 25, 28};
 
-    Rectangle bonesSourceRect3 = {117, 142, 27, 22}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-    Vector2 bonesPosition3 = {10 * TILE_SIZE, 6 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesSourceRect3 = {117, 142, 27, 22};
+    Vector2 bonesPosition3 = {10 * TILE_SIZE, 6 * TILE_SIZE};
     Rectangle bonesDestRect3 = {bonesPosition3.x, bonesPosition3.y, 27, 22};
 
-    Rectangle bonesSourceRect4 = {557, 60, 45, 37}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-    Vector2 bonesPosition4 = {30 * TILE_SIZE, 3 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesSourceRect4 = {557, 60, 45, 37};
+    Vector2 bonesPosition4 = {30 * TILE_SIZE, 3 * TILE_SIZE};
     Rectangle bonesDestRect4 = {bonesPosition4.x, bonesPosition4.y, 45, 37};
 
-    Rectangle bonesSourceRect5 = {557, 60, 45, 37}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-    Vector2 bonesPosition5 = {12 * TILE_SIZE, 18 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesSourceRect5 = {557, 60, 45, 37};
+    Vector2 bonesPosition5 = {12 * TILE_SIZE, 18 * TILE_SIZE};
     Rectangle bonesDestRect5 = {bonesPosition5.x, bonesPosition5.y, 45, 37};
 
-    Rectangle bonesSourceRect6 = {739, 203, 32, 27}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-    Vector2 bonesPosition6 = {22 * TILE_SIZE, 6 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesSourceRect6 = {739, 203, 32, 27};
+    Vector2 bonesPosition6 = {22 * TILE_SIZE, 6 * TILE_SIZE};
     Rectangle bonesDestRect6 = {bonesPosition6.x, bonesPosition6.y, 32, 27};
 
-    Rectangle bonesSourceRect7 = {739, 203, 32, 27}; // Remova os sinais de negativo, pois o `sourceRect` usa valores absolutos
-    Vector2 bonesPosition7 = {17 * TILE_SIZE, 12 * TILE_SIZE}; // Posição de destino no mapa (ajuste conforme necessário)
+    Rectangle bonesSourceRect7 = {739, 203, 32, 27};
+    Vector2 bonesPosition7 = {17 * TILE_SIZE, 12 * TILE_SIZE};
     Rectangle bonesDestRect7 = {bonesPosition7.x, bonesPosition7.y, 32, 27};
 
     DrawTexturePro(bonesTexture, bonesSourceRect, bonesDestRect, origin, 0.0f, WHITE);
@@ -582,36 +581,29 @@ void drawGame() {
     DrawTexturePro(bonesTexture, bonesSourceRect6, bonesDestRect6, origin, 0.0f, WHITE);
     DrawTexturePro(bonesTexture, bonesSourceRect7, bonesDestRect7, origin, 0.0f, WHITE);
 
-    // Desenha o environment1_2 e a ruina grande
     DrawTexture(environment1_2, 20, 20, RAYWHITE);
     DrawTexturePro(ruinasDeAreiaGrandes, ruinasSourceRec, ruinasDestRec, origin, 0.0f, WHITE);
     DrawTexture(ruinasDeAreiaPequenas, 20, 20, RAYWHITE);
-    
-    // Alterna as dunas entre Sand_ruins2 e Sand_ruins3
-    // Alterna as dunas entre Sand_ruins2, Sand_ruins3 e Sand_ruins4
+
     for (int i = 0; i < DUNAS_MAPA2; i++) {
         Vector2 posicaoDuna = { posicoesDunasMapa1[i].x * TILE_SIZE, posicoesDunasMapa1[i].y * TILE_SIZE };
-        Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 64, 64 }; // Ajuste o tamanho se necessário
+        Rectangle destRect = { posicaoDuna.x, posicaoDuna.y, 64, 64 };
 
         if (i % 5 == 0) {
-            // 1 bloco com sandRuins3
-            Rectangle sandRuinsSourceRect3 = {3, 0, 64, 64};  // Coordenadas ajustadas da ruína completa
+
+            Rectangle sandRuinsSourceRect3 = {3, 0, 64, 64};
             DrawTexturePro(sandRuins3, sandRuinsSourceRect3, destRect, origin, 0.0f, WHITE);
         } else if (i % 5 == 1 || i % 5 == 2) {
-            // 2 blocos com sandRuins2
-            Rectangle sandRuinsSourceRect2 = {4, 3, 53, 57};  // Coordenadas ajustadas da ruína completa
+            Rectangle sandRuinsSourceRect2 = {4, 3, 53, 57};
             DrawTexturePro(sandRuins2, sandRuinsSourceRect2, destRect, origin, 0.0f, WHITE);
 
 
         } else {
-            // 2 blocos com sandRuins4
-            Rectangle sandRuinsSourceRect4 = {3, 1, 43, 43};  // Coordenadas ajustadas da ruína completa
+            Rectangle sandRuinsSourceRect4 = {3, 1, 43, 43};
             DrawTexturePro(sandRuins4, sandRuinsSourceRect4, destRect, origin, 0.0f, WHITE);
         }
     }
 
-
-    // Desenha as safezones no mapa 1
     Vector2 baseSafezonePosition1_Map1 = {5 * TILE_SIZE, 10 * TILE_SIZE};   
     Vector2 baseSafezonePosition2_Map1 = {35 * TILE_SIZE, 15 * TILE_SIZE}; 
     Rectangle safezoneRec = {376, 136, 32, 32}; 
@@ -632,13 +624,11 @@ void drawGame() {
         }
     }
 
-    // Configuração das sub-regiões da textura para cada sprite, do arquivo 'finallevel.png'
-    Rectangle sprite1 = { 19, 8, 67, 80 };   // Sprite para as primeiras zonas
-    Rectangle sprite2 = { 105, 34, 66, 54 }; // Sprite para as segundas zonas
-    Rectangle sprite3 = { 188, 41, 46, 46 }; // Sprite para as terceiras zonas
-    Rectangle sprite4 = { 82, 101, 40, 39 }; // Sprite para as últimas zonas
+    Rectangle sprite1 = { 19, 8, 67, 80 };
+    Rectangle sprite2 = { 105, 34, 66, 54 };
+    Rectangle sprite3 = { 188, 41, 46, 46 };
+    Rectangle sprite4 = { 82, 101, 40, 39 };
 
-    // Posições atualizadas de colisão no mapa 2
     Vector2 collisionPositions[10] = { 
         {8 * TILE_SIZE, 8 * TILE_SIZE}, {14 * TILE_SIZE, 12 * TILE_SIZE},
         {22 * TILE_SIZE, 16 * TILE_SIZE}, {4 * TILE_SIZE, 18 * TILE_SIZE},
@@ -647,44 +637,39 @@ void drawGame() {
         {6 * TILE_SIZE, 20 * TILE_SIZE}, {16 * TILE_SIZE, 2 * TILE_SIZE}
     };
 
-    // Renderizando cada sprite, dimensionando-o para preencher 64x64 pixels (2x2 tiles)
     for (int i = 0; i < 10; i++) {
         Rectangle destRect = { collisionPositions[i].x, collisionPositions[i].y, 76, 76 };
         Rectangle sourceRect;
 
         if (i < 2) {
-            sourceRect = sprite1;  // Usa o sprite 1 para as primeiras duas zonas
+            sourceRect = sprite1;
         } else if (i < 4) {
-            sourceRect = sprite2;  // Usa o sprite 2 para as próximas duas zonas
+            sourceRect = sprite2;  
         } else if (i < 7) {
-            sourceRect = sprite3;  // Usa o sprite 3 para as três zonas seguintes
+            sourceRect = sprite3;  
         } else {
-            sourceRect = sprite4;  // Usa o sprite 4 para as zonas finais
+            sourceRect = sprite4;  
         }
 
         DrawTexturePro(environment3_1, sourceRect, destRect, (Vector2){0, 0}, 0.0f, WHITE);
     }
 
-    // Adicionando bones.png ao mapa 2
-    Rectangle bonesSourceRect = {145, 426, 42, 41};  // Fonte da imagem bones.png
-    Vector2 bonesPosition = {30 * TILE_SIZE, 10 * TILE_SIZE};  // Posição no mapa 2
-    Rectangle bonesDestRect = {bonesPosition.x, bonesPosition.y, 42, 41};  // Destino com as dimensões da imagem
+    Rectangle bonesSourceRect = {145, 426, 42, 41};  
+    Vector2 bonesPosition = {30 * TILE_SIZE, 10 * TILE_SIZE};  
+    Rectangle bonesDestRect = {bonesPosition.x, bonesPosition.y, 42, 41}; 
 
-    // Desenha bones.png no mapa 2
     DrawTexturePro(bonesTexture, bonesSourceRect, bonesDestRect, (Vector2){0, 0}, 0.0f, WHITE); 
 
-    Rectangle bonesSourceRect2 = {229, 436, 30, 30};  // Fonte da imagem bones.png
-    Vector2 bonesPosition2 = {10 * TILE_SIZE, 6 * TILE_SIZE};  // Posição no mapa 2
-    Rectangle bonesDestRect2 = {bonesPosition2.x, bonesPosition2.y, 30, 30};  // Destino com as dimensões da imagem
+    Rectangle bonesSourceRect2 = {229, 436, 30, 30};  
+    Vector2 bonesPosition2 = {10 * TILE_SIZE, 6 * TILE_SIZE};  
+    Rectangle bonesDestRect2 = {bonesPosition2.x, bonesPosition2.y, 30, 30};  
 
-    // Desenha bones.png no mapa 2
     DrawTexturePro(bonesTexture, bonesSourceRect2, bonesDestRect2, (Vector2){0, 0}, 0.0f, WHITE);
 
-    Rectangle bonesSourceRect3 = {229, 436, 30, 30};  // Fonte da imagem bones.png
-    Vector2 bonesPosition3 = {15 * TILE_SIZE, 2 * TILE_SIZE};  // Posição no mapa 2
-    Rectangle bonesDestRect3 = {bonesPosition3.x, bonesPosition3.y, 30, 30};  // Destino com as dimensões da imagem
+    Rectangle bonesSourceRect3 = {229, 436, 30, 30}; 
+    Vector2 bonesPosition3 = {15 * TILE_SIZE, 2 * TILE_SIZE};
+    Rectangle bonesDestRect3 = {bonesPosition3.x, bonesPosition3.y, 30, 30};
 
-    // Desenha bones.png no mapa 2
     DrawTexturePro(bonesTexture, bonesSourceRect3, bonesDestRect3, (Vector2){0, 0}, 0.0f, WHITE);
 
     Rectangle bonesSourceRect4 = {387, 387, 38, 30};
@@ -881,6 +866,15 @@ void resetarJogo() {
     limparHistoricoPassos();
     inicializarEspeciaria();
     playerWater = 100.0;
+
+    isMonsterActive = false;
+    nextMonsterCheckTime = 0.0;
+    monsterStartTime = 0.0;
+    lastEPressTime = 0.0;
+    ePressCount = 0;
+    spriteFrameIndex = 0;
+    spriteAnimationTimer = 0.0f;
+    lastMap = -1;
 }
 
 void zerarMonetaria() {
@@ -1131,7 +1125,7 @@ void playGame(GameScreen *currentScreen) {
                     EndDrawing();
                 }
 
-                sleep(7.7);
+                sleep(2);
 
                 atualizarRanking(playerName, playerMoney);
                 zerarMonetaria();
@@ -1140,59 +1134,49 @@ void playGame(GameScreen *currentScreen) {
                 return;
             }
         }
-        static double nextMonsterCheckTime = 0.0;
-        static int lastMap = -1; // Variável para rastrear o último mapa
 
-        // Verifica se o jogador entrou em um novo mapa
-        if (mapaAtual != lastMap) { // Mudança de mapa detectada
-            lastMap = mapaAtual;    // Atualiza o mapa atual
-            // Define um intervalo aleatório entre 6 e 10 segundos antes de verificar a lógica do monstro
+        if (mapaAtual != lastMap) {
+            lastMap = mapaAtual;
             nextMonsterCheckTime = GetTime() + GetRandomValue(6, 10);
-            isMonsterActive = false; // Desativa qualquer monstro ativo
+            isMonsterActive = false;
         }
 
-        // Verifica a lógica do monstro
         if (!isMonsterActive && GetTime() >= nextMonsterCheckTime) {
-            // Chance de 1/3 para ativar o monstro
             if (GetRandomValue(1, 100) <= 33) {
                 PlaySound(monsterGrowl2);
-                SetSoundVolume(monsterGrowl2, 1.0f); // Volume máximo
+                SetSoundVolume(monsterGrowl2, 1.0f);
                 isMonsterActive = true;
                 monsterStartTime = GetTime();
                 lastEPressTime = 0.0;
                 ePressCount = 0;
-                spriteFrameIndex = 0; // Reiniciar o frame
+                spriteFrameIndex = 0;
                 spriteAnimationTimer = 0.0f;
             }
 
-            // Atualizar o próximo tempo de verificação, mesmo se o monstro não ativar
-            nextMonsterCheckTime = GetTime() + 20.0; // Checar novamente em 20 segundos
+            nextMonsterCheckTime = GetTime() + 15.0;
         }
 
         if (isMonsterActive) {
             double elapsedTime = GetTime() - monsterStartTime;
 
-            if (elapsedTime >= 0.5) { // Lógica e sprite só começam 0.5 segundos depois
+            if (elapsedTime >= 0.5) {
                 BeginDrawing();
 
-                // Alternar os frames do sprite a cada 0.2 segundos
                 spriteAnimationTimer += GetFrameTime();
                 if (spriteAnimationTimer >= 0.2f) {
-                    spriteFrameIndex = (spriteFrameIndex + 1) % 2; // Alternar entre 0 e 1
+                    spriteFrameIndex = (spriteFrameIndex + 1) % 2;
                     spriteAnimationTimer = 0.0f;
                 }
 
-                // Calcular a posição ao lado direito do jogador
                 Vector2 spritePosition = {player_x * TILE_SIZE + TILE_SIZE, player_y * TILE_SIZE};
                 Rectangle sourceRec = (spriteFrameIndex == 0)
                                         ? (Rectangle){160, 192, 704, 656}
                                         : (Rectangle){160, 2336, 704, 560};
-                Rectangle destRec = {spritePosition.x, spritePosition.y, 48, 48}; // Reduzido para 48x48
+                Rectangle destRec = {spritePosition.x, spritePosition.y, 48, 48};
                 Vector2 origin = {0, 0};
 
                 DrawTexturePro(EpressSprite, sourceRec, destRec, origin, 0.0f, WHITE);
 
-                // Verifica pressionamentos de 'E'
                 if (IsKeyPressed(KEY_E)) {
                     double currentTime = GetTime();
 
@@ -1200,44 +1184,125 @@ void playGame(GameScreen *currentScreen) {
                         ePressCount++;
                         lastEPressTime = currentTime;
                     } else {
-                        ePressCount = 1; // Reinicia o contador se demorou demais
+                        ePressCount = 1;
                         lastEPressTime = currentTime;
                     }
 
-                    // Jogador escapa após pressionar 'E' 3 vezes
                     if (ePressCount >= 3) {
-                        isMonsterActive = false; // Evita mortes subsequentes
+                        isMonsterActive = false;
                     }
                 }
 
                 EndDrawing();
             }
 
-            // Remove sprite e lógica somente após o som parar de tocar
             if (!IsSoundPlaying(monsterGrowl2)) {
                 isMonsterActive = false;
             }
 
-            // Caso o jogador não aperte `E` 3 vezes em tempo suficiente
-            if (GetTime() - monsterStartTime > 4.5f && ePressCount < 3) { // Tempo limite para escapar é de 4 segundos
+            if (GetTime() - monsterStartTime > 4.5f && ePressCount < 3) {
                 StopSound(monsterGrowl2);
 
-                // Parar a música atual
                 StopSound(musicaMapa0);
                 StopSound(musicaMapa1);
                 StopSound(musicaMapa2);
-
-                // Tocar sons de morte
+                
+                sleep(1);
                 PlaySound(gameOverSound);
                 sleep(1);
-                PlaySound(deathEmotiva);
 
-                // Exibir animação de morte
                 Texture2D personagemMorto = LoadTexture("static/image/dead.png");
                 ClearBackground(BLACK);
                 desenharAnimacaoMorte(personagem, personagemMorto);
-                DrawText("GAME OVER - Você foi pego pelo monstro!", 10, 40, 20, RED);
+                deathEmotivaTocando = 1;
+                PlaySound(deathEmotiva);
                 sleep(3);
+
+                Vector2 spritePos = {GetScreenWidth() / 2, GetScreenHeight() / 2};
+                float scale = 10.0f;
+                Rectangle frames[3] = {
+                    {128, 192, 64, 64},
+                    {64, 192, 64, 64},
+                    {0, 192, 64, 64}
+                };
+                int frameIndex = 0;
+                float frameTime = 1.0f;
+                float moveSpeed = 20.0f;
+                float startTime = GetTime();
+                float elapsedTime = 0.0f;
+                float maxScreenTime = 5.0f;
+
+                PlaySound(barulhoMonstro);
+                Vector2 monstersPos = {850, spritePos.y};
+
+                while ((GetTime() - startTime < maxScreenTime) && !WindowShouldClose()) {
+                    BeginDrawing();
+                    ClearBackground(BLACK);
+
+                    elapsedTime = GetTime() - startTime;
+
+                    Rectangle destMonsters = {monstersPos.x, monstersPos.y, 128 * scale, 128 * scale};
+                    Rectangle srcMonsters;
+                    Vector2 originMonsters = {64 * scale, 64 * scale};
+
+                    if (frameIndex == 0) {
+                        srcMonsters = (Rectangle){352, 320, 128, 128};
+                    } else if (frameIndex == 1) {
+                        srcMonsters = (Rectangle){240, 320, 128, 128};
+                    } else if (frameIndex == 2) {
+                        srcMonsters = (Rectangle){128, 320, 128, 128};
+                    }
+
+                    DrawTexturePro(monsters, srcMonsters, destMonsters, originMonsters, 0.0f, WHITE);
+
+                    Rectangle dest = {
+                        spritePos.x, spritePos.y,
+                        frames[frameIndex].width * scale,
+                        frames[frameIndex].height * scale
+                    };
+                    Vector2 origin = {frames[frameIndex].width / 2, frames[frameIndex].height / 2};
+
+                    DrawTexturePro(personagemMorto, frames[frameIndex], dest, origin, 0.0f, WHITE);
+
+                    spritePos.x -= moveSpeed * GetFrameTime();
+                    monstersPos.x -= moveSpeed * GetFrameTime();
+
+                    if (elapsedTime >= frameTime * (frameIndex + 1) && frameIndex < 2) {
+                        frameIndex++;
+                    }
+
+                    DrawText(TextFormat("GAME OVER - O verme de areia lhe identificou"), 10, 40, 20, RED);
+
+                    EndDrawing();
+
+                    sleep(0.5);
+                }
+                ClearBackground(BLACK);
+
+                sleep(2);
+
+                const char *euFalhei = "Eu... Eu falhei minha missão...";
+                int caractereExibido = 0;
+                float tempoPorCaractere = 0.5f;
+                float timer = 0;
+
+                while (caractereExibido < strlen(euFalhei) && !WindowShouldClose()) {
+                    BeginDrawing();
+                    ClearBackground(BLACK);
+                    timer += GetFrameTime();
+
+                    if (timer >= tempoPorCaractere) {
+                        caractereExibido++;
+                        timer = 0;
+                    }
+
+                    DrawText(TextSubtext(euFalhei, 0, caractereExibido), 
+                             GetScreenWidth() / 2 - MeasureText(euFalhei, 20) / 2, 
+                             GetScreenHeight() / 2, 20, RAYWHITE);
+                    EndDrawing();
+                }
+
+                sleep(2);
 
                 
 
