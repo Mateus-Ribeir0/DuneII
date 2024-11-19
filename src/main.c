@@ -35,10 +35,8 @@ int main() {
                     iniciarLobby();
                     lobbyInitialized = true;
                 }
-                processarEntradaLobby(&currentScreen, &lobbyInitialized);
-                BeginDrawing();
-                desenharLobbyDetalhado();
-                EndDrawing();
+
+                playLobby(&currentScreen);
 
                 if (currentScreen != LOBBY && lobbyInitialized) {
                     finalizarLobby();

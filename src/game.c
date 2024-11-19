@@ -313,6 +313,40 @@ Rectangle cityCollisionBoxes[] = {
 };
 
 
+bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
+    if (mapaAtual == -1) {
+        if (new_x >= PORTAL_LOBBY_MAPA1_X && 
+            new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
+            new_y >= PORTAL_LOBBY_MAPA1_Y && 
+            new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) {
+            return true;
+        }
+
+        if (new_x >= PORTAL_LOBBY_MAPA2_X && 
+            new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
+            new_y >= PORTAL_LOBBY_MAPA2_Y && 
+            new_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) {
+            return true;
+        }
+
+        if (new_x >= PORTAL_LOBBY_MAPA3_X && 
+            new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
+            new_y >= PORTAL_LOBBY_MAPA3_Y && 
+            new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA) {
+            return true;
+        }
+
+    } else {
+        if (new_x >= PORTAL_RETORNO_X && 
+            new_x < PORTAL_RETORNO_X + PORTAL_RETORNO_LARGURA &&
+            new_y >= PORTAL_RETORNO_Y && 
+            new_y < PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void movePlayer(int dx, int dy) {
     int new_x = player_x + dx;
     int new_y = player_y + dy;

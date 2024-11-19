@@ -212,10 +212,10 @@ void iniciarMenu(GameScreen *currentScreen) {
     PlayMusicStream(titleMusic);
     SetTargetFPS(60);
     Texture2D introImage = LoadTexture("static/image/intro.png");
-    showFadingImage(introImage, 3.0f);
+    showFadingImage(introImage, 0.1f);
     sleep(1);
     Texture2D introImage2 = LoadTexture("static/image/intro2.png");
-    showFadingImage(introImage2, 3.0f);
+    showFadingImage(introImage2, 0.1f);
     sleep(1);
     UnloadTexture(introImage);
     *currentScreen = TITLE;

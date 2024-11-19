@@ -1,51 +1,34 @@
-
 #include "lobby.h"
-#include <math.h>
 
-// Variáveis de textura e som declaradas como static
-static Texture2D velho;
-static Texture2D desertTileset;
-static Texture2D personagem;
 static Texture2D personagemAndando;
-static Texture2D portal;
+static Texture2D monstersTexture;
 static Texture2D cerealsTexture;
-static Texture2D goldTexture;
+static Texture2D desertTileset;
+static Texture2D bonesTexture;
 static Texture2D aguaTexture;
 static Texture2D cityTexture;
-static Texture2D bonesTexture;
-static Texture2D monstersTexture;
-static Sound troca;
-static Music lobbyMusic; 
+static Texture2D goldTexture;
+static Texture2D personagem;
+static Texture2D portal;
 static Texture2D sombra;
+static Music lobbyMusic; 
+static Texture2D velho;
+static Sound troca;
 
-// Variáveis Globias
-int isInteractingWithMerchant = 0;
 int MAX_ESPECIARIAS = BOLSA_CAPACIDADE_PEQUENA;
-const char* mensagem = NULL;
-double errorMessageTimer = 0.0;
-bool showErrorMessage = false;
-bool showThankYouMessage = false;
-const double MESSAGE_DURATION = 5.0;
-const char *errorMessage = "";
-static const char easterEggSequence[] = "micucci";
-static int easterEggIndex = 0;
-const int widthMercador = 620;
-const int heigthMercador = 140;
 static float portalAnimationTimer = 0.0f;
-static int portalFrameIndex = 0;
+const double MESSAGE_DURATION = 5.0;
 static bool isMusicPlaying = false;
-
-bool isPlayerOnVendinha(int player_x, int player_y) {
-    // Ajuste para a posição e tamanho corretos da vendinha
-    int vendinha_x = 20;  // Baseado em posicaoVendinha.x
-    int vendinha_y = 20;  // Baseado em posicaoVendinha.y
-    int vendinha_largura = 123 * 0.8;  // Ajustado pelo fator de escala
-    int vendinha_altura = 120 * 0.8;   // Ajustado pelo fator de escala
-
-    return player_x >= vendinha_x && player_x < vendinha_x + vendinha_largura &&
-           player_y >= vendinha_y && player_y < vendinha_y + vendinha_altura;
-}
-
+int isInteractingWithMerchant = 0;
+bool showThankYouMessage = false;
+static int portalFrameIndex = 0;
+double errorMessageTimer = 0.0;
+const int heigthMercador = 140;
+bool showErrorMessage = false;
+const char *errorMessage = "";
+static int easterEggCount = 0;
+const int widthMercador = 620;
+const char* mensagem = NULL;
 
 void iniciarLobby() {
     velho = LoadTexture("static/image/velho.png");
@@ -65,7 +48,6 @@ void iniciarLobby() {
     if (!isMusicPlaying) {
         lobbyMusic = LoadMusicStream("static/music/Musica_lobby.mp3");
         PlayMusicStream(lobbyMusic);
-        //SetMusicVolume(lobbyMusic, 2.0f);
         isMusicPlaying = true; 
     } else {
         ResumeMusicStream(lobbyMusic);
@@ -73,10 +55,6 @@ void iniciarLobby() {
 }
 
 void finalizarLobby() {
-    if (isMusicPlaying) {
-        PauseMusicStream(lobbyMusic);
-    }
-
     UnloadTexture(velho);
     UnloadTexture(cityTexture);
     UnloadTexture(monstersTexture);
@@ -89,6 +67,10 @@ void finalizarLobby() {
     UnloadTexture(goldTexture);
     UnloadTexture(aguaTexture);
     UnloadSound(troca);
+    
+    if (isMusicPlaying) {
+        PauseMusicStream(lobbyMusic);
+    }
 }
 
 int isPlayerNearMerchant() {
@@ -98,52 +80,25 @@ int isPlayerNearMerchant() {
             (player_y == MERCHANT_Y && (player_x == MERCHANT_X_LEFT - 1 || player_x == MERCHANT_X_LEFT + 1));
 }
 
-bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual) {
-    if (mapaAtual == -1) {
-        if (new_x >= PORTAL_LOBBY_MAPA1_X && 
-            new_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA &&
-            new_y >= PORTAL_LOBBY_MAPA1_Y && 
-            new_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA) {
-            return true;
-        }
+void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool isPortalDialog) {
+    if (isPortalDialog) width = 420;
+    else width = 600; 
 
-        if (new_x >= PORTAL_LOBBY_MAPA2_X && 
-            new_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA &&
-            new_y >= PORTAL_LOBBY_MAPA2_Y && 
-            new_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA) {
-            return true;
-        }
+    DrawRectangleRounded((Rectangle){ posX, posY, width, height }, 0.1f, 16, boxColor);
 
-        if (new_x >= PORTAL_LOBBY_MAPA3_X && 
-            new_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA &&
-            new_y >= PORTAL_LOBBY_MAPA3_Y && 
-            new_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA) {
-            return true;
-        }
+    int maxCharsPerLine = (width - 20) / MeasureText("A", 20);  
+    int maxLines = (height - 20) / 20;                          
+    int maxCharsInBox = maxCharsPerLine * maxLines;
 
-    } else {
-        if (new_x >= PORTAL_RETORNO_X && 
-            new_x < PORTAL_RETORNO_X + PORTAL_RETORNO_LARGURA &&
-            new_y >= PORTAL_RETORNO_Y && 
-            new_y < PORTAL_RETORNO_Y + PORTAL_RETORNO_ALTURA) {
-            return true;
-        }
-    }
-    return false;
+    DrawText(TextSubtext(text, 0, maxCharsInBox), posX + 10, posY + 10, 20, textColor);
 }
 
-void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
+void playLobby(GameScreen *currentScreen) {
     mapaAtual = -1;
+    bool pertoDePortal = false;
     int dx = 0, dy = 0;
 
     updateWaterLevel(currentScreen);
-
-    if (playerWater <= 0.0) {
-        *currentScreen = RANKINGS;
-        resetarJogo();
-        return;
-    }
-
     UpdateMusicStream(lobbyMusic);
 
     if (IsKeyPressed(KEY_D)) dx = 1;
@@ -152,43 +107,6 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     if (IsKeyPressed(KEY_S)) dy = 1;
 
     movePlayer(dx, dy);
-
-    if (player_x == 0 && player_y == MAPA_ALTURA - 1) {
-        // Obter o próximo caractere esperado na sequência
-        char expectedChar = easterEggSequence[easterEggIndex];
-
-        // Verifica se a tecla esperada foi pressionada
-        bool keyPressed = false;
-        if (expectedChar == 'm' && IsKeyPressed(KEY_M)) {
-            easterEggIndex++;
-            keyPressed = true;
-        } else if (expectedChar == 'i' && IsKeyPressed(KEY_I)) {
-            easterEggIndex++;
-            keyPressed = true;
-        } else if (expectedChar == 'c' && IsKeyPressed(KEY_C)) {
-            easterEggIndex++;
-            keyPressed = true;
-        } else if (expectedChar == 'u' && IsKeyPressed(KEY_U)) {
-            easterEggIndex++;
-            keyPressed = true;
-        }
-
-        // Se uma tecla errada for pressionada, reseta o índice
-        if (!keyPressed && (IsKeyPressed(KEY_M) || IsKeyPressed(KEY_I) || IsKeyPressed(KEY_C) || IsKeyPressed(KEY_U))) {
-            easterEggIndex = 0;
-        }
-
-        // Se a sequência estiver completa
-        if (easterEggIndex == strlen(easterEggSequence)) {
-            playerMoney = 99999;
-            playerWater = 999.0;
-            easterEggIndex = 0;
-        }
-    } else {
-        easterEggIndex = 0; // Reseta o índice se o jogador sair da posição
-    }
-
-    bool pertoDePortal = false;
 
     if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
         (player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
@@ -201,7 +119,8 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
             mensagem = NULL;
         }
     }
-    else if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1) &&
+
+    if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1) &&
         (player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA + 1)) {
         
         mensagem = "Você deseja viajar para Bashir'har?\nPressione [P]\n\nDificuldade: Média";
@@ -212,8 +131,9 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
             mensagem = NULL;
         }
     }
-    else if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
-            (player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
+
+    if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
+        (player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
         mensagem = "Você deseja viajar para Qasr'Rahim?\nPressione [P]\n\nDificuldade: Difícil";
         pertoDePortal = true;
@@ -227,147 +147,55 @@ void processarEntradaLobby(GameScreen *currentScreen, bool *lobbyInitialized) {
     if (!pertoDePortal) {
         mensagem = NULL;
     }
-}
 
-void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool isPortalDialog) {
-    if (isPortalDialog) {
-        width = 420;
-    } else {
-        width = 600;
-    }
-
-    DrawRectangleRounded((Rectangle){ posX, posY, width, height }, 0.1f, 16, boxColor);
-
-    static int frameCount = 0;
-    static int charactersToShow = 0;
-
-    if (isPortalDialog) {
-        charactersToShow = strlen(text);
-    } else {
-        if (IsKeyPressed(KEY_SPACE)) {
-            charactersToShow = strlen(text);
-        } else if (charactersToShow < strlen(text)) {
-            frameCount++;
-            charactersToShow = frameCount / 5; 
-            if (charactersToShow > strlen(text)) charactersToShow = strlen(text);
+    if (player_x == 0 && player_y == MAPA_ALTURA - 1) {
+        if (IsKeyPressed(KEY_M)) {
+            easterEggCount++;
+            if (easterEggCount >= 10) {
+                playerMoney = 99999;
+                easterEggCount = 0;
+            }
         }
+    } else {
+        easterEggCount = 0;
     }
 
-    int maxCharsPerLine = (width - 20) / MeasureText("A", 20);  
-    int maxLines = (height - 20) / 20;                          
-    int maxCharsInBox = maxCharsPerLine * maxLines;
-
-    if (charactersToShow > maxCharsInBox) charactersToShow = maxCharsInBox;
-
-    DrawText(TextSubtext(text, 0, charactersToShow), posX + 10, posY + 10, 20, textColor);
+    if (playerWater <= 0.0) {
+        *currentScreen = RANKINGS;
+        resetarJogo();
+        return;
+    }
+    
+    drawLobby();
 }
 
 void drawLobby() {
+    BeginDrawing();
+
     bool soundPlayed = false;
+    static int lastDirection = 3;
+    static float walkingTimer = 0.0f;
+    static bool isWalking = false;
+    int infoBoxX = SCREEN_WIDTH - 230;
+    int infoBoxY = 10;
+    int infoBoxWidth = 220;
+    int infoBoxHeight = 100;
+    int merchantMood = 0;
+
     Rectangle tileSourceRec = { 128, 32, 32, 32 };
     Rectangle hitboxVendinha = { 1389, 330, 123, 120 };
-
-    Vector2 posicaoVendinha = { 20, 20 };
-    Rectangle destRecVendinha = { posicaoVendinha.x, posicaoVendinha.y, 123* 0.8 , 120* 0.8  }; 
-
-    portalAnimationTimer += GetFrameTime();
-    if (portalAnimationTimer >= 0.1f) {  // Ajuste a velocidade da animação aqui (0.1f é a velocidade em segundos por frame)
-        portalAnimationTimer = 0.0f;
-        portalFrameIndex++;
-        if (portalFrameIndex > 3) {  // Como temos 4 frames (0, 1, 2, 3)
-            portalFrameIndex = 0;
-        }
-    }
-
-
-    for (int y = 0; y < MAPA_ALTURA; y++) {
-        for (int x = 0; x < MAPA_LARGURA; x++) {
-            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
-            DrawTextureRec(desertTileset, tileSourceRec, tilePosition, WHITE);
-        }
-    }
-
-    // Defina a região da imagem que deseja desenhar (ajuste as coordenadas conforme necessário)
-    Rectangle sourceRecMonster = { 282, 13, 106, 116 };  // Exemplo de um monstro de 64x64 pixels na posição inicial da spritesheet
-
-    // Defina a posição onde a imagem será exibida no lobby
-    Vector2 positionMonster = { 180, 20 };  // Posição x e y no lobby, ajuste conforme desejado
-
-    // Desenhe o monstro no lobby usando a função DrawTexturePro
-    DrawTexturePro(monstersTexture, sourceRecMonster, 
-                (Rectangle){ positionMonster.x, positionMonster.y, 106, 116 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-
-    // Defina a região da imagem que deseja desenhar (ajuste as coordenadas conforme necessário)
-    Rectangle sourceRecbones = { 557, 60, 45, 37 };  // Exemplo de um monstro de 64x64 pixels na posição inicial da spritesheet
+    Rectangle destRecVendinha = { 20, 20, 123* 0.8 , 120* 0.8  };
+    Rectangle sourceRecMonster = { 282, 13, 106, 116 };
+    Rectangle sourceRecbones1 = { 557, 60, 45, 37 };
     Rectangle sourceRecbones2 = { 557, 60, 45, 37 };
     Rectangle sourceRecbones3 = { 557, 60, 45, 37 };
     Rectangle sourceRecbones4 = { 557, 60, 45, 37 };
-
     Rectangle sourceRecbones5 = { 666, 125, 23, 19 };
     Rectangle sourceRecbones6 = { 666, 125, 23, 19 };
     Rectangle sourceRecbones7 = { 666, 125, 23, 19 };
-
     Rectangle sourceRecbones8 = { 784, 72, 29, 24 };
     Rectangle sourceRecbones9 = { 784, 72, 29, 24 };
     Rectangle sourceRecbones10 = { 181, 140, 43, 32 };
-
-    // Defina a posição onde a imagem será exibida no lobby
-    Vector2 positionBones = { 300, 50 };  // Posição x e y no lobby, ajuste conforme desejado
-    Vector2 positionBones2 = { 660, 600 }; 
-    Vector2 positionBones3 = { 200, 680 }; 
-    Vector2 positionBones4 = {760, 300 }; 
-
-    Vector2 positionBones5 = {730, 330 }; 
-    Vector2 positionBones6 = {780, 543}; 
-    Vector2 positionBones7 = {900, 203}; 
-
-    Vector2 positionBones8 = {1164, 540}; 
-    Vector2 positionBones9 = {370, 512}; 
-
-    Vector2 positionBones10 = {560, 134}; 
-    
-    // Desenhe o monstro no lobby usando a função DrawTexturePro
-    DrawTexturePro(bonesTexture, sourceRecbones, 
-                (Rectangle){ positionBones.x, positionBones.y, 45, 37 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-    DrawTexturePro(bonesTexture, sourceRecbones2, 
-                (Rectangle){ positionBones2.x, positionBones2.y, 45, 37 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-    DrawTexturePro(bonesTexture, sourceRecbones3, 
-                (Rectangle){ positionBones3.x, positionBones3.y, 45, 37 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-    DrawTexturePro(bonesTexture, sourceRecbones4, 
-                (Rectangle){ positionBones4.x, positionBones4.y, 45, 37 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-
-    
-    DrawTexturePro(bonesTexture, sourceRecbones5, 
-                (Rectangle){ positionBones5.x, positionBones5.y, 23, 19 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-
-    DrawTexturePro(bonesTexture, sourceRecbones6, 
-                (Rectangle){ positionBones6.x, positionBones6.y, 23, 19 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-    DrawTexturePro(bonesTexture, sourceRecbones7, 
-                (Rectangle){ positionBones7.x, positionBones7.y, 23, 19 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-
-
-    DrawTexturePro(bonesTexture, sourceRecbones8, 
-                (Rectangle){ positionBones8.x, positionBones8.y, 29, 24 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-    DrawTexturePro(bonesTexture, sourceRecbones9, 
-                (Rectangle){ positionBones9.x, positionBones9.y, 29, 24 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-
-    DrawTexturePro(bonesTexture, sourceRecbones10, 
-                (Rectangle){ positionBones10.x, positionBones10.y, 43, 32 },  // Tamanho de destino
-                (Vector2){ 0, 0 }, 0.0f, WHITE);
-
-    DrawTexturePro(cityTexture, hitboxVendinha, destRecVendinha, (Vector2){0, 0}, 0.0f, WHITE);
-
-    
     Rectangle sourceRec = { 831, 66, 108, 162 };
     Rectangle sourceRec2 = { 1167, 108, 132, 120 };
     Rectangle sourceRec3 = { 978, 102, 150, 126 };
@@ -386,9 +214,17 @@ void drawLobby() {
     Rectangle sourceRec16 = { 102, 363, 123, 126 };
     Rectangle sourceRec17 = { 345, 369, 108, 126 };
     Rectangle sourceRec18 = { 1167, 108, 132, 120 };
-    
-
-
+    Vector2 positionBones = { 300, 50 };
+    Vector2 positionBones2 = { 660, 600 }; 
+    Vector2 positionBones3 = { 200, 680 }; 
+    Vector2 positionBones4 = {760, 300 }; 
+    Vector2 positionBones5 = {730, 330 }; 
+    Vector2 positionBones6 = {780, 543}; 
+    Vector2 positionBones7 = {900, 203}; 
+    Vector2 positionBones8 = {1164, 540}; 
+    Vector2 positionBones9 = {370, 512}; 
+    Vector2 positionBones10 = {560, 134};
+    Vector2 positionMonster = { 180, 20 }; 
     Vector2 positionCity1 = { 800, 4 };
     Vector2 positionCity2 = { 890, 36 }; 
     Vector2 positionCity3 = { 1000, 36 }; 
@@ -407,8 +243,6 @@ void drawLobby() {
     Vector2 positionCity16 = { 300, 220 };
     Vector2 positionCity17 = { 64, 280 };
     Vector2 positionCity18 = { 576, 38 }; 
-
-
     Rectangle destRec = { positionCity1.x, positionCity1.y, 108 * 0.8, 162 * 0.8 };
     Rectangle destRec2 = { positionCity2.x, positionCity2.y, 132 * 0.8, 120 * 0.8 };
     Rectangle destRec3 = { positionCity3.x, positionCity3.y, 150 * 0.8, 126 * 0.8 };
@@ -427,10 +261,60 @@ void drawLobby() {
     Rectangle destRec16 = { positionCity16.x, positionCity16.y, 123 * 0.6, 126 * 0.6};
     Rectangle destRec17 = { positionCity17.x, positionCity17.y, 108 * 0.6, 126 * 0.6};
     Rectangle destRec18 = { positionCity18.x, positionCity18.y, 132 * 0.8, 120 * 0.8 };
+    Rectangle sourceRecPersonagem;
+    Vector2 origin = { 0, 0 };
+    Color fillColor = (Color){205, 133, 63, 255};
+    Color borderColor = (Color){101, 67, 33, 255};
+    Vector2 positionPersonagem = { player_x * TILE_SIZE, player_y * TILE_SIZE };
+    Rectangle destRecPersonagem = { positionPersonagem.x - 32, positionPersonagem.y - 32, 96, 96 };
+    Rectangle portalSourceRec = { 32 * portalFrameIndex, 0, 32, 32 };
+    Rectangle portalDestRec1 = { 
+        PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 
+        TILE_SIZE * PORTAL_HORIZONTAL_LARGURA,  
+        TILE_SIZE * PORTAL_HORIZONTAL_ALTURA 
+    };
+    Rectangle portalDestRec2 = { 
+        PORTAL_LOBBY_MAPA2_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 
+        TILE_SIZE * PORTAL_VERTICAL_LARGURA,  
+        TILE_SIZE * PORTAL_VERTICAL_ALTURA 
+    };
+    Rectangle portalDestRec3 = { 
+        PORTAL_LOBBY_MAPA3_X * TILE_SIZE, 
+        PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 
+        TILE_SIZE * PORTAL_HORIZONTAL_LARGURA,  
+        TILE_SIZE * PORTAL_HORIZONTAL_ALTURA 
+    };
 
-    static int lastDirection = 3;
-    static float walkingTimer = 0.0f;
-    static bool isWalking = false;
+    portalAnimationTimer += GetFrameTime();
+    if (portalAnimationTimer >= 0.1f) {
+        portalAnimationTimer = 0.0f;
+        portalFrameIndex++;
+        if (portalFrameIndex > 3) {
+            portalFrameIndex = 0;
+        }
+    }
+
+    for (int y = 0; y < MAPA_ALTURA; y++) {
+        for (int x = 0; x < MAPA_LARGURA; x++) {
+            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+            DrawTextureRec(desertTileset, tileSourceRec, tilePosition, WHITE);
+        }
+    }
+
+    DrawTexturePro(monstersTexture, sourceRecMonster, (Rectangle){ positionMonster.x, positionMonster.y, 106, 116 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones1, (Rectangle){ positionBones.x, positionBones.y, 45, 37 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones2, (Rectangle){ positionBones2.x, positionBones2.y, 45, 37 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones3, (Rectangle){ positionBones3.x, positionBones3.y, 45, 37 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones4, (Rectangle){ positionBones4.x, positionBones4.y, 45, 37 }, (Vector2){ 0, 0 }, 0.0f, WHITE);    
+    DrawTexturePro(bonesTexture, sourceRecbones5, (Rectangle){ positionBones5.x, positionBones5.y, 23, 19 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones6, (Rectangle){ positionBones6.x, positionBones6.y, 23, 19 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones7, (Rectangle){ positionBones7.x, positionBones7.y, 23, 19 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones8, (Rectangle){ positionBones8.x, positionBones8.y, 29, 24 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones9, (Rectangle){ positionBones9.x, positionBones9.y, 29, 24 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(bonesTexture, sourceRecbones10, (Rectangle){ positionBones10.x, positionBones10.y, 43, 32 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+    DrawTexturePro(cityTexture, hitboxVendinha, destRecVendinha, (Vector2){0, 0}, 0.0f, WHITE);
 
     if (IsKeyPressed(KEY_W)) {
         lastDirection = 1;
@@ -457,7 +341,6 @@ void drawLobby() {
         }
     }
 
-    Rectangle sourceRecPersonagem;
     switch (lastDirection) {
         case 1:
             sourceRecPersonagem = (Rectangle){0, 192, 64, 64};
@@ -475,10 +358,6 @@ void drawLobby() {
             sourceRecPersonagem = (Rectangle){0, 0, 64, 64};
             break;
     }
-
-    Vector2 positionPersonagem = { player_x * TILE_SIZE, player_y * TILE_SIZE };
-
-    Rectangle destRecPersonagem = { positionPersonagem.x - 32, positionPersonagem.y - 32, 96, 96 };
 
     if (isWalking) {
         DrawTexturePro(sombra, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
@@ -506,43 +385,9 @@ void drawLobby() {
     DrawTexturePro(cityTexture, sourceRec16, destRec16, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(cityTexture, sourceRec17, destRec17, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(cityTexture, sourceRec18, destRec18, (Vector2){0, 0}, 0.0f, WHITE);
-
-    Rectangle portalSourceRec = { 32 * portalFrameIndex, 0, 32, 32 };
-    Rectangle portalDestRec1 = { 
-        PORTAL_LOBBY_MAPA1_X * TILE_SIZE, 
-        PORTAL_LOBBY_MAPA1_Y * TILE_SIZE, 
-        TILE_SIZE * PORTAL_HORIZONTAL_LARGURA,  
-        TILE_SIZE * PORTAL_HORIZONTAL_ALTURA 
-    };
-
-    Rectangle portalDestRec2 = { 
-        PORTAL_LOBBY_MAPA2_X * TILE_SIZE, 
-        PORTAL_LOBBY_MAPA2_Y * TILE_SIZE, 
-        TILE_SIZE * PORTAL_VERTICAL_LARGURA,  
-        TILE_SIZE * PORTAL_VERTICAL_ALTURA 
-    };
-
-    Rectangle portalDestRec3 = { 
-        PORTAL_LOBBY_MAPA3_X * TILE_SIZE, 
-        PORTAL_LOBBY_MAPA3_Y * TILE_SIZE, 
-        TILE_SIZE * PORTAL_HORIZONTAL_LARGURA,  
-        TILE_SIZE * PORTAL_HORIZONTAL_ALTURA 
-    };
-
-    Vector2 origin = { 0, 0 };
-
     DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);
-
-    int infoBoxX = SCREEN_WIDTH - 230;
-    int infoBoxY = 10;
-    int infoBoxWidth = 220;
-    int infoBoxHeight = 100;
-
-    Color fillColor = (Color){205, 133, 63, 255};
-    Color borderColor = (Color){101, 67, 33, 255};
-
     DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, fillColor);
     DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, borderColor);
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, borderColor);
@@ -599,9 +444,6 @@ void drawLobby() {
         soundPlayed = false;
     }
 
-    // No arquivo config.h ou no início de lobby.c
-    int merchantMood = 0; // 0: Neutro, 1: Feliz, 2: Puto
-
     if (isPlayerNearMerchant()) {
         // Configurações do sprite do mercador
         Rectangle sourceRecVelho = { 62, 54, 509, 485 };
@@ -620,7 +462,7 @@ void drawLobby() {
         if (!isInteractingWithMerchant) {
             merchantMood = 0; // Reseta o humor para neutro
             // Diálogo inicial
-            DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1] para vender especiarias\n[2] para comprar uma bolsa nova\n[3] para comprar garrafa de água",
+            DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1]  para vender especiarias\n[2] para comprar uma bolsa nova\n[3] para comprar garrafa de água",
                         100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
 
             if (IsKeyPressed(KEY_ONE)) isInteractingWithMerchant = 1;
@@ -681,7 +523,7 @@ void drawLobby() {
 
 
                 case 2: // Comprar bolsa
-                DrawDialogBox("Qual bolsa deseja comprar?\n\n[1] Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000",
+                DrawDialogBox("Qual bolsa deseja comprar?\n\n[1]  Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000",
                             100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
 
                 if (IsKeyPressed(KEY_ONE)) { // Bolsa Média
@@ -776,7 +618,7 @@ void drawLobby() {
 
 
                 case 3: // Comprar água
-                DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1] Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000",
+                DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1]  Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000",
                             100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
 
                 if (IsKeyPressed(KEY_ONE)) {
@@ -876,9 +718,5 @@ void drawLobby() {
         isInteractingWithMerchant = 0;
     }
 
-}
-
-
-void desenharLobbyDetalhado() {
-    drawLobby();
+    EndDrawing();
 }

@@ -14,5 +14,8 @@ void limparHistoricoPassos();
 void limparColisoesEZonas();
 void iniciarGame();
 void finalizarGame();
+bool isPlayerOnPortal(int new_x, int new_y, int mapaAtual);
+void updateWaterLevel(GameScreen *currentScreen);
+void resetarJogo();
 
 #endif

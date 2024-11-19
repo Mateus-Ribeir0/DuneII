@@ -4,11 +4,11 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include "raylib.h"
 
 typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RANKINGS } GameScreen;
-
 
 #define TILE_SIZE 32
 #define MAPA_LARGURA 40
@@ -17,7 +17,6 @@ typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RA
 #define SCREEN_HEIGHT 704
 
 #define MAX_NAME_LENGTH 30
-extern char playerName[MAX_NAME_LENGTH];
 
 #define MERCHANT_X 2
 #define MERCHANT_Y 2
@@ -49,17 +48,6 @@ extern char playerName[MAX_NAME_LENGTH];
 #define PORTAL_RETORNO_X 18
 #define PORTAL_RETORNO_Y 0
 
-extern int player_x;
-extern int player_y;
-extern int mapaAtual;
-extern int itemsCollected;
-extern int playerMoney;
-extern const char* mensagem;
-extern int MAX_ESPECIARIAS;
-
-extern float playerWater;
-extern double lastWaterUpdateTime;
-
 #define LOBBY_WATER_LOSS_INTERVAL 30.0
 #define MAP1_WATER_LOSS_INTERVAL 20.0
 #define MAP2_WATER_LOSS_INTERVAL 15.0
@@ -73,9 +61,15 @@ extern double lastWaterUpdateTime;
 #define PRECO_GARRAFA_MEDIA 5000
 #define PRECO_GARRAFA_GRANDE 7000
 
+extern int player_x;
+extern int player_y;
+extern int mapaAtual;
+extern int itemsCollected;
+extern int playerMoney;
+extern const char* mensagem;
+extern int MAX_ESPECIARIAS;
+extern float playerWater;
+extern double lastWaterUpdateTime;
+extern char playerName[MAX_NAME_LENGTH];
 
 #endif
-
-//SetMusicVolume(lobbyMusic, 0.5f);
-//SetMusicVolume(lobbyMusic, 0.5f);
-//SetSoundVolume(troca, 0.3f);
