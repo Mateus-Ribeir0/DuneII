@@ -15,7 +15,7 @@ int main() {
         switch (currentScreen) {
             case TITLE:
                 atualizarMenu(&currentScreen);
-                desenharMenu(currentScreen);
+                drawMenu();
                 if (IsKeyPressed(KEY_ENTER)) {
                     currentScreen = NAME_INPUT;
                 }

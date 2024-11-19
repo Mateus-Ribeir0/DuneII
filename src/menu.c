@@ -1,29 +1,27 @@
 #include "menu.h"
-#include "raylib.h"
 
 static Texture2D background, logo, objetivoImage;
 static Music titleMusic;
-static float backgroundPosX;
 static Sound swordsfx;
 static Sound rankingssfx;
 static Sound controlssfx;
+static float backgroundPosX;
 
 void showFadingImage(Texture2D image, float duration) {
-    float startTime = GetTime(); // Tempo inicial
-    float opacity = 1.0f;        // Opacidade inicial (100%)
+    float startTime = GetTime();
+    float opacity = 1.0f;
 
     while (opacity > 0.0f && !WindowShouldClose()) {
-        float elapsedTime = GetTime() - startTime; // Tempo decorrido
+        float elapsedTime = GetTime() - startTime;
         if (elapsedTime >= duration) {
-            opacity = 0.0f; // A imagem desaparece completamente após a duração
+            opacity = 0.0f;
         } else {
-            opacity = 1.0f - (elapsedTime / duration); // Reduz a opacidade gradualmente
+            opacity = 1.0f - (elapsedTime / duration);
         }
 
         BeginDrawing();
         ClearBackground(BLACK);
 
-        // Desenha a imagem com opacidade ajustada
         Rectangle destRect = { 
             GetScreenWidth() / 2 - image.width / 2, 
             GetScreenHeight() / 2 - image.height / 2, 
@@ -32,11 +30,9 @@ void showFadingImage(Texture2D image, float duration) {
         };
 
         DrawTexturePro(image, (Rectangle){0, 0, image.width, image.height}, destRect, (Vector2){0, 0}, 0.0f, Fade(WHITE, opacity));
-
         EndDrawing();
     }
 }
-
 
 void recebeNomeDoPlayer(GameScreen *currentScreen) {
     static char nameBuffer[MAX_NAME_LENGTH] = "";
@@ -86,7 +82,6 @@ void desenharBackgroundComLogo() {
     float scale = scaleX > scaleY ? scaleX : scaleY;
 
     DrawTextureEx(background, (Vector2){-backgroundPosX, 0}, 0.0f, scale, WHITE);
-
     DrawTextureEx(background, (Vector2){-backgroundPosX + background.width * scale, 0}, 0.0f, scale, WHITE);
 
     backgroundPosX += 0.2f;
@@ -137,7 +132,6 @@ void displayCutscene(Texture2D image, const char* text, Music titleMusic, float 
 }
 
 void cutsceneArrakis() {
-    //SetMusicVolume(titleMusic, 1.0f);
 
     const char* text1 = "Arrakis. Um vasto deserto, onde a areia carrega\ncicatrizes das guerras travadas pela raras especiarias.";
     const char* text2 = "E eu vim em busca desse raro tesouro, mas cada\npasso é uma batalha. As especiarias não são fáceis\nde conquistar.";
@@ -256,7 +250,6 @@ void exibirObjetivo(GameScreen *currentScreen) {
         Vector2 origin = { 0.0f, 0.0f };
 
         BeginDrawing();
-        //ClearBackground(RAYWHITE);
         DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE);
         EndDrawing();
 
@@ -267,31 +260,20 @@ void exibirObjetivo(GameScreen *currentScreen) {
     }
 }
 
-void desenharMenu(GameScreen currentScreen) {
+void drawMenu() {
+    int mainTextY = 400;
+    int optionsY = mainTextY + 100;
+    int spacingX = 50;
+    int textSize = 25;
+    int centerX = SCREEN_WIDTH / 2;
+
     BeginDrawing();
-    //ClearBackground(RAYWHITE);
-
-    if (currentScreen == TITLE) {
-        desenharBackgroundComLogo();
-
-        // Texto principal centralizado, agora mais para baixo
-        int mainTextY = 400; // Linha base para "Pressione ENTER para Jogar"
-        DrawText("Pressione [ENTER] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 30) / 2, mainTextY, 30, WHITE);
-
-        // Alinhamento e espaçamento para Rankings e Controles
-        int optionsY = mainTextY + 100; // Mais abaixo do texto principal
-        int spacingX = 50; // Espaço horizontal entre as opções
-        int textSize = 25; // Tamanho da fonte das opções
-
-        // Alinhamento horizontal das opções
-        int centerX = SCREEN_WIDTH / 2;
-        DrawText("[R] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, textSize, WHITE);
-        DrawText("[C] Controles", centerX + spacingX, optionsY, textSize, WHITE);
-    }
-
+    desenharBackgroundComLogo();
+    DrawText("Pressione [ENTER] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 30) / 2, mainTextY, 30, WHITE);
+    DrawText("[R] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, textSize, WHITE);
+    DrawText("[C] Controles", centerX + spacingX, optionsY, textSize, WHITE);
     EndDrawing();
 }
-
 
 void finalizarMenu() {
     UnloadTexture(background);
@@ -299,6 +281,5 @@ void finalizarMenu() {
     StopMusicStream(titleMusic);
     UnloadMusicStream(titleMusic);
     UnloadTexture(objetivoImage); 
-    CloseAudioDevice();
     CloseWindow();
 }
