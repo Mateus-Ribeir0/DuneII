@@ -1,33 +1,38 @@
-# DuneII
+# **Duna: A Jornada em Arrakis**
 
-DuneII é um jogo desenvolvido em C, inspirado no filme Duna.
+Bem-vindo ao **Duna: A Jornada em Arrakis**, um jogo inspirado no épico universo de Duna. Sua missão é sobreviver aos perigos do deserto de Arrakis enquanto coleta especiarias valiosas para prosperar sua casa.
 
-Nele, você é um cidadão de Arrakis, cujo deve coletar especiarias de modo a sustentar sua casa e torná-la próspera.
+---
 
-Para isso, você vai numa missão no deserto de Arrakis, podendo se deslocar para 3 localidades diferentes do seu planeta, sendo um mais difícil de sobreviver que o outro.
+## **Objetivo do Jogo**
 
-Os vermes de areias são ativados por movimentos rítmicos, então tente não repetir seus passos no deserto, para que você não morra.
+- **Colete especiarias**: Espalhadas pelos mapas, elas são a chave para enriquecer sua casa e garantir sua prosperidade.
+- **Venda especiarias no mercador de Arrakis**: Troque as especiarias por dinheiro e use os lucros para melhorar seu inventário e garantir sua sobrevivência.
+- **Gerencie sua água**: O deserto é implacável, e sem água você não sobreviverá.
+- **Explore diferentes mapas**:
+  - **Mapa 1**: Relativamente tranquilo, mas cuidado com as dunas.
+  - **Mapa 2**: Mais perigoso, onde movimentos descuidados podem chamar a atenção dos **vermes gigantes**.
+  - **Mapa 3**: O desafio máximo, onde sobreviver exige estratégia.
 
-Esporadicamente, há a chance de vermes se movimentando pelas profundezas da areia, sentirem sua presença. Para não ser detectado, se mantenha parado e pressione E repetidamente para se manter imóvel.
+---
 
-Sua água acaba com o tempo, e você pode morrer por isso. Troque suas especiarias por mais água para que consiga sobreviver.
+## **Desafios**
 
-O que lhe dá pontuação é vender suas especiarias, então concilie bem sua sobrevivência, com suas recompensas.
+- **Equilibre recursos**: Coletar especiarias e manter sua água são tarefas que demandam planejamento.
+- **Evite os vermes gigantes**: Nos mapas mais perigosos, movimentos repetitivos ou padrões atraem esses predadores mortais.
+- **Planeje cada movimento**: Errar pode significar a sua morte.
 
-## Passo a Passo
+---
 
-1. **Clone o repositório** (caso ainda não tenha feito):
-    ```bash
-    git clone https://github.com/Mateus-Ribeir0/DuneII.git
-    cd DuneII
-    ```
+## **Como Jogar**
 
-2. **Compile o jogo** usando o comando `make`:
-    ```bash
-    make
-    ```
+### **Controles**
+- **WASD**: Movimente seu personagem.
+- **ENTER**: Interaja com portais ou vendedores.
+- **E**: Escape de eventos perigosos, como os ataques dos vermes gigantes.
 
-3. **Execute o jogo** com o comando `run`:
-    ```bash
-    ./dune_game
-    ```
+---
+
+## **Como Configurar e Executar**
+
+Este jogo utiliza a biblioteca gráfica **Raylib**. Veja como configurá-la no seu sistema
