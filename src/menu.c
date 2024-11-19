@@ -51,10 +51,10 @@ void recebeNomeDoPlayer(GameScreen *currentScreen) {
         ClearBackground(RAYWHITE);
         desenharBackgroundComLogo();
 
-        DrawText("Digite seu nome:", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 50, 20, WHITE);
+        DrawText("Digite seu nome:", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 50, 25, WHITE);
         DrawRectangle(SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 100, 350, 30, WHITE);
-        DrawText(nameBuffer, SCREEN_WIDTH / 2 - 195, SCREEN_HEIGHT / 2 + 105, 20, BLACK);
-        DrawText("Pressione ENTER para continuar", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 150, 20, WHITE);
+        DrawText(nameBuffer, SCREEN_WIDTH / 2 - 195, SCREEN_HEIGHT / 2 + 105, 25, BLACK);
+        DrawText("Pressione [ENTER] para continuar", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 150, 25, WHITE);
 
         EndDrawing();
 
@@ -204,6 +204,11 @@ void iniciarMenu(GameScreen *currentScreen) {
     logo = LoadTexture("static/image/logonova.png");
     titleMusic = LoadMusicStream("static/music/epicversion3.mp3");
 
+    controlssfx = LoadSound("static/music/controls.wav");
+    rankingssfx = LoadSound("static/music/rankings.wav");
+    SetSoundVolume(controlssfx, 0.6f);
+    SetSoundVolume(rankingssfx, 0.6f);
+
     PlayMusicStream(titleMusic);
     SetTargetFPS(60);
     Texture2D introImage = LoadTexture("static/image/intro.png");
@@ -218,11 +223,6 @@ void iniciarMenu(GameScreen *currentScreen) {
 
 void atualizarMenu(GameScreen *currentScreen) {
     UpdateMusicStream(titleMusic);
-
-    controlssfx = LoadSound("static/music/controls.wav");
-    rankingssfx = LoadSound("static/music/rankings.wav");
-    SetSoundVolume(controlssfx, 0.6f);
-    SetSoundVolume(rankingssfx, 0.6f);
 
     if (*currentScreen == TITLE) {
         backgroundPosX += 0.2f;
