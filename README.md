@@ -1,6 +1,6 @@
-# **Duna: A Jornada em Arrakis**
+# **Duna II**
 
-Bem-vindo ao **Duna: A Jornada em Arrakis**, um jogo inspirado no épico universo de Duna. Sua missão é sobreviver aos perigos do deserto de Arrakis enquanto coleta especiarias valiosas para prosperar sua casa.
+Bem-vindo ao **Dune II**, um jogo inspirado no épico universo de Duna. Sua missão é sobreviver aos perigos do deserto de Arrakis enquanto coleta especiarias valiosas para prosperar sua casa.
 
 ---
 
@@ -36,3 +36,16 @@ Bem-vindo ao **Duna: A Jornada em Arrakis**, um jogo inspirado no épico univers
 ## **Como Configurar e Executar**
 
 Este jogo utiliza a biblioteca gráfica **Raylib**. Veja como configurá-la no seu sistema
+
+### **Linux**
+1. Instale as dependências:
+   ```bash
+   sudo apt update
+   sudo apt install build-essential libgl1-mesa-dev libopenal-dev libx11-dev
+
+2. Baixe e compile a Raylib:
+   
+   git clone https://github.com/raysan5/raylib.git
+   cd raylib/src
+   make PLATFORM=PLATFORM_DESKTOP
+   sudo make install
