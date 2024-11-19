@@ -69,6 +69,9 @@ Este jogo utiliza a biblioteca gráfica **Raylib**. Veja como configurá-la no s
 
   ```brew install raylib```
 
+3. Clone o repositório:
+   ```git clone https://github.com/Mateus-Ribeir0/DuneII```
+
 3. Compile o jogo:
 
   ```gcc -o duna_game main.c -lraylib -lm```
@@ -76,6 +79,8 @@ Este jogo utiliza a biblioteca gráfica **Raylib**. Veja como configurá-la no s
 4. Execute o jogo:
 
   ```./dune_game```
+
+Caso tenha alguma dúvida, siga o tutorial da própria documentação da Raylib: [Tutorial da Raylib](https://github.com/raysan5/raylib/wiki/Working-on-macOS)
 
 
 ### **Windows**
