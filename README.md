@@ -55,8 +55,8 @@ Este jogo utiliza a biblioteca gráfica **Raylib**. Veja como configurá-la no s
     ```cd DuneII```
 
 4. Compile o jogo e rode:
-   ```make
-   ./dune_game
+   ```make```
+   ```./dune_game```
 
 
 ### **Mac**
