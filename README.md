@@ -52,8 +52,27 @@ Este jogo utiliza a biblioteca gráfica **Raylib**. Veja como configurá-la no s
 
 3. Vá para o diretório do jogo:
 
-  ```cd DuneII```
+    ```cd DuneII```
 
 4. Compile o jogo e rode:
    ```make
    ./dune_game
+
+
+### **Mac**
+
+1. Caso não queira buildar por você mesmo, instale o HomeBrew:
+
+  ```/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"```
+
+2. Assim que tiver instalado, coloque no terminal:
+
+  ```brew install raylib```
+
+3. Compile o jogo:
+
+  ```gcc -o duna_game main.c -lraylib -lm```
+
+4. Execute o jogo:
+
+  ```./dune_game```
