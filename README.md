@@ -1,6 +1,6 @@
 # DuneII
 
-DuneII é um jogo desenvolvido em C, inspirado no jogo Duna.
+DuneII é um jogo desenvolvido em C, inspirado no filme Duna.
 
 Nele, você é um cidadão de Arrakis, cujo deve coletar especiarias de modo a sustentar sua casa e torná-la próspera.
 
