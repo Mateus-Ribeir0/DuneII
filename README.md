@@ -35,114 +35,85 @@ Bem-vindo ao **Dune II**, um jogo inspirado no épico universo de Duna. Sua miss
 
 ---
 
-## Para instalar no Linux:
+## Em Linux:
 
-1. Baixe os essenciais:
+1. Se certifique que terá o GCC, make e git:
 ```
 sudo apt install build-essential git
 ```
 
-2.  Instale as dependências:
+2.  Instale todas as bibliotecas necessárias:
 ```
- sudo apt update
- sudo apt install build-essential libgl1-mesa-dev libopenal-dev libx11-dev
+sudo apt install libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
 ```
 
 3.  Baixe o código-fonte do Raylib diretamente do GitHub e entre na pasta:
 ```
-git clone https://github.com/raysan5/raylib.git
-cd raylib/src
-make PLATFORM=PLATFORM_DESKTOP
-sudo make install
+git clone --depth 1 https://github.com/raysan5/raylib.git raylib
+cd raylib/src/
 ```
 
-4.  Clone o repositório do jogo:
+4. Compile a raylib:
 ```
-git clone https://github.com/Mateus-Ribeir0/DuneII
+make PLATFORM=PLATFORM_DESKTOP
+```
+
+5.  Instale a raylib:
+```
+sudo make install
+cd ~
+```
+
+6.  Clone o repositório do jogo:
+```
+git clone https://github.com/Mateus-Ribeir0/DuneII.git
 cd DuneII
 ```
 
-5.  Compile e rode o jogo:
+7.  Compile e rode o jogo:
 ```
 make
 ./dune_game
 ```
-Caso houver algum imprevisto, consulte a documentação da Raylib para Linux: [Raylib em Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux).
+Caso ocorra algum imprevisto, leia a documentação da Raylib para Linux: [Raylib para Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux).
 
 <br>
 
-## Mac:
+## Em Mac:
 
-1. Instale o HomeBrew:
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-2. Use o Homebrew para instalar o compilador GCC e a Raylib:
-```
-brew install gcc
-brew install raylib
-```
-
-3. Clone o repositório do jogo:
-```
-git clone https://github.com/Mateus-Ribeir0/DuneII
-cd DuneII
-```
-
-4. Compile e rode o jogo:
-```
-make
-```
-
-### Sem XCode
-
-1. Instale o Homebrew:
-   ```
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-2. No terminal:
+1. Configure o ambiente para suportar a compilação estática:
 ```
 export MACOSX_DEPLOYMENT_TARGET=10.9
 ```
 
-4. Instale as ferramentas do XCode:
+2. Instale as ferramentas XCode (certifique-se de atualizar as ferramentas após a instalação):
 ```
 xcode-select --install
 ```
 
-5. Builde a Raylib novamente:
+3. Baixe o código-fonte do Raylib diretamente do GitHub e entre na pasta:
 ```
 git clone https://github.com/raysan5/raylib.git
 cd raylib/src
+```
+
+4. Compile a raylib:
+```
 make
 ```
 
-5. Faça esse check da Otool:
-
+5. Clone o repositório:
 ```
-cp raylib/src/libraylib.a YOUR_PROJECTS_ROOT_FOLDER
-```
-
-6. Clone o repositório:
-```
-git clone https://github.com/Mateus-Ribeir0/DuneII
-```
-
-7. Mude o diretório:
-```
+git clone https://github.com/Mateus-Ribeir0/DuneII.git
 cd DuneII
 ```
 
-8. Compile e rode:
-
+6º) Compile e rode o jogo usando o seguinte comando:
 ```
 make
 ./dune_game
 ```
 
-
-Caso houver algum imprevisto, consulte a documentação da Raylib para Mac: [Raylib em Mac](https://github.com/raysan5/raylib/wiki/Working-on-macOS).
+Caso ocorra algum imprevisto, leia a documentação da Raylib para Mac: [Raylib para Mac](https://github.com/raysan5/raylib/wiki/Working-on-macOS).
 
 ---
