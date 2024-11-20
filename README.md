@@ -95,6 +95,45 @@ cd DuneII
 make
 ```
 
+### Sem XCode
+
+1. No terminal:
+```export MACOSX_DEPLOYMENT_TARGET=10.9```
+
+2. Instale as ferramentas do XCode:
+```xcode-select --install```
+
+3. Builde a Raylib novamente:
+```
+git clone https://github.com/raysan5/raylib.git
+cd raylib/src
+make
+```
+
+4. Faça esse check da Otool:
+
+```
+cp raylib/src/libraylib.a YOUR_PROJECTS_ROOT_FOLDER
+```
+
+5. Clone o repositório:
+```
+git clone https://github.com/Mateus-Ribeir0/DuneII
+```
+
+6. Mude o diretório:
+```
+cd DuneII
+```
+
+7. Compile e rode:
+
+```
+make
+./dune_game
+```
+
+
 Caso houver algum imprevisto, consulte a documentação da Raylib para Mac: [Raylib em Mac](https://github.com/raysan5/raylib/wiki/Working-on-macOS).
 
 ---
