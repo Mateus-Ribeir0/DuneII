@@ -98,6 +98,13 @@ export MACOSX_DEPLOYMENT_TARGET=10.9
 xcode-select --install
 ```
 
+2.1. Assegure a instalação do xcode:
+
+```
+sudo rm -rf /Library/Developer/CommandLineTools
+xcode-select --install
+```
+
 3. Baixe o código-fonte do Raylib diretamente do GitHub e entre na pasta:
 ```
 git clone https://github.com/raysan5/raylib.git
