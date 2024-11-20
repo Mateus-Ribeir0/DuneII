@@ -13,8 +13,15 @@ INCLUDE_DIR = include
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
 HEADERS = $(wildcard $(INCLUDE_DIR)/*.h)
 
-# Bibliotecas necessárias
-LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+# Detecta o sistema operacional
+UNAME_S := $(shell uname -s)
+
+# Configura as bibliotecas de acordo com o sistema operacional
+ifeq ($(UNAME_S), Linux)
+    LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+else ifeq ($(UNAME_S), Darwin)
+    LIBS = -lraylib -lm -lpthread -ldl -framework OpenGL -framework Cocoa -framework IOKit
+endif
 
 # Regra para gerar o executável principal
 $(TARGET): $(SOURCES) $(HEADERS)
