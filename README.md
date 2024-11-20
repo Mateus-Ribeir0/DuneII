@@ -103,12 +103,16 @@ make
    ```
 
 2. No terminal:
-```export MACOSX_DEPLOYMENT_TARGET=10.9```
+```
+export MACOSX_DEPLOYMENT_TARGET=10.9
+```
 
-3. Instale as ferramentas do XCode:
-```xcode-select --install```
+4. Instale as ferramentas do XCode:
+```
+xcode-select --install
+```
 
-4. Builde a Raylib novamente:
+5. Builde a Raylib novamente:
 ```
 git clone https://github.com/raysan5/raylib.git
 cd raylib/src
