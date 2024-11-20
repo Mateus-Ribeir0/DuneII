@@ -8,18 +8,18 @@ Bem-vindo ao **Dune II**, um jogo inspirado no épico universo de Duna. Sua miss
 
 - **Colete especiarias**: Espalhadas pelos mapas, elas são a chave para enriquecer sua casa e garantir sua prosperidade.
 - **Venda especiarias no mercador de Arrakis**: Troque as especiarias por dinheiro e use os lucros para melhorar seu inventário e garantir sua sobrevivência.
-- **Gerencie sua água**: O deserto é implacável, e sem água você não sobreviverá.
+- **Gerencie sua água**: O deserto é implacável, e sem água você não sobreviverá. Sempre que possível, compre água para não morrer.
 - **Explore diferentes mapas**:
-  - **Mapa 1**: Relativamente tranquilo, mas cuidado com as dunas.
-  - **Mapa 2**: Mais perigoso, onde movimentos descuidados podem chamar a atenção dos **vermes gigantes**.
-  - **Mapa 3**: O desafio máximo, onde sobreviver exige estratégia.
+  - **Mapa 1**: Relativamente tranquilo, mas com menos especiarias.
+  - **Mapa 2**: Mais perigoso, onde movimentos descuidados podem chamar a atenção dos **vermes gigantes** mais facilmente.
+  - **Mapa 3**: O desafio máximo, onde sobreviver exige estratégia. Nele, você acumula muitos pontos ao coletar especiarias, mas você é facilmente identificado pelos **vermes**.
 
 ---
 
 ## **Desafios**
 
-- **Equilibre recursos**: Coletar especiarias e manter sua água são tarefas que demandam planejamento.
-- **Evite os vermes gigantes**: Nos mapas mais perigosos, movimentos repetitivos ou padrões atraem esses predadores mortais.
+- **Equilibre recursos**: Colete especiarias, mas saiba conciliar com sua água, para acumular dinheiro sem morrer desidratado.
+- **Evite os vermes gigantes**: Para não ser identificado por eles, não repita seus passos, e, em mapas com mais especiarias, mais fácil é de ser atacado por um deles.
 - **Planeje cada movimento**: Errar pode significar a sua morte.
 
 ---
@@ -28,8 +28,10 @@ Bem-vindo ao **Dune II**, um jogo inspirado no épico universo de Duna. Sua miss
 
 ### **Controles**
 - **WASD**: Movimente seu personagem.
-- **ENTER**: Interaja com portais ou vendedores.
-- **E**: Escape de eventos perigosos, como os ataques dos vermes gigantes.
+- **SPACE**: Pule as cutscenes.
+- **ENTER**: Confirme ações.
+- **P**: Interaja com portais.
+- **E**: Se mantenha parado sem respirar para evitar ser identificado pelos vermes que se rastejam sob a areia.
 
 ---
 
