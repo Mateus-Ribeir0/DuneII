@@ -43,6 +43,8 @@ static double mapaEntradaTime = 0.0;
 static Texture2D monsters;
 static double nextMonsterCheckTime = 0.0;
 static int lastMap = -1;
+static Sound heartbeatSound;
+static bool isHeartbeatPlaying = false;
 
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
@@ -149,6 +151,9 @@ void iniciarGame() {
     deathEmotiva = LoadSound("static/music/deathemotiva.mp3");
     SetSoundVolume(musicaMapa2, 0.8f);
     monsterGrowl2 = LoadSound("static/music/monsterGrowl2.wav");
+    heartbeatSound = LoadSound("static/music/heartbeat.wav");
+    SetSoundVolume(heartbeatSound, 1.0f);
+
 
     initializeLoadingScreen();
 }
@@ -184,6 +189,7 @@ void finalizarGame() {
     UnloadSound(barulhoMonstro);
     UnloadSound(deathEmotiva);
     UnloadSound(monsterGrowl2);
+    UnloadSound(heartbeatSound);
 
     for (int i = 0; i < 4; i++) {
         UnloadTexture(loadingImagesMap0[i]);
@@ -215,6 +221,11 @@ void inicializarEspeciaria() {
         items[0].position = posicoesEspeciarias[indiceEspeciariaAtual];
         items[0].collected = false;
     }
+}
+
+bool faltamDoisParaSequencia(const char *historico, size_t tamanho_padrao) {
+    size_t historico_len = strlen(historico);
+    return (historico_len >= tamanho_padrao - 2 && historico_len < tamanho_padrao);
 }
 
 void updateWaterLevel(GameScreen *currentScreen) {
@@ -986,6 +997,23 @@ void playGame(GameScreen *currentScreen) {
             mensagem = NULL;
             break;
         }
+
+        int tamanho_padrao = 0;
+        switch (mapaAtual) {
+            case 0: tamanho_padrao = 10; break;
+            case 1: tamanho_padrao = 8; break;
+            case 2: tamanho_padrao = 6; break;
+        }
+
+        if (faltamDoisParaSequencia(historico, tamanho_padrao)) {
+            if (!isHeartbeatPlaying) {
+                PlaySound(heartbeatSound);
+                isHeartbeatPlaying = true;
+            }
+        } else {
+            isHeartbeatPlaying = false;
+        }
+
 
         if (movimento != '\0') {
             movePlayer(dx, dy);
