@@ -97,36 +97,41 @@ make
 
 ### Sem XCode
 
-1. No terminal:
+1. Instale o Homebrew:
+   ```
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+2. No terminal:
 ```export MACOSX_DEPLOYMENT_TARGET=10.9```
 
-2. Instale as ferramentas do XCode:
+3. Instale as ferramentas do XCode:
 ```xcode-select --install```
 
-3. Builde a Raylib novamente:
+4. Builde a Raylib novamente:
 ```
 git clone https://github.com/raysan5/raylib.git
 cd raylib/src
 make
 ```
 
-4. Faça esse check da Otool:
+5. Faça esse check da Otool:
 
 ```
 cp raylib/src/libraylib.a YOUR_PROJECTS_ROOT_FOLDER
 ```
 
-5. Clone o repositório:
+6. Clone o repositório:
 ```
 git clone https://github.com/Mateus-Ribeir0/DuneII
 ```
 
-6. Mude o diretório:
+7. Mude o diretório:
 ```
 cd DuneII
 ```
 
-7. Compile e rode:
+8. Compile e rode:
 
 ```
 make
