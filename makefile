@@ -1,25 +1,25 @@
-# Nome do executável principal
 TARGET = dune_game
 
-# Compilador e flags
 CC = gcc
 CFLAGS = -Wall -std=c99
 
-# Diretórios
 SRC_DIR = src
 INCLUDE_DIR = include
 
-# Lista de arquivos .c e .h
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
-HEADERS = $(wildcard $(INCLUDE_DIR)/*.h)
 
-# Bibliotecas necessárias
-LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+UNAME_S := $(shell uname -s)
 
-# Regra para gerar o executável principal
-$(TARGET): $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) $(SOURCES) -I$(INCLUDE_DIR) -o $(TARGET) $(LIBS) || ($(MAKE) clean && $(MAKE))
+ifeq ($(UNAME_S), Linux)
+    LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+else ifeq ($(UNAME_S), Darwin)
+    LIBS = -L../raylib/src -lraylib -lm -lpthread -ldl -framework OpenGL -framework Cocoa -framework IOKit
+    CFLAGS += -I../raylib/src
+endif
 
-# Limpeza dos arquivos temporários e executáveis
+$(TARGET): $(SOURCES)
+	$(CC) $(CFLAGS) $(SOURCES) -I$(INCLUDE_DIR) -o $(TARGET) $(LIBS)
+
+
 clean:
 	rm -f $(TARGET)
