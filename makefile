@@ -1,7 +1,7 @@
 TARGET = dune_game
 
 CC = gcc
-CFLAGS = -Wall -std=c99
+CFLAGS = -Wall -std=c99 -v
 
 SRC_DIR = src
 INCLUDE_DIR = include
