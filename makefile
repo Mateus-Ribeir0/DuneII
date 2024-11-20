@@ -1,3 +1,4 @@
+
 TARGET = dune_game
 
 CC = gcc
@@ -17,8 +18,8 @@ else ifeq ($(UNAME_S), Darwin)
     LIBS = -lraylib -lm -lpthread -ldl -framework OpenGL -framework Cocoa -framework IOKit
 endif
 
-$(TARGET): $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) $(SOURCES) -I$(INCLUDE_DIR) -o $(TARGET) $(LIBS) || ($(MAKE) clean && $(MAKE))
+$(TARGET): $(SOURCES)
+	$(CC) $(CFLAGS) $(SOURCES) -I$(INCLUDE_DIR) -o $(TARGET) $(LIBS)
 
 clean:
 	rm -f $(TARGET)
