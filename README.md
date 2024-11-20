@@ -95,6 +95,54 @@ cd DuneII
 make
 ```
 
+### Sem XCode
+
+1. Instale o Homebrew:
+   ```
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+2. No terminal:
+```
+export MACOSX_DEPLOYMENT_TARGET=10.9
+```
+
+4. Instale as ferramentas do XCode:
+```
+xcode-select --install
+```
+
+5. Builde a Raylib novamente:
+```
+git clone https://github.com/raysan5/raylib.git
+cd raylib/src
+make
+```
+
+5. Faça esse check da Otool:
+
+```
+cp raylib/src/libraylib.a YOUR_PROJECTS_ROOT_FOLDER
+```
+
+6. Clone o repositório:
+```
+git clone https://github.com/Mateus-Ribeir0/DuneII
+```
+
+7. Mude o diretório:
+```
+cd DuneII
+```
+
+8. Compile e rode:
+
+```
+make
+./dune_game
+```
+
+
 Caso houver algum imprevisto, consulte a documentação da Raylib para Mac: [Raylib em Mac](https://github.com/raysan5/raylib/wiki/Working-on-macOS).
 
 ---
