@@ -79,7 +79,7 @@ Caso ocorra algum imprevisto, leia a documentação da Raylib para Linux: [Rayli
 
 <br>
 
-## Em Mac:
+## Em Mac: (O código apresenta defeitos ao compilar no Mac devido à forma que ele lida com algumas partes do nosso código, que é diferente do Linux)
 
 1. Configure o ambiente para suportar a compilação estática:
 ```
@@ -108,7 +108,7 @@ git clone https://github.com/Mateus-Ribeir0/DuneII.git
 cd DuneII
 ```
 
-6º) Compile e rode o jogo usando o seguinte comando:
+6. Compile e rode o jogo usando o seguinte comando:
 ```
 make
 ./dune_game
