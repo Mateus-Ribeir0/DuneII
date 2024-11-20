@@ -75,6 +75,13 @@ cd DuneII
 make
 ./dune_game
 ```
+
+*. Se não funcionar a compilação, tente esse comando:
+
+```
+gcc -Wall -std=c99 -Iinclude -I../raylib/src src/*.c -o dune_game -L../raylib/src -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+```
+
 Caso ocorra algum imprevisto, leia a documentação da Raylib para Linux: [Raylib para Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux).
 
 <br>
