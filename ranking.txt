@@ -1,29 +1,7 @@
-Miccuci|7000
-Carlos|6400
-Mamede|6200
-Mateus|5000
-Pro Player|4300
-Amanda|4000
-Malu|3900
-fava eh bom|3600
-Gianny|2000
-José|1800
-Tomate|1800
-buchada|1800
-Carol|300
-Zelda|290
-Gabriel|280
-Lucas|275
-André|270
-Bruno|265
-Rafael|260
-Gustavo|255
-Ana|250
-Felipe|245
-Patricia|240
-Cláudio|235
-Camila|230
-Júlia|225
-Fábio|210
-mamede|0
-mamede|0
+Carlos|0
+Mamede|0
+Mateus|0
+carlos|0
+dsfa|0
+carc|0
+af|0

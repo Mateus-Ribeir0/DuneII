@@ -93,7 +93,7 @@ void DrawDialogBox(const char *text, int posX, int posY, int width, int height, 
     DrawText(TextSubtext(text, 0, maxCharsInBox), posX + 10, posY + 10, 20, textColor);
 }
 
-void playLobby(GameScreen *currentScreen) {
+void processarEntradaLobby(GameScreen *currentScreen) {
     mapaAtual = -1;
     bool pertoDePortal = false;
     int dx = 0, dy = 0;

@@ -36,7 +36,7 @@ int main() {
                     lobbyInitialized = true;
                 }
 
-                playLobby(&currentScreen);
+                processarEntradaLobby(&currentScreen);
 
                 if (currentScreen != LOBBY && lobbyInitialized) {
                     finalizarLobby();
