@@ -45,6 +45,8 @@ static double nextMonsterCheckTime = 0.0;
 static int lastMap = -1;
 static Sound heartbeatSound;
 static bool isHeartbeatPlaying = false;
+static Texture2D npcArmoured;
+Rectangle npcArmouredHitbox;
 
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
@@ -53,6 +55,7 @@ static bool isHeartbeatPlaying = false;
 
 int playerMoney = 0;
 int deathEmotivaTocando;
+
 
 Rectangle cerealsSourceRec = { 64, 64, 32, 32 };
 
@@ -138,6 +141,7 @@ void iniciarGame() {
     map0 = LoadTexture("static/image/map0.png");
     EpressSprite = LoadTexture("static/image/Epress.png");
     monsters = LoadTexture("static/image/monsters.png");
+    npcArmoured = LoadTexture("static/image/spriteNpcArmoured.png");
 
     musicaMapa0 = LoadSound("static/music/mapa0musica.mp3");
     SetSoundVolume(musicaMapa0, 0.7f);
@@ -180,6 +184,7 @@ void finalizarGame() {
     UnloadTexture(portal);
     UnloadTexture(map0);
     UnloadTexture(EpressSprite);
+    UnloadTexture(npcArmoured);
 
     UnloadSound(musicaMapa0);
     UnloadSound(musicaMapa1);
@@ -364,6 +369,10 @@ void movePlayer(int dx, int dy) {
     int new_y = player_y + dy;
 
     Rectangle playerRect = { new_x * TILE_SIZE, new_y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
+
+    if (CheckCollisionRecs(playerRect, npcArmouredHitbox)) {
+        return; // Impede o jogador de entrar na área do NPC
+    }
 
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool colidiuComDuna = false;
@@ -556,6 +565,25 @@ void drawGame() {
             DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map1Color);
         }
     }
+
+    Vector2 npcPosition = {25 * TILE_SIZE, 10 * TILE_SIZE}; // Posição do NPC no mapa
+    Rectangle npcSourceRec = {0, 192, 64, 64}; // Região na spritesheet (64x64 pixels)
+    Rectangle npcDestRec = {
+        npcPosition.x,          // Posição X no mapa
+        npcPosition.y,          // Posição Y no mapa
+        96,                     // Largura ajustada para 96 pixels
+        96                      // Altura ajustada para 96 pixels
+    };
+    npcArmouredHitbox = (Rectangle){
+        npcPosition.x + TILE_SIZE,  // Ajuste para alinhar horizontalmente
+        npcPosition.y + TILE_SIZE,  // Ajuste para alinhar verticalmente
+        32,                       // Largura (ajustada conforme necessário)
+        32                        // Altura (ajustada conforme necessário)
+    };
+    Vector2 npcOrigin = {0, 0}; // Origem para rotação (não aplicada aqui)
+
+    DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
+
     Rectangle bonesSourceRect = {774, 113, 38, 33};
     Vector2 bonesPosition = {30 * TILE_SIZE, 10 * TILE_SIZE};
     Rectangle bonesDestRect = {bonesPosition.x, bonesPosition.y, 38, 33}; 
@@ -910,6 +938,7 @@ bool isPlayerNearPortal() {
 
 void playGame(GameScreen *currentScreen) {
     mapaEntradaTime = GetTime();
+
     ClearBackground(BLACK);
     BeginDrawing();
     EndDrawing();
