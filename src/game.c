@@ -842,10 +842,26 @@ void drawGame() {
 
     DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, (Vector2){0, 0}, 0.0f, WHITE);
      // Sorte (Lucky)
-    Vector2 luckyIconPos = {infoBoxX + 18, infoBoxY + 95};
-    Rectangle luckySourceRec = {164, 186, 107, 115};
-    Rectangle luckyDestRec = {luckyIconPos.x, luckyIconPos.y, 24, 24};
+    Vector2 luckyIconPos = { infoBoxX + 18, infoBoxY + 95 }; // Alinhado ao layout do HUD
+    Rectangle luckySourceRec;
+
+    // Verificar o valor de sorte e alterar o ícone conforme necessário
+    if (playerLucky == 50) {
+        luckySourceRec = (Rectangle){ 164, 44, 107, 108 }; // Coordenadas do ícone para 50% de sorte
+    } else if (playerLucky == 30) {
+        luckySourceRec = (Rectangle){ 480, 176, 122, 129 }; // Coordenadas do ícone para 30% de sorte
+    } else if (playerLucky == 20) {
+        luckySourceRec = (Rectangle){ 494, 41, 107, 107 }; // Coordenadas do ícone para 20% de sorte
+    } else {
+        luckySourceRec = (Rectangle){ 164, 186, 107, 115 }; // Coordenadas do ícone padrão
+    }
+
+    Rectangle luckyDestRec = { luckyIconPos.x, luckyIconPos.y, 24, 24 }; // Reduzido para o HUD
+
+    // Desenhar o ícone de sorte
     DrawTexturePro(luckyTexture, luckySourceRec, luckyDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+    // Adicionar o texto correspondente
     DrawText(TextFormat("Sorte: %.0f%%", playerLucky), infoBoxX + 50, infoBoxY + 100, 18, WHITE);
 
 
