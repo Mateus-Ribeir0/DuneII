@@ -14,6 +14,9 @@ static Texture2D sombra;
 static Music lobbyMusic; 
 static Texture2D velho;
 static Sound troca;
+static Texture2D spaceshipTexture;
+static Music warMusic; 
+
 
 int MAX_ESPECIARIAS = BOLSA_CAPACIDADE_PEQUENA;
 static float portalAnimationTimer = 0.0f;
@@ -29,6 +32,10 @@ const char *errorMessage = "";
 static int easterEggCount = 0;
 const int widthMercador = 620;
 const char* mensagem = NULL;
+static bool spaceshipAnimationPlayed = false;
+static float spaceshipPositionX = -128;
+static bool isInExtendedLobby = false;
+static bool isWarMusicPlaying = false;
 
 void iniciarLobby() {
     velho = LoadTexture("static/image/velho.png");
@@ -44,6 +51,8 @@ void iniciarLobby() {
     monstersTexture = LoadTexture("static/image/monsters.png");
     bonesTexture = LoadTexture("static/image/bones.png");
     sombra = LoadTexture("static/image/sombras.png");
+    spaceshipTexture = LoadTexture("static/image/spaceships.png");
+    warMusic = LoadMusicStream("static/music/warMusic.wav");
 
     if (!isMusicPlaying) {
         lobbyMusic = LoadMusicStream("static/music/Musica_lobby.mp3");
@@ -67,6 +76,8 @@ void finalizarLobby() {
     UnloadTexture(goldTexture);
     UnloadTexture(aguaTexture);
     UnloadSound(troca);
+    UnloadTexture(spaceshipTexture);
+    UnloadMusicStream(warMusic);
     
     if (isMusicPlaying) {
         PauseMusicStream(lobbyMusic);
@@ -165,9 +176,10 @@ void processarEntradaLobby(GameScreen *currentScreen) {
         resetarJogo();
         return;
     }
-    
+
     drawLobby();
 }
+
 
 void drawLobby() {
     BeginDrawing();
@@ -388,6 +400,37 @@ void drawLobby() {
     DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);
+
+    if (itemsCollected >= 3 && !spaceshipAnimationPlayed) {
+        static float spaceshipTimer = 0.0f;
+        spaceshipTimer += GetFrameTime();
+
+        Rectangle spaceshipSourceRec = { 0, 0, spaceshipTexture.width, spaceshipTexture.height };
+        Rectangle spaceshipDestRec = { spaceshipPositionX, 100, spaceshipTexture.width * 4, spaceshipTexture.height * 4 };
+        Vector2 spaceshipOrigin = { spaceshipTexture.width / 2.0f, spaceshipTexture.height / 2.0f };
+
+        DrawTexturePro(spaceshipTexture, spaceshipSourceRec, spaceshipDestRec, spaceshipOrigin, 90.0f, WHITE);
+
+        spaceshipPositionX += 200 * GetFrameTime(); 
+
+        if (!isWarMusicPlaying) {
+            StopMusicStream(lobbyMusic); 
+            PlayMusicStream(warMusic);
+            isWarMusicPlaying = true; 
+        }
+
+        if (spaceshipPositionX > SCREEN_WIDTH + 800) {
+            spaceshipAnimationPlayed = true;
+            spaceshipTimer = 0.0f;
+        }
+    }
+
+    if (isWarMusicPlaying) {
+        UpdateMusicStream(warMusic);
+    } else {
+        UpdateMusicStream(lobbyMusic);
+    }
+
     DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, fillColor);
     DrawRectangleRoundedLines((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, borderColor);
     DrawRectangleRoundedLines((Rectangle){infoBoxX + 1, infoBoxY + 1, infoBoxWidth - 2, infoBoxHeight - 2}, 0.1f, 16, borderColor);
