@@ -29,7 +29,7 @@ int isInteractingWithMerchant = 0;
 bool showThankYouMessage = false;
 static int portalFrameIndex = 0;
 double errorMessageTimer = 0.0;
-const int heigthMercador = 140;
+const int heigthMercador = 150;
 bool showErrorMessage = false;
 const char *errorMessage = "";
 static int easterEggCount = 0;
@@ -508,7 +508,7 @@ void drawLobby() {
         Rectangle sourceRecVelho = { 62, 54, 509, 485 };
         Rectangle sourceRecVelhoPuto = { 1084, 108, 510, 484 };
         Rectangle sourceRecVelhoFeliz = { 573, 81, 510, 484 };
-        Rectangle destRecVelho = { 150, 350, 256, 256 };
+        Rectangle destRecVelho = { 150, 370, 256, 256 };
         Vector2 originVelho = { 32, 32 };
 
         Rectangle currentSprite = (merchantMood == 2) ? sourceRecVelhoPuto :
@@ -520,12 +520,14 @@ void drawLobby() {
         if (!isInteractingWithMerchant) {
             merchantMood = 0; 
 
-            DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1]  para vender especiarias\n[2] para comprar uma bolsa nova\n[3] para comprar garrafa de água",
+            DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1] para vender especiarias\n[2] para comprar uma bolsa nova\n[3] para comprar garrafa de água\n[4] para comprar itens de sorte",
                         100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
 
             if (IsKeyPressed(KEY_ONE)) isInteractingWithMerchant = 1;
             else if (IsKeyPressed(KEY_TWO)) isInteractingWithMerchant = 2;
             else if (IsKeyPressed(KEY_THREE)) isInteractingWithMerchant = 3;
+            else if (IsKeyPressed(KEY_FOUR)) isInteractingWithMerchant = 4;
+
         } else {
 
             switch (isInteractingWithMerchant) {
@@ -768,6 +770,101 @@ void drawLobby() {
                     }
                 }
                 break;
+
+                case 4:
+                    DrawDialogBox("Qual item de sorte deseja comprar?\n\n[1] Ferradura (20%) - 3000\n[2] Amuleto (30%) - 7000\n[3] Trevo (50%) - 10000",
+                                100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+
+                    if (IsKeyPressed(KEY_ONE)) { 
+                        if (playerMoney >= FERRADURA_PRECO) {
+                            playerLucky = FERRADURA_SORTE;
+                            playerMoney -= FERRADURA_PRECO;
+                            merchantMood = 1;
+
+                            while (!IsKeyPressed(KEY_ENTER)) {
+                                UpdateMusicStream(lobbyMusic);
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE);
+                                DrawDialogBox("Obrigado pela compra! Aproveite sua sorte.\n\n\nAperte[ENTER] para voltar.",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                EndDrawing();
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0;
+                        } else {
+                            merchantMood = 2;
+                            while (!IsKeyPressed(KEY_ENTER)) {
+                                UpdateMusicStream(lobbyMusic);
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
+                                DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                EndDrawing();
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0;
+                        }
+                    } else if (IsKeyPressed(KEY_TWO)) { 
+                        if (playerMoney >= AMULETO_PRECO) {
+                            playerLucky = AMULETO_SORTE;
+                            playerMoney -= AMULETO_PRECO;
+                            merchantMood = 1;
+
+                            while (!IsKeyPressed(KEY_ENTER)) {
+                                UpdateMusicStream(lobbyMusic);
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE);
+                                DrawDialogBox("Obrigado pela compra! Aproveite sua sorte.\n\n\nAperte[ENTER] para voltar.",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                EndDrawing();
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0;
+                        } else {
+                            merchantMood = 2;
+                            while (!IsKeyPressed(KEY_ENTER)) {
+                                UpdateMusicStream(lobbyMusic);
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
+                                DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                EndDrawing();
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0;
+                        }
+                    } else if (IsKeyPressed(KEY_THREE)) { 
+                        if (playerMoney >= TREVO_PRECO) {
+                            playerLucky = TREVO_SORTE;
+                            playerMoney -= TREVO_PRECO;
+                            merchantMood = 1;
+
+                            while (!IsKeyPressed(KEY_ENTER)) {
+                                UpdateMusicStream(lobbyMusic);
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE);
+                                DrawDialogBox("Obrigado pela compra! Aproveite sua sorte.\n\n\nAperte[ENTER] para voltar.",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                EndDrawing();
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0;
+                        } else {
+                            merchantMood = 2;
+                            while (!IsKeyPressed(KEY_ENTER)) {
+                                UpdateMusicStream(lobbyMusic);
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
+                                DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                EndDrawing();
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0;
+                        }
+                    }
+                    break;
+
             }   
         }
     } else if (mensagem != NULL) {

@@ -61,6 +61,15 @@ typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RA
 #define PRECO_GARRAFA_MEDIA 5000
 #define PRECO_GARRAFA_GRANDE 7000
 
+#define FERRADURA_PRECO 3000
+#define AMULETO_PRECO 7000
+#define TREVO_PRECO 10000
+
+#define FERRADURA_SORTE 20.0f
+#define AMULETO_SORTE 30.0f
+#define TREVO_SORTE 50.0f
+
+
 extern int player_x;
 extern int player_y;
 extern int mapaAtual;
