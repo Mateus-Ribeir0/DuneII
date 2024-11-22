@@ -2,7 +2,7 @@
 
 Bem-vindo ao **Dune II**, um jogo inspirado no épico universo de Duna. Sua missão é sobreviver aos perigos do deserto de Arrakis enquanto coleta especiarias valiosas para prosperar sua casa.
 
-<video src="static/image/trailer.mov" controls="controls" style="max-width: 100%;">
+[![DuneII Trailer](https://img.youtube.com/vi/v=gd-w5tYxpn8/maxresdefault.jpg)](https://youtu.be/gd-w5tYxpn8)
 
 ---
 
