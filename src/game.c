@@ -1250,6 +1250,118 @@ void playGame(GameScreen *currentScreen) {
                     }
                 }
 
+                // Se o jogador tentar se mover, ele morre
+                if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_A) || IsKeyPressed(KEY_S) || IsKeyPressed(KEY_D)) {
+                    StopSound(monsterGrowl2);
+
+                    StopSound(musicaMapa0);
+                    StopSound(musicaMapa1);
+                    StopSound(musicaMapa2);
+
+                    sleep(1);
+                    PlaySound(gameOverSound);
+                    sleep(1);
+
+                    Texture2D personagemMorto = LoadTexture("static/image/dead.png");
+                    ClearBackground(BLACK);
+                    desenharAnimacaoMorte(personagem, personagemMorto);
+                    deathEmotivaTocando = 1;
+                    PlaySound(deathEmotiva);
+                    sleep(3);
+
+                    Vector2 spritePos = {GetScreenWidth() / 2, GetScreenHeight() / 2};
+                    float scale = 10.0f;
+                    Rectangle frames[3] = {
+                        {128, 192, 64, 64},
+                        {64, 192, 64, 64},
+                        {0, 192, 64, 64}
+                    };
+                    int frameIndex = 0;
+                    float frameTime = 1.0f;
+                    float moveSpeed = 20.0f;
+                    float startTime = GetTime();
+                    float elapsedTime = 0.0f;
+                    float maxScreenTime = 5.0f;
+
+                    PlaySound(barulhoMonstro);
+                    Vector2 monstersPos = {850, spritePos.y};
+
+                    while ((GetTime() - startTime < maxScreenTime) && !WindowShouldClose()) {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+
+                        elapsedTime = GetTime() - startTime;
+
+                        Rectangle destMonsters = {monstersPos.x, monstersPos.y, 128 * scale, 128 * scale};
+                        Rectangle srcMonsters;
+                        Vector2 originMonsters = {64 * scale, 64 * scale};
+
+                        if (frameIndex == 0) {
+                            srcMonsters = (Rectangle){352, 320, 128, 128};
+                        } else if (frameIndex == 1) {
+                            srcMonsters = (Rectangle){240, 320, 128, 128};
+                        } else if (frameIndex == 2) {
+                            srcMonsters = (Rectangle){128, 320, 128, 128};
+                        }
+
+                        DrawTexturePro(monsters, srcMonsters, destMonsters, originMonsters, 0.0f, WHITE);
+
+                        Rectangle dest = {
+                            spritePos.x, spritePos.y,
+                            frames[frameIndex].width * scale,
+                            frames[frameIndex].height * scale
+                        };
+                        Vector2 origin = {frames[frameIndex].width / 2, frames[frameIndex].height / 2};
+
+                        DrawTexturePro(personagemMorto, frames[frameIndex], dest, origin, 0.0f, WHITE);
+
+                        spritePos.x -= moveSpeed * GetFrameTime();
+                        monstersPos.x -= moveSpeed * GetFrameTime();
+
+                        if (elapsedTime >= frameTime * (frameIndex + 1) && frameIndex < 2) {
+                            frameIndex++;
+                        }
+
+                        DrawText(TextFormat("GAME OVER - Você tentou fugir!"), 10, 40, 20, RED);
+
+                        EndDrawing();
+
+                        sleep(0.5);
+                    }
+                    ClearBackground(BLACK);
+
+                    sleep(2);
+
+                    const char *euFalhei = "Eu... Eu falhei minha missão...";
+                    int caractereExibido = 0;
+                    float tempoPorCaractere = 0.2f;
+                    float timer = 0;
+
+                    while (caractereExibido < strlen(euFalhei) && !WindowShouldClose()) {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        timer += GetFrameTime();
+
+                        if (timer >= tempoPorCaractere) {
+                            caractereExibido++;
+                            timer = 0;
+                        }
+
+                        DrawText(TextSubtext(euFalhei, 0, caractereExibido), 
+                                GetScreenWidth() / 2 - MeasureText(euFalhei, 20) / 2, 
+                                GetScreenHeight() / 2, 20, RAYWHITE);
+                        EndDrawing();
+                    }
+
+                    sleep(2);
+
+                    atualizarRanking(playerName, playerMoney);
+                    zerarMonetaria();
+                    resetarJogo();
+                    *currentScreen = RANKINGS;
+                    return;
+                }
+
                 EndDrawing();
             }
 
@@ -1257,7 +1369,7 @@ void playGame(GameScreen *currentScreen) {
                 isMonsterActive = false;
             }
 
-            if (GetTime() - monsterStartTime > 4.5f && ePressCount < 3) {
+            if ((GetTime() - monsterStartTime > 4.5f && ePressCount < 3)) {
                 StopSound(monsterGrowl2);
 
                 StopSound(musicaMapa0);
