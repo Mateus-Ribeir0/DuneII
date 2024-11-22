@@ -6,8 +6,11 @@ static Texture2D cerealsTexture;
 static Texture2D desertTileset;
 static Texture2D bonesTexture;
 static Texture2D aguaTexture;
+
+
 static Texture2D cityTexture;
 static Texture2D goldTexture;
+static Texture2D luckyTexture;
 static Texture2D personagem;
 static Texture2D portal;
 static Texture2D sombra;
@@ -46,6 +49,7 @@ void iniciarLobby() {
     portal = LoadTexture("static/image/portal.png");
     cerealsTexture = LoadTexture("static/image/Cereals.png");
     goldTexture = LoadTexture("static/image/gold.png");
+    luckyTexture = LoadTexture("static/image/lucky.png");
     aguaTexture = LoadTexture("static/image/agua.png");
     troca = LoadSound("static/music/trocaDeDinheiro.wav");
     monstersTexture = LoadTexture("static/image/monsters.png");
@@ -74,6 +78,7 @@ void finalizarLobby() {
     UnloadTexture(portal);
     UnloadTexture(cerealsTexture);
     UnloadTexture(goldTexture);
+    UnloadTexture(luckyTexture);
     UnloadTexture(aguaTexture);
     UnloadSound(troca);
     UnloadTexture(spaceshipTexture);
@@ -191,7 +196,7 @@ void drawLobby() {
     int infoBoxX = SCREEN_WIDTH - 230;
     int infoBoxY = 10;
     int infoBoxWidth = 220;
-    int infoBoxHeight = 100;
+    int infoBoxHeight = 126;
     int merchantMood = 0;
 
     Rectangle tileSourceRec = { 128, 32, 32, 32 };
@@ -448,12 +453,24 @@ void drawLobby() {
     DrawTexturePro(goldTexture, goldSourceRec, goldDestRec, origin, 0.0f, WHITE);
     DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 50, infoBoxY + 40, 18, WHITE);
 
+    // Atualize o trecho onde os dados são desenhados
     Vector2 aguaIconPos = { infoBoxX + 18, infoBoxY + 65 };
     Rectangle aguaSourceRec = { 0, 0, aguaTexture.width, aguaTexture.height };
     Rectangle aguaDestRec = { aguaIconPos.x, aguaIconPos.y, 24, 24 };
 
     DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, origin, 0.0f, WHITE);
     DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
+
+    // Adicionar posição e fonte do ícone de sorte
+    Vector2 luckyIconPos = { infoBoxX + 18, infoBoxY + 95 }; // Alinhado ao layout do HUD
+    Rectangle luckySourceRec = { 164, 186, 107, 115 };       // Coordenadas na imagem
+    Rectangle luckyDestRec = { luckyIconPos.x, luckyIconPos.y, 24, 24 }; // Reduzido para o HUD
+
+    // Desenhar o ícone de sorte
+    DrawTexturePro(luckyTexture, luckySourceRec, luckyDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+    // Adicionar o texto correspondente
+    DrawText(TextFormat("Sorte: %.0f%%", playerLucky), infoBoxX + 50, infoBoxY + 100, 18, WHITE);
 
     if (!isPlayerNearMerchant() && showErrorMessage) {
         showErrorMessage = false;

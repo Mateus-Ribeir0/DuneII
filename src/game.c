@@ -4,6 +4,7 @@
 static Texture2D personagem;
 static Texture2D sandRuins2;
 static Texture2D sandRuins3;
+static Texture2D luckyTexture; 
 static Texture2D sandRuins4;
 static Texture2D personagemAndando;
 static Texture2D cerealsTexture;
@@ -131,6 +132,7 @@ void iniciarGame() {
     environment3_1 = LoadTexture("static/image/finallevel.png");
     environment3_2 = LoadTexture("static/image/Rock8_3.png");
     safezone = LoadTexture ("static/image/desert_tileset2.png");
+    luckyTexture = LoadTexture("static/image/lucky.png");
     ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
     goldTexture = LoadTexture("static/image/gold.png");
     aguaTexture = LoadTexture("static/image/agua.png");
@@ -178,6 +180,7 @@ void finalizarGame() {
     UnloadTexture(environment3_2);
     UnloadTexture(ruinasDeAreiaPequenas);
     UnloadTexture(goldTexture);
+    UnloadTexture(luckyTexture);
     UnloadTexture(aguaTexture);
     UnloadTexture(characterBack);
     UnloadTexture(sandworm);
@@ -266,6 +269,12 @@ void checkItemCollection() {
                 case 0: especiariasGanhas = 1; break;
                 case 1: especiariasGanhas = 2; break;
                 case 2: especiariasGanhas = 4; break;
+            }
+
+            // Verificar chance extra com base na sorte
+            int chanceExtra = GetRandomValue(1, 100); // Gera um número entre 1 e 100
+            if (chanceExtra <= playerLucky) {
+                especiariasGanhas++; // Ganha uma especiaria extra
             }
 
             itemsCollected += especiariasGanhas;
@@ -802,7 +811,7 @@ void drawGame() {
     int infoBoxX = SCREEN_WIDTH - 230;
     int infoBoxY = 10;
     int infoBoxWidth = 220;
-    int infoBoxHeight = 100;
+    int infoBoxHeight = 126;
 
     DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){205, 133, 63, 255});
 
@@ -824,12 +833,21 @@ void drawGame() {
     DrawTexturePro(goldTexture, goldSourceRec, goldDestRec, (Vector2){0, 0}, 0.0f, WHITE);
     DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 50, infoBoxY + 40, 18, WHITE);
 
+    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
+
+
     Vector2 aguaIconPos = { infoBoxX + 18, infoBoxY + 65 };
     Rectangle aguaSourceRec = { 0, 0, aguaTexture.width, aguaTexture.height };
     Rectangle aguaDestRec = { aguaIconPos.x, aguaIconPos.y, 24, 24 };
 
     DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, (Vector2){0, 0}, 0.0f, WHITE);
-    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
+     // Sorte (Lucky)
+    Vector2 luckyIconPos = {infoBoxX + 18, infoBoxY + 95};
+    Rectangle luckySourceRec = {164, 186, 107, 115};
+    Rectangle luckyDestRec = {luckyIconPos.x, luckyIconPos.y, 24, 24};
+    DrawTexturePro(luckyTexture, luckySourceRec, luckyDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawText(TextFormat("Sorte: %.0f%%", playerLucky), infoBoxX + 50, infoBoxY + 100, 18, WHITE);
+
 
     portalAnimationTimer += GetFrameTime();
     if (portalAnimationTimer >= 0.1) {

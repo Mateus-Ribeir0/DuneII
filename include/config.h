@@ -69,6 +69,7 @@ extern int playerMoney;
 extern const char* mensagem;
 extern int MAX_ESPECIARIAS;
 extern float playerWater;
+extern float playerLucky;
 extern double lastWaterUpdateTime;
 extern char playerName[MAX_NAME_LENGTH];
 
