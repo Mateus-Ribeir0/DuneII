@@ -8,7 +8,7 @@
 #include <string.h>
 #include "raylib.h"
 
-typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RANKINGS } GameScreen;
+typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RANKINGS, EMPTY_SCREEN } GameScreen;
 
 #define TILE_SIZE 32
 #define MAPA_LARGURA 40

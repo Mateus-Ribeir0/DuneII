@@ -114,6 +114,15 @@ void processarEntradaLobby(GameScreen *currentScreen) {
     bool pertoDePortal = false;
     int dx = 0, dy = 0;
 
+    static bool firstEntry = true;
+
+    // Mover para a posição correta ao retornar da tela vazia
+    if (!firstEntry) {
+        firstEntry = true;
+    } else if (player_y >= 0) {
+        firstEntry = false;
+    }
+
     updateWaterLevel(currentScreen);
     UpdateMusicStream(lobbyMusic);
 
@@ -123,6 +132,14 @@ void processarEntradaLobby(GameScreen *currentScreen) {
     if (IsKeyPressed(KEY_S)) dy = 1;
 
     movePlayer(dx, dy);
+
+    // Verificar se o jogador está na borda direita
+    if (player_x >= (MAPA_LARGURA - 1) && spaceshipAnimationPlayed) {
+        if (dx == 1) { // Pressionou 'D'
+            *currentScreen = EMPTY_SCREEN; // Transição para a tela vazia
+            return;
+        }
+    }
 
     if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
         (player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
@@ -183,6 +200,108 @@ void processarEntradaLobby(GameScreen *currentScreen) {
     }
 
     drawLobby();
+}
+
+void processarTelaVazia(GameScreen *currentScreen) {
+    // Variáveis estáticas para a tela vazia
+    static Texture2D empty_personagem;
+    static Texture2D empty_personagemAndando;
+    static Texture2D empty_sombra;
+    static Texture2D empty_desertTileset;
+    static bool initialized = false;
+
+    // Coordenadas do jogador na tela vazia
+    static int empty_player_x = 10;
+    static int empty_player_y = 10;
+
+    // Direção e animação
+    static int empty_lastDirection = 3;  // 1=up, 2=left, 3=down, 4=right
+    static bool empty_isWalking = false;
+    static float empty_walkingTimer = 0.0f;
+
+    if (!initialized) {
+        // Carregar texturas específicas da tela vazia
+        empty_personagem = LoadTexture("static/image/newstoppedsprites.png");
+        empty_personagemAndando = LoadTexture("static/image/newwalkingsprites.png");
+        empty_sombra = LoadTexture("static/image/sombras.png");
+        empty_desertTileset = LoadTexture("static/image/environment.png");
+
+        initialized = true;
+    }
+
+    // Lógica de movimento
+    int dx = 0, dy = 0;
+    if (IsKeyPressed(KEY_D)) dx = 1;
+    if (IsKeyPressed(KEY_A)) dx = -1;
+    if (IsKeyPressed(KEY_W)) dy = -1;
+    if (IsKeyPressed(KEY_S)) dy = 1;
+
+    // Atualizar posição do jogador
+    if (dx != 0 || dy != 0) {
+        empty_player_x += dx;
+        empty_player_y += dy;
+
+        if (dx > 0) empty_lastDirection = 4;
+        else if (dx < 0) empty_lastDirection = 2;
+        if (dy > 0) empty_lastDirection = 3;
+        else if (dy < 0) empty_lastDirection = 1;
+
+        empty_isWalking = true;
+        empty_walkingTimer = 0.3f;
+    }
+
+    // Verificar se o jogador saiu pela borda esquerda
+    if (empty_player_x < 0) {
+        // Transição para a lobby
+        player_y = empty_player_y; // Atualizar o Y da lobby com o Y da tela vazia
+        *currentScreen = LOBBY;   // Alterar tela para a lobby
+        return;
+    }
+
+    // Atualizar o temporizador de caminhada
+    if (empty_isWalking) {
+        empty_walkingTimer -= GetFrameTime();
+        if (empty_walkingTimer <= 0) {
+            empty_isWalking = false;
+        }
+    }
+
+    // Início do desenho
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    // Desenhar o mapa (chão)
+    Rectangle tileSourceRec = { 128, 32, 32, 32 };
+    for (int y = 0; y < MAPA_ALTURA; y++) {
+        for (int x = 0; x < MAPA_LARGURA; x++) {
+            Vector2 tilePosition = { x * TILE_SIZE, y * TILE_SIZE };
+            DrawTextureRec(empty_desertTileset, tileSourceRec, tilePosition, WHITE);
+        }
+    }
+
+    // Desenhar o personagem com base na direção
+    Rectangle sourceRecPersonagem;
+    switch (empty_lastDirection) {
+        case 1: sourceRecPersonagem = (Rectangle){0, 192, 64, 64}; break;  // Up
+        case 2: sourceRecPersonagem = (Rectangle){0, 64, 64, 64}; break;   // Left
+        case 3: sourceRecPersonagem = (Rectangle){0, 0, 64, 64}; break;    // Down
+        case 4: sourceRecPersonagem = (Rectangle){0, 128, 64, 64}; break;  // Right
+        default: sourceRecPersonagem = (Rectangle){0, 0, 64, 64}; break;
+    }
+
+    Vector2 positionPersonagem = { empty_player_x * TILE_SIZE, empty_player_y * TILE_SIZE };
+    Rectangle destRecPersonagem = { positionPersonagem.x - 32, positionPersonagem.y - 32, 96, 96 };
+
+    // Desenhar personagem
+    if (empty_isWalking) {
+        DrawTexturePro(empty_sombra, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
+        DrawTexturePro(empty_personagemAndando, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
+    } else {
+        DrawTexturePro(empty_sombra, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
+        DrawTexturePro(empty_personagem, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
+    }
+
+    EndDrawing();
 }
 
 

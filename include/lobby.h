@@ -4,6 +4,8 @@
 #include "config.h"
 #include "game.h"
 
+
+
 void iniciarLobby();
 void finalizarLobby();
 int isPlayerNearMerchant();
@@ -12,5 +14,6 @@ void processarEntradaLobby(GameScreen *currentScreen);
 void drawLobby();
 void resetSpaceshipAnimation();
 void updateAndDrawSpaceshipAnimation();
+void processarTelaVazia();
 
 #endif
