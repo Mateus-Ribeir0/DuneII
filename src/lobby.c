@@ -685,7 +685,7 @@ void drawLobby() {
         soundPlayed = false;
     }
 
-    if (isPlayerNearMerchant()) {
+    if (isPlayerNearMerchant() && !spaceshipAnimationPlayed) {
         Rectangle sourceRecVelho = { 62, 54, 509, 485 };
         Rectangle sourceRecVelhoPuto = { 1084, 108, 510, 484 };
         Rectangle sourceRecVelhoFeliz = { 573, 81, 510, 484 };
@@ -697,7 +697,9 @@ void drawLobby() {
 
 
         DrawTexturePro(velho, currentSprite, destRecVelho, originVelho, 0.0f, WHITE);
-
+        if (!spaceshipAnimationPlayed){
+            
+        }
         if (!isInteractingWithMerchant) {
             merchantMood = 0; 
 
