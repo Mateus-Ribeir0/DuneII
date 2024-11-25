@@ -207,19 +207,21 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static Texture2D empty_sombra;
     static Texture2D empty_desertTileset;
     static Texture2D empty_villain;
-    static Texture2D villain_sombra; // Sombra para o vilão
-    static Texture2D villain_portrait; // Retrato do vilão
-    static Music epicMusic; // Nova música
-    static Sound typingSound; // Som de digitação
+    static Texture2D villain_sombra;
+    static Texture2D villain_portrait;
+    static Music epicMusic;
+    static Music battleMusic;
+    static Sound machineLoadingSound;
 
     static bool initialized = false;
     static double startTime = 0;
     static bool dialogTriggered = false;
     static bool epicMusicStarted = false;
+    static bool battleMusicStarted = false;
+    static bool soundPlayed = false;
 
-    static int empty_player_x = 1; // Posição ajustada para mais próximo da borda esquerda
+    static int empty_player_x = 1;
     static int empty_player_y = 10;
-    static bool player_frozen = true;
 
     static const char *dialogTexts[] = {
         "Você não deveria estar aqui...",
@@ -232,7 +234,8 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static int currentDialogIndex = 0;
     static char displayedText[256] = "";
     static int displayedTextLength = 0;
-    static bool typingSoundPlaying = false;
+    static double lastTextEndTime = 0;
+    static bool hideDialog = false;
 
     if (!initialized) {
         empty_personagem = LoadTexture("static/image/newstoppedsprites.png");
@@ -242,17 +245,10 @@ void processarTelaVazia(GameScreen *currentScreen) {
         villain_sombra = LoadTexture("static/image/sombras.png");
         villain_portrait = LoadTexture("static/image/villainPortrait.png");
         epicMusic = LoadMusicStream("static/music/epicversion2.wav");
-        typingSound = LoadSound("static/music/falas.wav");
+        battleMusic = LoadMusicStream("static/music/battleMusic.wav");
+        machineLoadingSound = LoadSound("static/music/machineLoading.wav");
 
-        // Aumentar o volume do som de digitação
-        SetSoundVolume(typingSound, 1.0f);
-
-        if (empty_personagem.id == 0 || empty_sombra.id == 0 || empty_desertTileset.id == 0 ||
-            empty_villain.id == 0 || villain_sombra.id == 0 || villain_portrait.id == 0 ||
-            epicMusic.stream.buffer == NULL || typingSound.stream.buffer == NULL) {
-            TraceLog(LOG_ERROR, "Falha ao carregar uma ou mais texturas ou músicas.");
-            return;
-        }
+        SetSoundVolume(machineLoadingSound, 1.0f);
 
         startTime = GetTime();
         initialized = true;
@@ -261,7 +257,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
     BeginDrawing();
     ClearBackground(BLACK);
 
-    // Desenhar o mapa com desertTileset
+    // Desenhar o mapa
     Rectangle tileSourceRec = { 128, 32, 32, 32 };
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
@@ -270,7 +266,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
     }
 
-    // Desenhar o jogador imóvel com sprite de "D"
+    // Desenhar o personagem
     Rectangle sourceRecPersonagem = { 0, 128, 64, 64 };
     Vector2 positionPersonagem = { empty_player_x * TILE_SIZE, empty_player_y * TILE_SIZE };
     Rectangle destRecPersonagem = { positionPersonagem.x - 32, positionPersonagem.y - 32, 96, 96 };
@@ -278,78 +274,79 @@ void processarTelaVazia(GameScreen *currentScreen) {
     DrawTexturePro(empty_sombra, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(empty_personagem, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
 
-    // Desenhar o vilão, no mesmo `y` que o personagem e ajustado para se alinhar com a sombra
-    Rectangle sourceRecVillain = { 0, 64, 64, 64 }; // Coordenadas na spritesheet
-    Vector2 villainPosition = { (MAPA_LARGURA - 3) * TILE_SIZE, empty_player_y * TILE_SIZE + 8 }; // Ajustado
+    // Desenhar o vilão
+    Rectangle sourceRecVillain = { 0, 64, 64, 64 };
+    Vector2 villainPosition = { (MAPA_LARGURA - 3) * TILE_SIZE, empty_player_y * TILE_SIZE + 8 };
     Rectangle destRecVillain = { villainPosition.x - 48, villainPosition.y - 48, 96, 96 };
-    Rectangle destRecVillainShadow = { villainPosition.x - 48, villainPosition.y - 48, 96, 96 }; // Sombra ajustada
 
-    DrawTexturePro(villain_sombra, sourceRecVillain, destRecVillainShadow, (Vector2){0, 0}, 0.0f, WHITE);
+    DrawTexturePro(villain_sombra, sourceRecVillain, destRecVillain, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(empty_villain, sourceRecVillain, destRecVillain, (Vector2){0, 0}, 0.0f, WHITE);
 
-    // Mostrar uma caixa de texto após 4 segundos
-    if (GetTime() - startTime >= 4.0) {
+    // Mostrar diálogo e retrato somente após 3 segundos
+    if (GetTime() - startTime >= 3.0 && !hideDialog) {
         dialogTriggered = true;
 
-        // Trocar a música para epicversion2.wav
-        if (!epicMusicStarted) {
-            PlayMusicStream(epicMusic);
-            epicMusicStarted = true;
-        }
-        UpdateMusicStream(epicMusic);
-    }
-
-    if (dialogTriggered && currentDialogIndex < totalDialogTexts) {
-        // Desenhar o retrato do vilão, atrás da caixa de texto
-            Rectangle villainPortraitDest = {
-            SCREEN_WIDTH - 338, // Ajustado para 288 de largura
-            SCREEN_HEIGHT - 418, // Ajustado para 288 de altura
-            288, // Largura proporcional
-            288  // Altura proporcional
-        };
-        DrawTexturePro(villain_portrait, (Rectangle){0, 0, villain_portrait.width, villain_portrait.height}, 
+        // Desenhar o retrato do vilão
+        Rectangle villainPortraitDest = { SCREEN_WIDTH - 338, SCREEN_HEIGHT - 418, 288, 288 };
+        DrawTexturePro(villain_portrait, (Rectangle){0, 0, villain_portrait.width, villain_portrait.height},
                        villainPortraitDest, (Vector2){0, 0}, 0.0f, WHITE);
 
-        // Desenhar a caixa de texto
+        // Mostrar a caixa de texto
         DrawRectangleRounded((Rectangle){ 50, SCREEN_HEIGHT - 150, SCREEN_WIDTH - 100, 100 }, 0.1f, 16, (Color){ 0, 0, 0, 200 });
         DrawRectangleRoundedLines((Rectangle){ 50, SCREEN_HEIGHT - 150, SCREEN_WIDTH - 100, 100 }, 0.1f, 16, WHITE);
 
-        // Efeito de digitação para cada frase
+        // Mostrar texto com efeito de digitação
         if (displayedTextLength < strlen(dialogTexts[currentDialogIndex])) {
-            if (GetTime() - startTime >= 4.0 + displayedTextLength * 0.05) {
+            if (GetTime() - startTime >= 3.0 + displayedTextLength * 0.05) {
                 displayedText[displayedTextLength] = dialogTexts[currentDialogIndex][displayedTextLength];
                 displayedTextLength++;
                 displayedText[displayedTextLength] = '\0';
-
-                // Tocar som de digitação
-                if (!typingSoundPlaying) {
-                    PlaySound(typingSound);
-                    typingSoundPlaying = true;
-                }
             }
         } else {
-            StopSound(typingSound);
-            typingSoundPlaying = false;
+            // Atualizar o tempo do último texto exibido
+            if (lastTextEndTime == 0) {
+                lastTextEndTime = GetTime();
+            }
 
-            if (IsKeyPressed(KEY_ENTER)) {
-                // Avança para o próximo texto ao pressionar ENTER
+            // Avançar para o próximo texto se houver ou ocultar caixa de texto
+            if (currentDialogIndex < totalDialogTexts - 1 && IsKeyPressed(KEY_ENTER)) {
                 currentDialogIndex++;
-                if (currentDialogIndex < totalDialogTexts) {
-                    displayedTextLength = 0;
-                    memset(displayedText, 0, sizeof(displayedText));
-                }
+                displayedTextLength = 0;
+                memset(displayedText, 0, sizeof(displayedText));
+                lastTextEndTime = 0;
+            } else if (currentDialogIndex == totalDialogTexts - 1 && GetTime() - lastTextEndTime >= 4.0) {
+                hideDialog = true;
             }
         }
 
         DrawText(displayedText, 80, SCREEN_HEIGHT - 120, 20, WHITE);
 
-        // Indicativo de avançar texto
-        if (displayedTextLength == strlen(dialogTexts[currentDialogIndex])) {
+        if (displayedTextLength == strlen(dialogTexts[currentDialogIndex]) && currentDialogIndex < totalDialogTexts - 1) {
             DrawText("Pressione ENTER para continuar...", SCREEN_WIDTH - 300, SCREEN_HEIGHT - 40, 16, GRAY);
         }
-    } else if (dialogTriggered && currentDialogIndex >= totalDialogTexts && IsKeyPressed(KEY_ENTER)) {
-        // Finalizar o diálogo ao pressionar ENTER no último texto
-        dialogTriggered = false; // Caixa e portrait somem
+    }
+
+    // Quando os elementos desaparecem, trocar as músicas
+    if (hideDialog) {
+        if (!soundPlayed) {
+            StopMusicStream(epicMusic);
+            PlaySound(machineLoadingSound);
+            soundPlayed = true;
+        } else if (!IsSoundPlaying(machineLoadingSound) && !battleMusicStarted) {
+            PlayMusicStream(battleMusic);
+            battleMusicStarted = true;
+        }
+
+        if (battleMusicStarted) {
+            UpdateMusicStream(battleMusic);
+        }
+    } else {
+        // Atualizar música épica enquanto os elementos ainda estão visíveis
+        if (!epicMusicStarted) {
+            PlayMusicStream(epicMusic);
+            epicMusicStarted = true;
+        }
+        UpdateMusicStream(epicMusic);
     }
 
     EndDrawing();
