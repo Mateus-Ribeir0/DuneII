@@ -316,6 +316,15 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static Sound typingSound;
     static Sound gameOverSoundWar;
 
+    #define MAX_OCCURRENCES 15
+    static Vector2 warningPositions[MAX_OCCURRENCES]; // Posições dos Warnings
+    static double occurrenceTimers[MAX_OCCURRENCES];  // Timers para cada Warning/Explosion
+    static bool warningsActive[MAX_OCCURRENCES];     // Status de Warning ativo
+    static bool explosionsActive[MAX_OCCURRENCES];   // Status de Explosion ativo
+
+    static bool initializedWarnings = false;         // Marca inicialização
+    static Sound explosionSound; 
+
     static bool initialized = false;
     static double startTime = 0;
     static bool dialogTriggered = false;
@@ -585,6 +594,20 @@ void processarTelaVazia(GameScreen *currentScreen) {
         UpdateMusicStream(windMusic);
     }
 
+    if (!initializedWarnings) {
+        for (int i = 0; i < MAX_OCCURRENCES; i++) {
+            // Posicionar Warnings mais próximos do centro, à direita
+            warningPositions[i] = (Vector2){
+                (MAPA_LARGURA / 2 + GetRandomValue(1, 5)) * TILE_SIZE, // À direita do centro
+                (MAPA_ALTURA / 2 + GetRandomValue(-2, 2)) * TILE_SIZE  // Altura próxima do centro
+            };
+            occurrenceTimers[i] = 0; // Inicializar timer
+            warningsActive[i] = false;
+            explosionsActive[i] = false;
+        }
+        explosionSound = LoadSound("static/music/explosionsfx.wav"); // Carregar som de explosão
+        initializedWarnings = true;
+    }
     BeginDrawing();
     ClearBackground(BLACK);
 
@@ -665,16 +688,15 @@ void processarTelaVazia(GameScreen *currentScreen) {
         warWarningStartTime = GetTime();
     }
 
-    // Desenhar o Warning no centro do tile de explosão 1.5 segundos antes da explosão
-    // Desenhar o Warning no centro do sprite de explosão 1.5 segundos antes da explosão
-    if (warWarningActive && !explosionActive) {
+    // Desenhar o Warning no centro do tile
+    if (warWarningActive) {
         if (GetTime() - warWarningStartTime <= 1.5) {
-            // Ajustar posição para centralizar o Warning no centro do sprite de explosão
+            // Ajustar posição do Warning no centro do tile
             Vector2 warningPosition = {
-                warningTilePosition.x + (192 / 2) - (TILE_SIZE / 2), // Centralizar no eixo X
-                warningTilePosition.y + (192 / 2) - (TILE_SIZE / 2)  // Centralizar no eixo Y
+                warningTilePosition.x, // Centralizado no tile
+                warningTilePosition.y
             };
-            DrawTextureEx(warningSign, warningPosition, 0.0f, 2.0f, WHITE); // Escala para 192x192
+            DrawTextureEx(warningSign, warningPosition, 0.0f, 2.0f, WHITE); // Escala Warning para 192x192
         } else {
             // Iniciar a explosão após 1.5 segundos do Warning
             explosionActive = true;
@@ -683,8 +705,9 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
     }
 
-    // Desenhar a animação da explosão se ativa
-    if (explosionActive) {
+    // Desenhar a explosão se ativa
+    static bool explosionOccurred = false; // Garante que a explosão só aconteça uma vez
+    if (explosionActive && !explosionOccurred) {
         // Tocar o som de explosão no início da animação
         static bool explosionSoundPlayed = false;
         if (!explosionSoundPlayed) {
@@ -701,23 +724,25 @@ void processarTelaVazia(GameScreen *currentScreen) {
         int currentFrame = (int)((elapsedTime / 1.5) * totalFrames); // Calcular o frame atual
 
         if (currentFrame < totalFrames) {
-            // Definir o frame atual da spritesheet
+            // Ajustar a posição da explosão para o centro do Warning
             Rectangle sourceRecExplosion = { currentFrame * frameWidth, 0, frameWidth, frameHeight };
+            float warningX = warningTilePosition.x;
+            float warningY = warningTilePosition.y;
 
-            // Configurar o retângulo de destino proporcional a 192x192
+            // Ajustar a posição da explosão
             Rectangle destRecExplosion = {
-                warningTilePosition.x - 48,  // Centralizar posição X (- metade da diferença)
-                warningTilePosition.y - 48,  // Centralizar posição Y (- metade da diferença)
-                192,                         // Largura proporcional
-                192                          // Altura proporcional
+                warningX - 3 * TILE_SIZE + (192 - 96) / 2, // Deslocar 3 tiles à esquerda e centralizar Explosion no Warning no eixo X
+                warningY - 3 * TILE_SIZE + (192 - 96) / 2, // Deslocar 3 tiles acima e centralizar Explosion no Warning no eixo Y
+                192,                                       // Largura proporcional
+                192                                        // Altura proporcional
             };
 
             // Desenhar a explosão no tamanho proporcional
             DrawTexturePro(LoadTexture("static/image/Explosion.png"), sourceRecExplosion, destRecExplosion, (Vector2){0, 0}, 0.0f, WHITE);
         } else {
-            // Encerrar a explosão após a animação
+            // Encerrar a explosão após a animação e garantir que ela não aconteça novamente
             explosionActive = false;
-            explosionSoundPlayed = false; // Resetar o som para reutilizar se necessário
+            explosionOccurred = true; // Marca que a explosão já ocorreu
         }
     }
 
@@ -779,6 +804,63 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
     }
 
+    if (battleMusicStarted) { // Garantir que as ocorrências só comecem após a música
+        for (int i = 0; i < MAX_OCCURRENCES; i++) {
+            double currentTime = GetTime();
+
+            // Ativar o Warning quando o timer atingir o tempo correspondente
+            if (!warningsActive[i] && !explosionsActive[i]) {
+                if (occurrenceTimers[i] == 0) {
+                    // Inicializar o timer após a música começar
+                    occurrenceTimers[i] = currentTime + i * 4.0; // Intervalo de 4 segundos entre as ocorrências
+                }
+                if (currentTime >= occurrenceTimers[i]) {
+                    warningsActive[i] = true; // Ativar o Warning
+                }
+            }
+
+            // Gerenciar o Warning
+            if (warningsActive[i]) {
+                if (currentTime - occurrenceTimers[i] <= 1.5) {
+                    // Desenhar o Warning
+                    DrawTextureEx(warningSign, warningPositions[i], 0.0f, 2.0f, WHITE);
+                } else {
+                    // Após 1.5 segundos, iniciar a Explosion
+                    warningsActive[i] = false;
+                    explosionsActive[i] = true;
+                    occurrenceTimers[i] = currentTime; // Resetar o timer para a Explosion
+                }
+            }
+
+            // Gerenciar a Explosion
+            if (explosionsActive[i]) {
+                double elapsedTime = currentTime - occurrenceTimers[i];
+                int frameWidth = 96, frameHeight = 96, totalFrames = 1152 / frameWidth;
+                int currentFrame = (int)((elapsedTime / 1.5) * totalFrames);
+
+                if (currentFrame < totalFrames) {
+                    // Tocar o som no momento da explosão (uma vez por explosão)
+                    if (currentFrame == 0 && !IsSoundPlaying(explosionSound)) {
+                        PlaySound(explosionSound);
+                    }
+
+                    // Ajustar a posição da explosão para o centro do Warning
+                    Rectangle sourceRecExplosion = { currentFrame * frameWidth, 0, frameWidth, frameHeight };
+                    Rectangle destRecExplosion = {
+                        warningPositions[i].x + TILE_SIZE - 96 / 2, // Centralizar Explosion no Warning no eixo X
+                        warningPositions[i].y + TILE_SIZE - 96 / 2, // Centralizar Explosion no Warning no eixo Y
+                        192,                                       // Largura proporcional
+                        192                                        // Altura proporcional
+                    };
+                    DrawTexturePro(LoadTexture("static/image/Explosion.png"), sourceRecExplosion, destRecExplosion, (Vector2){0, 0}, 0.0f, WHITE);
+                } else {
+                    // Encerrar a Explosion e reiniciar o ciclo
+                    explosionsActive[i] = false;
+                    occurrenceTimers[i] = currentTime + MAX_OCCURRENCES * 4.0; // Ciclar o timer
+                }
+            }
+        }
+    }
 
     EndDrawing();
 }
