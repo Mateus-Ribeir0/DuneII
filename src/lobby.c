@@ -1,4 +1,5 @@
 #include "lobby.h"
+#include "game.h"
 
 static Texture2D personagemAndando;
 static Texture2D monstersTexture;
@@ -307,10 +308,12 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static Texture2D villain_sombra;
     static Texture2D villain_portrait;
     static Texture2D warningSign;
+    static Texture2D fireballSprite;
     static Music windMusic;
     static Music battleMusic;
     static Sound machineLoadingSound;
     static Sound typingSound;
+    static Sound gameOverSoundWar;
 
     static bool initialized = false;
     static double startTime = 0;
@@ -318,6 +321,9 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static bool windMusicStarted = false;
     static bool battleMusicStarted = false;
     static bool soundPlayed = false;
+    static float fireballPositionX; // Posição inicial da Fireball
+    static float fireballSpeed;    // Velocidade da Fireball
+    static bool fireballActive = false; // Indica se a Fireball está ativa
 
     static int empty_player_x = 1;
     static int empty_player_y = 10;
@@ -347,13 +353,19 @@ void processarTelaVazia(GameScreen *currentScreen) {
         villain_sombra = LoadTexture("static/image/sombras.png");
         villain_portrait = LoadTexture("static/image/villainPortrait.png");
         warningSign = LoadTexture("static/image/WarningSign05.png");
+        fireballSprite = LoadTexture("static/image/Fireball68x9.png");
         windMusic = LoadMusicStream("static/music/wind.wav");
         battleMusic = LoadMusicStream("static/music/battleMusic.wav");
         machineLoadingSound = LoadSound("static/music/machineLoading.wav");
         typingSound = LoadSound("static/music/falas.wav");
+        gameOverSoundWar = LoadSound("static/music/deathsound.wav");
 
         SetSoundVolume(machineLoadingSound, 1.0f);
         SetSoundVolume(typingSound, 0.8f);
+
+        // Configurar posição e velocidade da Fireball
+        fireballPositionX = MAPA_LARGURA * TILE_SIZE; // Começa à direita
+        fireballSpeed = (float)(MAPA_LARGURA * TILE_SIZE) / 1.5f; // Velocidade para 1,5 segundos
 
         startTime = GetTime();
         initialized = true;
@@ -371,7 +383,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
     }
 
-    // Atualizar movimento do personagem
+    // Lógica de movimento do personagem
     int dx = 0, dy = 0;
 
     if (hideDialog && battleMusicStarted) {
@@ -418,6 +430,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
     }
 
+    // Sprite do personagem
     Rectangle sourceRecPersonagem;
     switch (lastDirection) {
         case 1:
@@ -443,6 +456,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
     DrawTexturePro(empty_sombra, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(empty_personagem, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
 
+    // Sprite do vilão
     Rectangle sourceRecVillain = { 0, 64, 64, 64 };
     Vector2 villainPosition = { (MAPA_LARGURA - 3) * TILE_SIZE, 10 * TILE_SIZE + 8 };
     Rectangle destRecVillain = { villainPosition.x - 48, villainPosition.y - 48, 96, 96 };
@@ -450,16 +464,20 @@ void processarTelaVazia(GameScreen *currentScreen) {
     DrawTexturePro(villain_sombra, sourceRecVillain, destRecVillain, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(empty_villain, sourceRecVillain, destRecVillain, (Vector2){0, 0}, 0.0f, WHITE);
 
+    // Mostrar diálogo e retrato
     if (GetTime() - startTime >= 3.0 && !hideDialog) {
         dialogTriggered = true;
 
+        // Retrato do vilão
         Rectangle villainPortraitDest = { SCREEN_WIDTH - 338, SCREEN_HEIGHT - 418, 288, 288 };
         DrawTexturePro(villain_portrait, (Rectangle){0, 0, villain_portrait.width, villain_portrait.height},
                        villainPortraitDest, (Vector2){0, 0}, 0.0f, WHITE);
 
+        // Caixa de texto
         DrawRectangleRounded((Rectangle){ 50, SCREEN_HEIGHT - 150, SCREEN_WIDTH - 100, 100 }, 0.1f, 16, (Color){ 0, 0, 0, 200 });
         DrawRectangleRoundedLines((Rectangle){ 50, SCREEN_HEIGHT - 150, SCREEN_WIDTH - 100, 100 }, 0.1f, 16, WHITE);
 
+        // Mostrar texto com efeito de digitação
         if (displayedTextLength < strlen(dialogTexts[currentDialogIndex])) {
             if (GetTime() - startTime >= 3.0 + displayedTextLength * 0.05) {
                 if (!IsSoundPlaying(typingSound)) {
@@ -481,6 +499,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                 lastTextEndTime = 0;
             } else if (currentDialogIndex == totalDialogTexts - 1 && GetTime() - lastTextEndTime >= 4.0) {
                 hideDialog = true;
+                fireballActive = true; // Ativar a Fireball após o diálogo
             }
         }
         DrawText(displayedText, 80, SCREEN_HEIGHT - 120, 20, WHITE);
@@ -490,6 +509,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
     }
 
+    // Quando o diálogo terminar e a música de batalha começar
     if (hideDialog) {
         if (!soundPlayed) {
             StopMusicStream(windMusic);
@@ -503,9 +523,27 @@ void processarTelaVazia(GameScreen *currentScreen) {
         if (battleMusicStarted) {
             UpdateMusicStream(battleMusic);
 
+            // Movimento da Fireball
+            if (fireballActive) {
+                fireballPositionX -= fireballSpeed * GetFrameTime();
+                if (fireballPositionX < -TILE_SIZE) {
+                    fireballActive = false; // Desativar a Fireball quando sair do mapa
+                }
+            }
+
+            // Desenhar WarningSign e Fireball
             for (int y = 0; y < MAPA_ALTURA; y += 2) {
+                // Desenhar WarningSign
                 Vector2 warningPosition = { (MAPA_LARGURA - 1) * TILE_SIZE, y * TILE_SIZE };
                 DrawTextureEx(warningSign, warningPosition, 0.0f, 1.0f, WHITE);
+
+                // Desenhar Fireball
+                if (fireballActive) {
+                    Rectangle sourceRecFireball = { 0, 0, 68, 9 };
+                    Vector2 fireballPosition = { fireballPositionX, y * TILE_SIZE + (TILE_SIZE - 32) / 2 }; // Centralizar na tile
+                    Rectangle destRecFireball = { fireballPosition.x, fireballPosition.y, 32 * (68.0f / 9.0f), 32 }; // Proporção de 32 pixels de altura
+                    DrawTexturePro(fireballSprite, sourceRecFireball, destRecFireball, (Vector2){0, 0}, 0.0f, WHITE);
+                }
             }
         }
     } else {
@@ -516,9 +554,67 @@ void processarTelaVazia(GameScreen *currentScreen) {
         UpdateMusicStream(windMusic);
     }
 
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    // Fireball e colisão
+    for (int y = 0; y < MAPA_ALTURA; y += 2) {
+        if (fireballActive) {
+            Rectangle sourceRecFireball = {0, 0, 68, 9};
+            Vector2 fireballPosition = {fireballPositionX, y * TILE_SIZE + (TILE_SIZE - 32) / 2};
+            Rectangle destRecFireball = {fireballPosition.x, fireballPosition.y, 32 * (68.0f / 9.0f), 32};
+
+            if (CheckCollisionRecs((Rectangle){
+                                        empty_player_x * TILE_SIZE,
+                                        empty_player_y * TILE_SIZE,
+                                        TILE_SIZE,
+                                        TILE_SIZE},
+                                   destRecFireball)) {
+                StopMusicStream(windMusic);
+                StopMusicStream(battleMusic);
+
+                PlaySound(gameOverSoundWar);
+
+                double startBlackTime = GetTime();
+                while (GetTime() - startBlackTime < 2.0) {
+                    BeginDrawing();
+                    ClearBackground(BLACK);
+                    EndDrawing();
+                }
+
+                // Bola branca com bordas opacas crescendo mais rápido
+                double startGrowTime = GetTime();
+                while (GetTime() - startGrowTime < 3.0) { // Cresce em 3 segundos
+                    BeginDrawing();
+                    ClearBackground(BLACK);
+
+                    float elapsed = GetTime() - startGrowTime;
+                    float radius = (elapsed / 3.0f) * GetScreenWidth() * 2; // Bola cresce até cobrir a tela
+
+                    // Criar efeito de bordas opacas
+                    for (int i = 0; i < 50; i++) {
+                        float innerRadius = radius - i * 2; // Gradiente nas bordas
+                        if (innerRadius > 0) {
+                            DrawCircle(GetScreenWidth() / 2, GetScreenHeight() / 2, innerRadius, Fade(WHITE, 1.0f - i * 0.02f));
+                        }
+                    }
+
+                    EndDrawing();
+                }
+
+                // Reiniciar jogo
+                sleep(1);
+                atualizarRanking(playerName, playerMoney);
+                zerarMonetaria();
+                resetarJogo();
+                *currentScreen = RANKINGS;
+                return;
+            }
+        }
+    }
+
     EndDrawing();
 }
-
 
 
 void drawLobby() {
