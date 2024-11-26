@@ -3,6 +3,8 @@
 
 #include "config.h"
 #include "game.h"
+void verificarProximidadePoco(float playerX, float playerY);
+void tentarRecuperarAguaNoPoco();
 
 
 

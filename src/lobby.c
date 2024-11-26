@@ -198,9 +198,106 @@ void processarEntradaLobby(GameScreen *currentScreen) {
         resetarJogo();
         return;
     }
-
+    verificarProximidadePoco(player_x * TILE_SIZE, player_y * TILE_SIZE);
     drawLobby();
 }
+static double lastWaterAttemptTime = 0; // Marca o tempo da última tentativa
+
+void tentarRecuperarAguaNoPoco() {
+    double currentTime = GetTime();
+    static double lastWaterAttemptTime = -120.0; // Tempo da última tentativa (-120 para permitir a primeira tentativa)
+    static bool lastAttemptSuccessful = true;   // Indica se a última tentativa foi bem-sucedida
+
+    // Atualizar o tempo da nova tentativa
+    lastWaterAttemptTime = currentTime;
+
+    // Chance e resultado
+    int chance = GetRandomValue(0, 99); // Chance baseada na sorte
+    int aguaRecuperada = 0;
+    bool sucesso = false;
+    char sucessoMensagem[128];
+
+    // Determinar sucesso com base na sorte
+    if (playerLucky == 20 && chance < 20) {
+        sucesso = true;
+        aguaRecuperada = GetRandomValue(1, 5);
+    } else if (playerLucky == 30 && chance < 30) {
+        sucesso = true;
+        aguaRecuperada = GetRandomValue(2, 6);
+    } else if (playerLucky == 50 && chance < 50) {
+        sucesso = true;
+        aguaRecuperada = GetRandomValue(3, 8);
+    }
+
+    // Processar sucesso ou falha
+    if (sucesso) {
+        playerWater = fmin(playerWater + aguaRecuperada, 100.0); // Evitar ultrapassar 100%
+        snprintf(sucessoMensagem, sizeof(sucessoMensagem), 
+                 "Parabéns! Você recuperou %d%% de água do poço.", aguaRecuperada);
+        DrawDialogBox(sucessoMensagem, 100, 550, 600, 100, WHITE, GREEN, false);
+        lastAttemptSuccessful = true; // Marca a última tentativa como bem-sucedida
+    } else {
+        DrawDialogBox("Você não conseguiu dessa vez, tente na próxima...", 100, 550, 600, 100, WHITE, RED, false);
+        lastAttemptSuccessful = false; // Marca a última tentativa como falha
+    }
+
+    // Manter a mensagem até o jogador pressionar ENTER
+    while (!IsKeyPressed(KEY_ENTER)) {
+        BeginDrawing();
+        UpdateMusicStream(lobbyMusic);
+        if (sucesso) {
+            DrawDialogBox(sucessoMensagem, 100, 550, 600, 100, WHITE, GREEN, false);
+        } else {
+            DrawDialogBox("Você não conseguiu dessa vez, tente na próxima...", 100, 550, 600, 100, WHITE, RED, false);
+        }
+        EndDrawing();
+    }
+}
+
+void verificarProximidadePoco(float playerX, float playerY) {
+    const float areas[][4] = {
+        {720, 160, 80, 80}, // Coordenadas do primeiro poço
+        {100, 550, 80, 80}  // Coordenadas do segundo poço
+    };
+    const int numAreas = sizeof(areas) / sizeof(areas[0]);
+    static double lastWaterAttemptTime = -120.0; // Tempo da última tentativa (-120 para permitir a primeira tentativa)
+    static bool lastAttemptSuccessful = true;   // Indica se a última tentativa foi bem-sucedida
+
+    for (int i = 0; i < numAreas; i++) {
+        float areaX = areas[i][0];
+        float areaY = areas[i][1];
+        float areaWidth = areas[i][2];
+        float areaHeight = areas[i][3];
+
+        if (playerX >= areaX - 10 && playerX <= areaX + areaWidth + 10 &&
+            playerY >= areaY - 10 && playerY <= areaY + areaHeight + 10) {
+
+            // Se a última tentativa foi falha e ainda está no intervalo de 2 minutos
+            if (!lastAttemptSuccessful && GetTime() - lastWaterAttemptTime < 120.0) {
+                DrawText("Ainda não é possível tentar, volte depois.", 100, 550, 20, RED);
+                return;
+            }
+
+            // Exibir a mensagem para tentar recuperar água
+            DrawDialogBox("Você deseja tentar recuperar água do poço?\n[1] Sim  [2] Não", 100, 550, 600, 100, WHITE, BLACK, false);
+
+            if (IsKeyPressed(KEY_ONE)) {
+                tentarRecuperarAguaNoPoco(); // Chama a função de tentativa
+            } else if (IsKeyPressed(KEY_TWO)) {
+                DrawDialogBox("Você decidiu não tentar agora.", 100, 550, 600, 100, WHITE, GRAY, false);
+                while (!IsKeyPressed(KEY_ENTER)) {
+                    BeginDrawing();
+                    UpdateMusicStream(lobbyMusic);
+                    DrawDialogBox("Você decidiu não tentar agora.", 100, 550, 600, 100, WHITE, GRAY, false);
+                    EndDrawing();
+                }
+            }
+
+            return;
+        }
+    }
+}
+
 
 void processarTelaVazia(GameScreen *currentScreen) {
     static Texture2D empty_personagem;
@@ -1052,6 +1149,6 @@ void drawLobby() {
     } else {
         isInteractingWithMerchant = 0;
     }
-
+    verificarProximidadePoco(player_x * TILE_SIZE, player_y * TILE_SIZE);
     EndDrawing();
 }
