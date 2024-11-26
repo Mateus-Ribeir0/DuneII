@@ -575,22 +575,82 @@ void drawGame() {
         }
     }
 
+    // Coordenadas do NPC
     Vector2 npcPosition = {25 * TILE_SIZE, 10 * TILE_SIZE}; // Posição do NPC no mapa
-    Rectangle npcSourceRec = {0, 192, 64, 64}; // Região na spritesheet (64x64 pixels)
+    Rectangle npcSourceRec = {0, 192, 64, 64};             // Região na spritesheet (64x64 pixels)
     Rectangle npcDestRec = {
         npcPosition.x,          // Posição X no mapa
         npcPosition.y,          // Posição Y no mapa
         96,                     // Largura ajustada para 96 pixels
         96                      // Altura ajustada para 96 pixels
     };
-    npcArmouredHitbox = (Rectangle){
-        npcPosition.x + TILE_SIZE,  // Ajuste para alinhar horizontalmente
-        npcPosition.y + TILE_SIZE,  // Ajuste para alinhar verticalmente
-        32,                       // Largura (ajustada conforme necessário)
-        32                        // Altura (ajustada conforme necessário)
+    Rectangle npcHitbox = {
+        npcPosition.x,          // Hitbox horizontal
+        npcPosition.y,          // Hitbox vertical
+        TILE_SIZE,              // Largura da hitbox
+        TILE_SIZE               // Altura da hitbox
     };
     Vector2 npcOrigin = {0, 0}; // Origem para rotação (não aplicada aqui)
 
+    // Textos para o diálogo do NPC
+    static const char *dialogNpc[] = {
+        "Olá, viajante.",
+        "Este mundo guarda muitos segredos.",
+        "Se precisar de ajuda, não hesite em me procurar.",
+        "Boa sorte em sua jornada!"
+    };
+    static const int totalDialogNpc = sizeof(dialogNpc) / sizeof(dialogNpc[0]);
+    static int dialogIndexNpc = 0;
+    static char textoExibidoNpc[256] = "";
+    static int comprimentoTextoExibidoNpc = 0;
+    static bool exibirDialogNpc = false;
+    static double tempoUltimaMensagemNpc = 0;
+
+    // Verifica se o jogador está perto do NPC
+    if (CheckCollisionRecs((Rectangle){
+                            player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE},
+                        npcHitbox)) {
+        if (!exibirDialogNpc) {
+            exibirDialogNpc = true;
+            dialogIndexNpc = 0;
+            comprimentoTextoExibidoNpc = 0;
+            memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+            tempoUltimaMensagemNpc = GetTime();
+        }
+    } else {
+        exibirDialogNpc = false;
+    }
+
+    // Exibe o diálogo se o jogador estiver perto do NPC
+    if (exibirDialogNpc) {
+        if (comprimentoTextoExibidoNpc < strlen(dialogNpc[dialogIndexNpc])) {
+            if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
+                textoExibidoNpc[comprimentoTextoExibidoNpc] = dialogNpc[dialogIndexNpc][comprimentoTextoExibidoNpc];
+                comprimentoTextoExibidoNpc++;
+                textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
+            }
+        } else if (IsKeyPressed(KEY_ENTER)) {
+            if (dialogIndexNpc < totalDialogNpc - 1) {
+                dialogIndexNpc++;
+                comprimentoTextoExibidoNpc = 0;
+                memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+            } else {
+                exibirDialogNpc = false;
+            }
+        }
+
+        // Exibe a caixa de diálogo e o texto à esquerda
+        DrawRectangleRounded((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, (Color){0, 0, 0, 200});
+        DrawRectangleRoundedLines((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, WHITE);
+        DrawText(textoExibidoNpc, 70, SCREEN_HEIGHT - 170, 20, WHITE);
+
+        // Instrução para pressionar Enter
+        if (comprimentoTextoExibidoNpc == strlen(dialogNpc[dialogIndexNpc]) && dialogIndexNpc < totalDialogNpc - 1) {
+            DrawText("Pressione ENTER para continuar...", 260, SCREEN_HEIGHT - 60, 16, GRAY);
+        }
+    }
+
+    // Desenha o NPC
     DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
 
     Rectangle bonesSourceRect = {774, 113, 38, 33};
