@@ -324,6 +324,8 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static float fireballPositionX; // Posição inicial da Fireball
     static float fireballSpeed;    // Velocidade da Fireball
     static bool fireballActive = false; // Indica se a Fireball está ativa
+    static int fireballWave = 1; // Controla qual onda está ativa: 1 ou 2
+    static bool waveInProgress = true; // Indica se a onda atual está em progresso
 
     static int empty_player_x = 1;
     static int empty_player_y = 10;
@@ -344,6 +346,11 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static int displayedTextLength = 0;
     static double lastTextEndTime = 0;
     static bool hideDialog = false;
+    static bool warWarningActive = false; // Indica se o Warning especial está ativo
+    static bool explosionActive = false; // Indica se a explosão está ativa
+    static double warWarningStartTime = 0; // Tempo em que o Warning começou
+    static double explosionStartTime = 0; // Tempo em que a explosão começou
+    static Vector2 warningTilePosition = { MAPA_LARGURA / 2 * TILE_SIZE, MAPA_ALTURA / 2 * TILE_SIZE }; // Posição do Warning no meio do mapa
 
     if (!initialized) {
         empty_personagem = LoadTexture("static/image/newstoppedsprites.png");
@@ -520,29 +527,52 @@ void processarTelaVazia(GameScreen *currentScreen) {
             battleMusicStarted = true;
         }
 
+
         if (battleMusicStarted) {
             UpdateMusicStream(battleMusic);
 
             // Movimento da Fireball
             if (fireballActive) {
                 fireballPositionX -= fireballSpeed * GetFrameTime();
-                if (fireballPositionX < -TILE_SIZE) {
+                if (fireballPositionX < -2 * TILE_SIZE) {
                     fireballActive = false; // Desativar a Fireball quando sair do mapa
+                    waveInProgress = false; // Finalizar a onda atual
                 }
             }
 
-            // Desenhar WarningSign e Fireball
-            for (int y = 0; y < MAPA_ALTURA; y += 2) {
-                // Desenhar WarningSign
-                Vector2 warningPosition = { (MAPA_LARGURA - 1) * TILE_SIZE, y * TILE_SIZE };
-                DrawTextureEx(warningSign, warningPosition, 0.0f, 1.0f, WHITE);
+            // Verificar se devemos iniciar a próxima onda
+            if (!fireballActive && !waveInProgress) {
+                fireballWave++; // Passar para a próxima onda
+                if (fireballWave > 2) fireballWave = 1; // Voltar para a primeira onda após a segunda
+                fireballPositionX = MAPA_LARGURA * TILE_SIZE; // Reiniciar posição da Fireball
+                fireballActive = true; // Ativar a próxima onda
+                waveInProgress = true; // A onda está em progresso novamente
+            }
 
-                // Desenhar Fireball
+            // Desenhar WarningSign
+            for (int y = 0; y < MAPA_ALTURA; y++) {
+                bool shouldDrawWarning = false;
+
+                // Ajustar lógica do WarningSign de acordo com a wave
+                if ((fireballWave == 1 && y % 2 == 0) || // Wave 1: Warnings nos tiles pares
+                    (fireballWave == 2 && y % 2 != 0)) { // Wave 2: Warnings nos tiles ímpares
+                    shouldDrawWarning = true;
+                }
+
+                if (shouldDrawWarning) {
+                    Vector2 warningPosition = { (MAPA_LARGURA - 1) * TILE_SIZE, y * TILE_SIZE };
+                    DrawTextureEx(warningSign, warningPosition, 0.0f, 1.0f, WHITE);
+                }
+            
+
+                // Desenhar Fireball nos tiles correspondentes à onda
                 if (fireballActive) {
-                    Rectangle sourceRecFireball = { 0, 0, 68, 9 };
-                    Vector2 fireballPosition = { fireballPositionX, y * TILE_SIZE + (TILE_SIZE - 32) / 2 }; // Centralizar na tile
-                    Rectangle destRecFireball = { fireballPosition.x, fireballPosition.y, 32 * (68.0f / 9.0f), 32 }; // Proporção de 32 pixels de altura
-                    DrawTexturePro(fireballSprite, sourceRecFireball, destRecFireball, (Vector2){0, 0}, 0.0f, WHITE);
+                    if ((fireballWave == 1 && y % 2 == 0) || (fireballWave == 2 && y % 2 != 0)) {
+                        Rectangle sourceRecFireball = { 0, 0, 68, 9 };
+                        Vector2 fireballPosition = { fireballPositionX, y * TILE_SIZE + (TILE_SIZE - 32) / 2 }; // Centralizar na tile
+                        Rectangle destRecFireball = { fireballPosition.x, fireballPosition.y, 32 * (68.0f / 9.0f), 32 }; // Proporção de 32 pixels de altura
+                        DrawTexturePro(fireballSprite, sourceRecFireball, destRecFireball, (Vector2){0, 0}, 0.0f, WHITE);
+                    }
                 }
             }
         }
@@ -558,60 +588,196 @@ void processarTelaVazia(GameScreen *currentScreen) {
     ClearBackground(BLACK);
 
     // Fireball e colisão
-    for (int y = 0; y < MAPA_ALTURA; y += 2) {
+    for (int y = 0; y < MAPA_ALTURA; y++) {
         if (fireballActive) {
-            Rectangle sourceRecFireball = {0, 0, 68, 9};
-            Vector2 fireballPosition = {fireballPositionX, y * TILE_SIZE + (TILE_SIZE - 32) / 2};
-            Rectangle destRecFireball = {fireballPosition.x, fireballPosition.y, 32 * (68.0f / 9.0f), 32};
+            // Lógica para desenhar a fireball apenas nas posições relevantes
+            bool fireballInTile = false;
 
-            if (CheckCollisionRecs((Rectangle){
-                                        empty_player_x * TILE_SIZE,
-                                        empty_player_y * TILE_SIZE,
-                                        TILE_SIZE,
-                                        TILE_SIZE},
-                                   destRecFireball)) {
-                StopMusicStream(windMusic);
-                StopMusicStream(battleMusic);
+            if ((fireballWave == 1 && y % 2 == 0) || // Onda 1: Fireball nos tiles pares
+                (fireballWave == 2 && y % 2 != 0)) { // Onda 2: Fireball nos tiles ímpares
+                fireballInTile = true;
+            }
 
-                PlaySound(gameOverSoundWar);
+            if (fireballInTile) {
+                Rectangle sourceRecFireball = {0, 0, 68, 9};
+                Vector2 fireballPosition = {fireballPositionX, y * TILE_SIZE + (TILE_SIZE - 32) / 2};
+                Rectangle destRecFireball = {fireballPosition.x, fireballPosition.y, 32 * (68.0f / 9.0f), 32};
 
-                double startBlackTime = GetTime();
-                while (GetTime() - startBlackTime < 2.0) {
-                    BeginDrawing();
-                    ClearBackground(BLACK);
-                    EndDrawing();
-                }
+                // Verificar colisão com o jogador
+                Rectangle playerRec = {
+                    empty_player_x * TILE_SIZE,
+                    empty_player_y * TILE_SIZE,
+                    TILE_SIZE,
+                    TILE_SIZE
+                };
 
-                // Bola branca com bordas opacas crescendo mais rápido
-                double startGrowTime = GetTime();
-                while (GetTime() - startGrowTime < 3.0) { // Cresce em 3 segundos
-                    BeginDrawing();
-                    ClearBackground(BLACK);
+                if (CheckCollisionRecs(playerRec, destRecFireball)) {
+                    // Parar músicas e tocar som de game over
+                    StopMusicStream(windMusic);
+                    StopMusicStream(battleMusic);
+                    PlaySound(gameOverSoundWar);
 
-                    float elapsed = GetTime() - startGrowTime;
-                    float radius = (elapsed / 3.0f) * GetScreenWidth() * 2; // Bola cresce até cobrir a tela
-
-                    // Criar efeito de bordas opacas
-                    for (int i = 0; i < 50; i++) {
-                        float innerRadius = radius - i * 2; // Gradiente nas bordas
-                        if (innerRadius > 0) {
-                            DrawCircle(GetScreenWidth() / 2, GetScreenHeight() / 2, innerRadius, Fade(WHITE, 1.0f - i * 0.02f));
-                        }
+                    // Animação de tela preta e reinício do jogo
+                    double startBlackTime = GetTime();
+                    while (GetTime() - startBlackTime < 2.0) {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        EndDrawing();
                     }
 
-                    EndDrawing();
-                }
+                    // Bola branca com bordas opacas crescendo mais rápido
+                    double startGrowTime = GetTime();
+                    while (GetTime() - startGrowTime < 3.0) { // Cresce em 3 segundos
+                        BeginDrawing();
+                        ClearBackground(BLACK);
 
-                // Reiniciar jogo
-                sleep(1);
-                atualizarRanking(playerName, playerMoney);
-                zerarMonetaria();
-                resetarJogo();
-                *currentScreen = RANKINGS;
-                return;
+                        float elapsed = GetTime() - startGrowTime;
+                        float radius = (elapsed / 3.0f) * GetScreenWidth() * 2; // Bola cresce até cobrir a tela
+
+                        // Criar efeito de bordas opacas
+                        for (int i = 0; i < 50; i++) {
+                            float innerRadius = radius - i * 2; // Gradiente nas bordas
+                            if (innerRadius > 0) {
+                                DrawCircle(GetScreenWidth() / 2, GetScreenHeight() / 2, innerRadius, Fade(WHITE, 1.0f - i * 0.02f));
+                            }
+                        }
+
+                        EndDrawing();
+                    }
+
+                    // Reiniciar jogo
+                    sleep(1);
+                    atualizarRanking(playerName, playerMoney);
+                    zerarMonetaria();
+                    resetarJogo();
+                    *currentScreen = RANKINGS;
+                    return;
+                }
             }
         }
     }
+
+        // Após 2 segundos de iniciar a música de batalha, mostrar o Warning no tile do meio
+        // Lógica para Warning e Explosão no tile central
+    if (battleMusicStarted && !warWarningActive && !explosionActive && GetTime() - startTime >= 2.0) {
+        warWarningActive = true;
+        warWarningStartTime = GetTime();
+    }
+
+    // Desenhar o Warning no centro do tile de explosão 1.5 segundos antes da explosão
+    // Desenhar o Warning no centro do sprite de explosão 1.5 segundos antes da explosão
+    if (warWarningActive && !explosionActive) {
+        if (GetTime() - warWarningStartTime <= 1.5) {
+            // Ajustar posição para centralizar o Warning no centro do sprite de explosão
+            Vector2 warningPosition = {
+                warningTilePosition.x + (192 / 2) - (TILE_SIZE / 2), // Centralizar no eixo X
+                warningTilePosition.y + (192 / 2) - (TILE_SIZE / 2)  // Centralizar no eixo Y
+            };
+            DrawTextureEx(warningSign, warningPosition, 0.0f, 2.0f, WHITE); // Escala para 192x192
+        } else {
+            // Iniciar a explosão após 1.5 segundos do Warning
+            explosionActive = true;
+            explosionStartTime = GetTime();
+            warWarningActive = false; // Remover o Warning
+        }
+    }
+
+    // Desenhar a animação da explosão se ativa
+    if (explosionActive) {
+        // Tocar o som de explosão no início da animação
+        static bool explosionSoundPlayed = false;
+        if (!explosionSoundPlayed) {
+            PlaySound(LoadSound("static/music/explosionsfx.wav"));
+            explosionSoundPlayed = true;
+        }
+
+        double elapsedTime = GetTime() - explosionStartTime;
+
+        // Configurar o frame da spritesheet
+        int frameWidth = 96;  // Largura de cada frame na spritesheet
+        int frameHeight = 96; // Altura de cada frame na spritesheet
+        int totalFrames = 1152 / frameWidth; // Número total de frames na spritesheet
+        int currentFrame = (int)((elapsedTime / 1.5) * totalFrames); // Calcular o frame atual
+
+        if (currentFrame < totalFrames) {
+            // Definir o frame atual da spritesheet
+            Rectangle sourceRecExplosion = { currentFrame * frameWidth, 0, frameWidth, frameHeight };
+
+            // Configurar o retângulo de destino proporcional a 192x192
+            Rectangle destRecExplosion = {
+                warningTilePosition.x - 48,  // Centralizar posição X (- metade da diferença)
+                warningTilePosition.y - 48,  // Centralizar posição Y (- metade da diferença)
+                192,                         // Largura proporcional
+                192                          // Altura proporcional
+            };
+
+            // Desenhar a explosão no tamanho proporcional
+            DrawTexturePro(LoadTexture("static/image/Explosion.png"), sourceRecExplosion, destRecExplosion, (Vector2){0, 0}, 0.0f, WHITE);
+        } else {
+            // Encerrar a explosão após a animação
+            explosionActive = false;
+            explosionSoundPlayed = false; // Resetar o som para reutilizar se necessário
+        }
+    }
+
+    // Verificar colisão com a explosão
+    if (explosionActive) {
+        Rectangle explosionRec = {
+            warningTilePosition.x,
+            warningTilePosition.y,
+            TILE_SIZE,
+            TILE_SIZE
+        };
+        Rectangle playerRec = {
+            empty_player_x * TILE_SIZE,
+            empty_player_y * TILE_SIZE,
+            TILE_SIZE,
+            TILE_SIZE
+        };
+
+        if (CheckCollisionRecs(playerRec, explosionRec)) {
+            StopMusicStream(windMusic);
+            StopMusicStream(battleMusic);
+
+            PlaySound(gameOverSoundWar);
+
+            double startBlackTime = GetTime();
+            while (GetTime() - startBlackTime < 2.0) {
+                BeginDrawing();
+                ClearBackground(BLACK);
+                EndDrawing();
+            }
+
+            // Bola branca com bordas opacas crescendo mais rápido
+            double startGrowTime = GetTime();
+            while (GetTime() - startGrowTime < 3.0) { // Cresce em 3 segundos
+                BeginDrawing();
+                ClearBackground(BLACK);
+
+                float elapsed = GetTime() - startGrowTime;
+                float radius = (elapsed / 3.0f) * GetScreenWidth() * 2; // Bola cresce até cobrir a tela
+
+                // Criar efeito de bordas opacas
+                for (int i = 0; i < 50; i++) {
+                    float innerRadius = radius - i * 2; // Gradiente nas bordas
+                    if (innerRadius > 0) {
+                        DrawCircle(GetScreenWidth() / 2, GetScreenHeight() / 2, innerRadius, Fade(WHITE, 1.0f - i * 0.02f));
+                    }
+                }
+
+                EndDrawing();
+            }
+
+            // Reiniciar jogo
+            sleep(1);
+            atualizarRanking(playerName, playerMoney);
+            zerarMonetaria();
+            resetarJogo();
+            *currentScreen = RANKINGS;
+            return;
+        }
+    }
+
 
     EndDrawing();
 }
