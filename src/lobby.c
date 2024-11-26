@@ -306,19 +306,24 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static Texture2D empty_villain;
     static Texture2D villain_sombra;
     static Texture2D villain_portrait;
-    static Music epicMusic;
+    static Texture2D warningSign;
+    static Music windMusic;
     static Music battleMusic;
     static Sound machineLoadingSound;
+    static Sound typingSound;
 
     static bool initialized = false;
     static double startTime = 0;
     static bool dialogTriggered = false;
-    static bool epicMusicStarted = false;
+    static bool windMusicStarted = false;
     static bool battleMusicStarted = false;
     static bool soundPlayed = false;
 
     static int empty_player_x = 1;
     static int empty_player_y = 10;
+    static int lastDirection = 3; // 1 = cima, 2 = esquerda, 3 = baixo, 4 = direita
+    static bool isWalking = false;
+    static float walkingTimer = 0.0f;
 
     static const char *dialogTexts[] = {
         "Você não deveria estar aqui...",
@@ -341,11 +346,14 @@ void processarTelaVazia(GameScreen *currentScreen) {
         empty_villain = LoadTexture("static/image/villain.png");
         villain_sombra = LoadTexture("static/image/sombras.png");
         villain_portrait = LoadTexture("static/image/villainPortrait.png");
-        epicMusic = LoadMusicStream("static/music/epicversion2.wav");
+        warningSign = LoadTexture("static/image/WarningSign05.png");
+        windMusic = LoadMusicStream("static/music/wind.wav");
         battleMusic = LoadMusicStream("static/music/battleMusic.wav");
         machineLoadingSound = LoadSound("static/music/machineLoading.wav");
+        typingSound = LoadSound("static/music/falas.wav");
 
         SetSoundVolume(machineLoadingSound, 1.0f);
+        SetSoundVolume(typingSound, 0.8f);
 
         startTime = GetTime();
         initialized = true;
@@ -363,49 +371,109 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
     }
 
-    // Desenhar o personagem
-    Rectangle sourceRecPersonagem = { 0, 128, 64, 64 };
+    // Atualizar movimento do personagem
+    int dx = 0, dy = 0;
+
+    if (hideDialog && battleMusicStarted) {
+        if (IsKeyPressed(KEY_D)) {
+            dx = 1;
+            lastDirection = 4; // Direita
+            isWalking = true;
+            walkingTimer = 0.3f;
+        }
+        if (IsKeyPressed(KEY_A)) {
+            dx = -1;
+            lastDirection = 2; // Esquerda
+            isWalking = true;
+            walkingTimer = 0.3f;
+        }
+        if (IsKeyPressed(KEY_W)) {
+            dy = -1;
+            lastDirection = 1; // Cima
+            isWalking = true;
+            walkingTimer = 0.3f;
+        }
+        if (IsKeyPressed(KEY_S)) {
+            dy = 1;
+            lastDirection = 3; // Baixo
+            isWalking = true;
+            walkingTimer = 0.3f;
+        }
+
+        if (!(dx == -1 && empty_player_x == 0)) {
+            empty_player_x += dx;
+            empty_player_y += dy;
+
+            empty_player_x = (empty_player_x < 0) ? 0 : empty_player_x;
+            empty_player_x = (empty_player_x >= MAPA_LARGURA) ? MAPA_LARGURA - 1 : empty_player_x;
+            empty_player_y = (empty_player_y < 0) ? 0 : empty_player_y;
+            empty_player_y = (empty_player_y >= MAPA_ALTURA) ? MAPA_ALTURA - 1 : empty_player_y;
+        }
+    }
+
+    if (isWalking) {
+        walkingTimer -= GetFrameTime();
+        if (walkingTimer <= 0) {
+            isWalking = false;
+        }
+    }
+
+    Rectangle sourceRecPersonagem;
+    switch (lastDirection) {
+        case 1:
+            sourceRecPersonagem = (Rectangle){0, 192, 64, 64};
+            break;
+        case 2:
+            sourceRecPersonagem = (Rectangle){0, 64, 64, 64};
+            break;
+        case 3:
+            sourceRecPersonagem = (Rectangle){0, 0, 64, 64};
+            break;
+        case 4:
+            sourceRecPersonagem = (Rectangle){0, 128, 64, 64};
+            break;
+        default:
+            sourceRecPersonagem = (Rectangle){0, 0, 64, 64};
+            break;
+    }
+
     Vector2 positionPersonagem = { empty_player_x * TILE_SIZE, empty_player_y * TILE_SIZE };
     Rectangle destRecPersonagem = { positionPersonagem.x - 32, positionPersonagem.y - 32, 96, 96 };
 
     DrawTexturePro(empty_sombra, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(empty_personagem, sourceRecPersonagem, destRecPersonagem, (Vector2){0, 0}, 0.0f, WHITE);
 
-    // Desenhar o vilão
     Rectangle sourceRecVillain = { 0, 64, 64, 64 };
-    Vector2 villainPosition = { (MAPA_LARGURA - 3) * TILE_SIZE, empty_player_y * TILE_SIZE + 8 };
+    Vector2 villainPosition = { (MAPA_LARGURA - 3) * TILE_SIZE, 10 * TILE_SIZE + 8 };
     Rectangle destRecVillain = { villainPosition.x - 48, villainPosition.y - 48, 96, 96 };
 
     DrawTexturePro(villain_sombra, sourceRecVillain, destRecVillain, (Vector2){0, 0}, 0.0f, WHITE);
     DrawTexturePro(empty_villain, sourceRecVillain, destRecVillain, (Vector2){0, 0}, 0.0f, WHITE);
 
-    // Mostrar diálogo e retrato somente após 3 segundos
     if (GetTime() - startTime >= 3.0 && !hideDialog) {
         dialogTriggered = true;
 
-        // Desenhar o retrato do vilão
         Rectangle villainPortraitDest = { SCREEN_WIDTH - 338, SCREEN_HEIGHT - 418, 288, 288 };
         DrawTexturePro(villain_portrait, (Rectangle){0, 0, villain_portrait.width, villain_portrait.height},
                        villainPortraitDest, (Vector2){0, 0}, 0.0f, WHITE);
 
-        // Mostrar a caixa de texto
         DrawRectangleRounded((Rectangle){ 50, SCREEN_HEIGHT - 150, SCREEN_WIDTH - 100, 100 }, 0.1f, 16, (Color){ 0, 0, 0, 200 });
         DrawRectangleRoundedLines((Rectangle){ 50, SCREEN_HEIGHT - 150, SCREEN_WIDTH - 100, 100 }, 0.1f, 16, WHITE);
 
-        // Mostrar texto com efeito de digitação
         if (displayedTextLength < strlen(dialogTexts[currentDialogIndex])) {
             if (GetTime() - startTime >= 3.0 + displayedTextLength * 0.05) {
+                if (!IsSoundPlaying(typingSound)) {
+                    PlaySound(typingSound);
+                }
                 displayedText[displayedTextLength] = dialogTexts[currentDialogIndex][displayedTextLength];
                 displayedTextLength++;
                 displayedText[displayedTextLength] = '\0';
             }
         } else {
-            // Atualizar o tempo do último texto exibido
+            StopSound(typingSound);
             if (lastTextEndTime == 0) {
                 lastTextEndTime = GetTime();
             }
-
-            // Avançar para o próximo texto se houver ou ocultar caixa de texto
             if (currentDialogIndex < totalDialogTexts - 1 && IsKeyPressed(KEY_ENTER)) {
                 currentDialogIndex++;
                 displayedTextLength = 0;
@@ -415,7 +483,6 @@ void processarTelaVazia(GameScreen *currentScreen) {
                 hideDialog = true;
             }
         }
-
         DrawText(displayedText, 80, SCREEN_HEIGHT - 120, 20, WHITE);
 
         if (displayedTextLength == strlen(dialogTexts[currentDialogIndex]) && currentDialogIndex < totalDialogTexts - 1) {
@@ -423,10 +490,9 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
     }
 
-    // Quando os elementos desaparecem, trocar as músicas
     if (hideDialog) {
         if (!soundPlayed) {
-            StopMusicStream(epicMusic);
+            StopMusicStream(windMusic);
             PlaySound(machineLoadingSound);
             soundPlayed = true;
         } else if (!IsSoundPlaying(machineLoadingSound) && !battleMusicStarted) {
@@ -436,18 +502,23 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
         if (battleMusicStarted) {
             UpdateMusicStream(battleMusic);
+
+            for (int y = 0; y < MAPA_ALTURA; y += 2) {
+                Vector2 warningPosition = { (MAPA_LARGURA - 1) * TILE_SIZE, y * TILE_SIZE };
+                DrawTextureEx(warningSign, warningPosition, 0.0f, 1.0f, WHITE);
+            }
         }
     } else {
-        // Atualizar música épica enquanto os elementos ainda estão visíveis
-        if (!epicMusicStarted) {
-            PlayMusicStream(epicMusic);
-            epicMusicStarted = true;
+        if (!windMusicStarted) {
+            PlayMusicStream(windMusic);
+            windMusicStarted = true;
         }
-        UpdateMusicStream(epicMusic);
+        UpdateMusicStream(windMusic);
     }
 
     EndDrawing();
 }
+
 
 
 void drawLobby() {
