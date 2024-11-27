@@ -692,6 +692,133 @@ void processarTelaVazia(GameScreen *currentScreen) {
             EndDrawing();
         }
 
+        const char *choiceText = "Poupar? [Aperte P] | Matar? [Aperte K]";
+
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        // Exibir o texto das escolhas centralizado na tela
+        DrawText(
+            choiceText,
+            (GetScreenWidth() - MeasureText(choiceText, 30)) / 2, // Centralizar horizontalmente
+            GetScreenHeight() / 2 - 15,                          // Posicionar verticalmente
+            30,                                                  // Tamanho da fonte
+            WHITE                                                // Cor do texto
+        );
+
+        Sound breathingSound = LoadSound("static/music/breathing.wav");
+        Sound suspenseSound = LoadSound("static/music/suspenseMusic.wav");
+        Texture2D slashSprite = LoadTexture("static/image/slash.png"); // Sprite do slash
+
+        SetSoundVolume(breathingSound, 1.0f); // Ajuste o volume do som
+        SetSoundVolume(suspenseSound, 0.7f);  // Ajuste o volume da música
+        PlaySound(breathingSound);            // Inicia o som de respiração
+        PlaySound(suspenseSound);             // Inicia a música de suspense
+
+        bool waitingForInput = true;
+        while (waitingForInput) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            // Exibir o texto das escolhas centralizado na tela
+            const char *choiceText = "Poupar? [Aperte P] | Matar? [Aperte K]";
+            DrawText(
+                choiceText,
+                (GetScreenWidth() - MeasureText(choiceText, 30)) / 2, // Centralizar horizontalmente
+                GetScreenHeight() / 2 - 15,                          // Posicionar verticalmente
+                30,                                                  // Tamanho da fonte
+                WHITE                                                // Cor do texto
+            );
+
+            EndDrawing();
+
+            // Verificar entrada do jogador
+            if (IsKeyPressed(KEY_P) || IsKeyPressed(KEY_K)) {
+                StopSound(breathingSound); // Para o som ao pressionar qualquer tecla válida
+                StopSound(suspenseSound); // Para a música de suspense
+                waitingForInput = false;
+
+                if (IsKeyPressed(KEY_P)) {
+                    // Ação para poupar
+                    // Adicione sua lógica aqui
+                    break;
+                }
+                if (IsKeyPressed(KEY_K)) {
+                    StopSound(breathingSound); // Parar o som de respiração
+                    StopSound(suspenseSound);  // Parar o som de suspense
+
+                    // Carregar o sprite para a animação de "slash"
+                    Texture2D slashSprite = LoadTexture("static/image/slash.png");
+                    Sound slashingSound = LoadSound("static/music/slashing.wav");
+                    SetSoundVolume(slashingSound, 1.0f);
+
+                    // Configuração da animação
+                    const int frameWidth = 128;  // Largura de cada quadro na spritesheet
+                    const int frameHeight = 128; // Altura de cada quadro na spritesheet
+                    const int numFrames = 10;    // Total de quadros
+                    const float frameTime = 1.0f / numFrames; // Tempo por quadro (1 segundo para todos os quadros)
+
+                    // Dimensão proporcional do sprite desenhado
+                    const int drawWidth = 896;
+                    const int drawHeight = 896;
+
+                    // Posição do sprite na tela
+                    Vector2 slashPosition = {
+                        (GetScreenWidth() - drawWidth) / 2,
+                        (GetScreenHeight() - drawHeight) / 2
+                    };
+
+                    // Lógica de animação
+                    float animationTimer = 0.0f;
+                    int currentFrame = 0;
+                    int animationCycles = 0;
+                    const int maxCycles = 3;
+
+                    PlaySound(slashingSound);
+
+                    // Executar a animação 3 vezes
+                    while (animationCycles < maxCycles) {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+
+                        // Calcular o quadro atual
+                        animationTimer += GetFrameTime();
+                        if (animationTimer >= frameTime) {
+                            animationTimer = 0.0f;
+                            currentFrame++;
+                            if (currentFrame >= numFrames) {
+                                currentFrame = 0;
+                                animationCycles++;
+                            }
+                        }
+
+                        // Calcular as coordenadas do quadro na spritesheet
+                        int frameX = (currentFrame % 2) * frameWidth; // Alterna entre 0 e 128 para colunas
+                        int frameY = (currentFrame / 2) * frameHeight; // Alterna entre linhas
+                        Rectangle sourceRec = { frameX, frameY, frameWidth, frameHeight };
+                        Rectangle destRec = { slashPosition.x, slashPosition.y, drawWidth, drawHeight };
+                        Vector2 origin = { 0, 0 };
+
+                        // Desenhar o quadro atual
+                        DrawTexturePro(slashSprite, sourceRec, destRec, origin, 0.0f, WHITE);
+
+                        EndDrawing();
+                    }
+
+                    StopSound(slashingSound);
+
+                    // Libera o recurso do sprite
+                    UnloadTexture(slashSprite);
+                }
+            }
+        }
+
+        UnloadSound(breathingSound); // Libera o recurso do som de respiração
+        UnloadSound(suspenseSound);  // Libera o recurso da música de suspense
+        UnloadTexture(slashSprite);
+
+        EndDrawing();
+
         telaVaziaBloqueada = true; // Bloquear telaVazia após a sequência
         *currentScreen = LOBBY;
         return;
