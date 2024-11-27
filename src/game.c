@@ -760,7 +760,7 @@ void drawGame() {
         npcPosition.x,          // Posição X no mapa
         npcPosition.y,          // Posição Y no mapa
         96,                     // Largura ajustada para 96 pixels
-        96                      // Altura ajustada para 96 pixels
+        96                      // Altura da hitbox
     };
     Rectangle npcHitbox = {
         npcPosition.x,          // Hitbox horizontal
@@ -773,17 +773,19 @@ void drawGame() {
     // Variáveis de controle
     static int estadoAposta = 0;       // Controle do estado da aposta
     static bool exibirDialogNpc = false; // Controle de exibição do diálogo
+    static bool apostaResolvida = false; // Se o resultado já foi exibido
+    static bool apostaVitoria = false;  // Resultado da aposta (true = vitória)
+    static bool escolhaCara = false;    // Escolha do jogador (true = cara)
+    static bool resultadoCara = false; // Resultado da moeda (true = cara)
     static char textoExibidoNpc[256] = "";
     static int comprimentoTextoExibidoNpc = 0;
     static double tempoUltimaMensagemNpc = 0;
 
     // Textos da aposta
     const char *textosAposta[] = {
-        "Você quer fazer uma aposta...?",
-        "Vou jogar uma moeda.",
-        "Se cair CARA, eu te dou muitas moedas...",
-        "Mas se cair COROA, eu pego metade da sua água...",
-        "E aí, aceita? (1) SIM ou (2) NÃO."
+        "Você quer fazer uma aposta?",
+        "Escolha: (1) Cara ou (2) Coroa.",
+        "Jogando a moeda...",
     };
     const int totalTextosAposta = sizeof(textosAposta) / sizeof(textosAposta[0]);
 
@@ -797,6 +799,7 @@ void drawGame() {
             comprimentoTextoExibidoNpc = 0;
             memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
             tempoUltimaMensagemNpc = GetTime();
+            apostaResolvida = false; // Reseta o estado da aposta
         }
     } else {
         exibirDialogNpc = false;
@@ -813,16 +816,26 @@ void drawGame() {
                 }
             } else if (estadoAposta == totalTextosAposta) {
                 // Escolha do jogador
-                if (IsKeyPressed(KEY_ONE)) { // Jogador escolhe apostar
-                    carregarFrames();       // Carrega todos os 36 frames
-                    exibirFrames();         // Exibe todos os frames
-                    liberarFrames();        // Libera os frames após exibição
-                    exibirDialogNpc = false; // Finaliza o diálogo
-                }
-                else if (IsKeyPressed(KEY_TWO)) { // Jogador escolhe não apostar
-                    exibirDialogNpc = false;     // Finaliza o diálogo
-                }
+                if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO)) {
+                    escolhaCara = IsKeyPressed(KEY_ONE);
+                    int chance = GetRandomValue(1, 100);
 
+                    // Determina o resultado da moeda
+                    resultadoCara = (chance <= 50); // 50% de chance para "cara"
+
+                    // Determina vitória ou derrota com base na sorte
+                    if ((escolhaCara && resultadoCara && chance <= playerLucky) ||
+                        (!escolhaCara && !resultadoCara && chance <= playerLucky)) {
+                        apostaVitoria = true; // Vitória
+                        playerMoney += 20000;
+                    } else {
+                        apostaVitoria = false; // Derrota
+                        playerWater *= 0.5; // Perde 50% da água
+                        if (playerWater < 0) playerWater = 0;
+                    }
+
+                    apostaResolvida = true;
+                }
             } else if (IsKeyPressed(KEY_ENTER)) {
                 estadoAposta++;
                 comprimentoTextoExibidoNpc = 0;
@@ -840,14 +853,37 @@ void drawGame() {
             if (estadoAposta < totalTextosAposta) {
                 DrawText("Pressione ENTER para continuar...", 260, SCREEN_HEIGHT - 60, 16, GRAY);
             } else if (estadoAposta == totalTextosAposta) {
-                DrawText("(1) SIM ou (2) NÃO", 260, SCREEN_HEIGHT - 60, 16, GRAY);
+                DrawText("(1) Cara ou (2) Coroa", 260, SCREEN_HEIGHT - 60, 16, GRAY);
             }
         }
     }
 
+    // Exibe o resultado da aposta
+    if (apostaResolvida) {
+        if (apostaVitoria) {
+            // Vitória: exibe o vídeo com o resultado correto
+            carregarFrames();
+            exibirFrames();
+            liberarFrames();
+        } else {
+            if (escolhaCara) {
+                // Derrota: jogador escolheu "cara", apenas mensagem do NPC
+                DrawRectangleRounded((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, (Color){0, 0, 0, 200});
+                DrawRectangleRoundedLines((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, WHITE);
+                DrawText("Você perdeu!", 70, SCREEN_HEIGHT - 170, 20, WHITE);
+            } else {
+                // Derrota: jogador escolheu "coroa", exibe o vídeo da moeda caindo em "cara"
+                carregarFrames();
+                exibirFrames();
+                liberarFrames();
+            }
+        }
+
+        apostaResolvida = false; // Reseta o estado
+    }
+
     // Desenha o NPC
     DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
-
 
 }
  else if (mapaAtual == 2) {
