@@ -129,6 +129,17 @@ void processarEntradaLobby(GameScreen *currentScreen) {
     updateWaterLevel(currentScreen);
     UpdateMusicStream(lobbyMusic);
 
+    // Garantir que a música do lobby toque
+    if (IsMusicStreamPlaying(warMusic)) {
+        StopMusicStream(lobbyMusic); // Garante que lobbyMusic pare enquanto warMusic toca
+        UpdateMusicStream(warMusic);
+    } else {
+        if (!IsMusicStreamPlaying(lobbyMusic)) {
+            PlayMusicStream(lobbyMusic);
+        }
+        UpdateMusicStream(lobbyMusic);
+    }
+
     if (IsKeyPressed(KEY_D)) dx = 1;
     if (IsKeyPressed(KEY_A)) dx = -1;
     if (IsKeyPressed(KEY_W)) dy = -1;
@@ -1194,6 +1205,13 @@ void drawLobby() {
         }
     }
 
+    if (IsMusicStreamPlaying(warMusic)) {
+        StopMusicStream(lobbyMusic); // Garantir que lobbyMusic não toque enquanto warMusic toca
+    } else if (!IsMusicStreamPlaying(lobbyMusic)) {
+        PlayMusicStream(lobbyMusic);
+    }
+    UpdateMusicStream(lobbyMusic);
+
     DrawTexturePro(monstersTexture, sourceRecMonster, (Rectangle){ positionMonster.x, positionMonster.y, 106, 116 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
     DrawTexturePro(bonesTexture, sourceRecbones1, (Rectangle){ positionBones.x, positionBones.y, 45, 37 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
     DrawTexturePro(bonesTexture, sourceRecbones2, (Rectangle){ positionBones2.x, positionBones2.y, 45, 37 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
@@ -1389,7 +1407,7 @@ void drawLobby() {
         soundPlayed = false;
     }
 
-    if (isPlayerNearMerchant() && !spaceshipAnimationPlayed) {
+    if (isPlayerNearMerchant() && IsMusicStreamPlaying(lobbyMusic)) {
         Rectangle sourceRecVelho = { 62, 54, 509, 485 };
         Rectangle sourceRecVelhoPuto = { 1084, 108, 510, 484 };
         Rectangle sourceRecVelhoFeliz = { 573, 81, 510, 484 };
