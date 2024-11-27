@@ -223,6 +223,7 @@ Texture2D loadingImagesMap0[4];
 Texture2D loadingImagesMap1[4];
 Texture2D loadingImagesMap2[4];
 Texture2D loadingImagesLobby[4];
+Texture2D apostaSprite;
 
 const float loadingImageDisplayTimes[4] = {2.5f, 3.0f, 3.5f, 4.0f};  
 
@@ -276,6 +277,7 @@ void initializeLoadingScreen() {
 }
 
 void iniciarGame() {
+    apostaSprite = LoadTexture("static/image/aposta.png");
     personagem = LoadTexture("static/image/newstoppedsprites.png");
     sandRuins2 = LoadTexture("static/image/Sand_ruins2.png");
     sandRuins3 = LoadTexture("static/image/Sand_ruins3.png");
@@ -324,6 +326,7 @@ void iniciarGame() {
 }
 
 void finalizarGame() {
+    UnloadTexture(apostaSprite);
     UnloadTexture(personagem);
     UnloadTexture(sandRuins2);
     UnloadTexture(sandRuins3);
@@ -880,9 +883,18 @@ void drawGame() {
         exibirDialogNpc = false;
     }
 
+    float scaleFactor = 1.3f;
+
+    // Ajuste da posição e largura da caixa de diálogo
+    float dialogBoxX = 30; // Posição X ajustada para reduzir o gap à esquerda
+    float dialogBoxWidth = 500; // Largura maior da caixa de diálogo
+    float dialogBoxY = SCREEN_HEIGHT - 200; // Posição Y da caixa de diálogo
+    float dialogBoxHeight = 100; // Altura da caixa de diálogo
+
     // Exibe o diálogo da aposta
     if (exibirDialogNpc) {
         if (estadoAposta > 0 && estadoAposta <= totalTextosAposta) {
+            // Controle de texto gradual
             if (comprimentoTextoExibidoNpc < strlen(textosAposta[estadoAposta - 1])) {
                 if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
                     textoExibidoNpc[comprimentoTextoExibidoNpc] = textosAposta[estadoAposta - 1][comprimentoTextoExibidoNpc];
@@ -890,22 +902,22 @@ void drawGame() {
                     textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
                 }
             } else if (estadoAposta == totalTextosAposta) {
-                // Escolha do jogador
+                // Lógica de escolha: Cara ou Coroa
                 if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO)) {
                     escolhaCara = IsKeyPressed(KEY_ONE);
                     int chance = GetRandomValue(1, 100);
 
-                    // Determina o resultado da moeda
-                    resultadoCara = (chance <= 50); // 50% de chance para "cara"
+                    // Resultado da moeda
+                    resultadoCara = (chance <= 50);
 
-                    // Determina vitória ou derrota com base na sorte
+                    // Determinação de vitória ou derrota
                     if ((escolhaCara && resultadoCara && chance <= playerLucky) ||
                         (!escolhaCara && !resultadoCara && chance <= playerLucky)) {
-                        apostaVitoria = true; // Vitória
+                        apostaVitoria = true;
                         playerMoney += 20000;
                     } else {
-                        apostaVitoria = false; // Derrota
-                        playerWater *= 0.5; // Perde 50% da água
+                        apostaVitoria = false;
+                        playerWater *= 0.5;
                         if (playerWater < 0) playerWater = 0;
                     }
 
@@ -918,17 +930,48 @@ void drawGame() {
             }
         }
 
-        // Desenha a caixa de diálogo e o texto
-        DrawRectangleRounded((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, (Color){0, 0, 0, 200});
-        DrawRectangleRoundedLines((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, WHITE);
-        DrawText(textoExibidoNpc, 70, SCREEN_HEIGHT - 170, 20, WHITE);
+        // Desenho da caixa de diálogo
+        DrawRectangleRounded(
+            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight}, 
+            0.1f, 16, 
+            (Color){0, 0, 0, 200}
+        );
+        DrawRectangleRoundedLines(
+            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight}, 
+            0.1f, 16, 
+            WHITE
+        );
 
-        // Instrução para continuar
+        // Ajuste da posição do texto para ficar mais centralizado na nova caixa
+        float textX = dialogBoxX + 20; // Margem interna do texto à esquerda
+        float textY = dialogBoxY + 20; // Margem interna do texto acima
+
+        DrawText(textoExibidoNpc, textX, textY, 20, WHITE);
+
+        // Desenho da sprite da aposta
+        Rectangle apostaSourceRect = {0, 0, apostaSprite.width, apostaSprite.height};
+        Rectangle apostaDestRect = {
+            50, // Posição X
+            SCREEN_HEIGHT - 360, // Posição Y
+            apostaSprite.width * scaleFactor,  // Largura proporcional ao fator de escala
+            apostaSprite.height * scaleFactor  // Altura proporcional ao fator de escala
+        };
+        DrawTexturePro(apostaSprite, apostaSourceRect, apostaDestRect, (Vector2){0, 0}, 0.0f, WHITE);
+
+        // Instruções na tela
         if (comprimentoTextoExibidoNpc == strlen(textosAposta[estadoAposta - 1])) {
             if (estadoAposta < totalTextosAposta) {
-                DrawText("Pressione ENTER para continuar...", 260, SCREEN_HEIGHT - 60, 16, GRAY);
+                DrawText(
+                    "Pressione ENTER para continuar...", 
+                    textX, dialogBoxY + dialogBoxHeight - 30, 
+                    16, GRAY
+                );
             } else if (estadoAposta == totalTextosAposta) {
-                DrawText("(1) Cara ou (2) Coroa", 260, SCREEN_HEIGHT - 60, 16, GRAY);
+                DrawText(
+                    "(1) Cara ou (2) Coroa", 
+                    textX, dialogBoxY + dialogBoxHeight - 30, 
+                    16, GRAY
+                );
             }
         }
     }
@@ -958,7 +1001,6 @@ void drawGame() {
         }
         apostaResolvida = false; // Reseta o estado
     }
-
 
     // Desenha o NPC
     DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
