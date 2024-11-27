@@ -41,6 +41,8 @@ static float spaceshipPositionX = -128;
 static bool isInExtendedLobby = false;
 static bool isWarMusicPlaying = false;
 
+static bool telaVaziaBloqueada = false; // Variável para bloquear a telaVazia após a sequência final
+
 void iniciarLobby() {
     velho = LoadTexture("static/image/velho.png");
     cityTexture = LoadTexture("static/image/city.png");
@@ -132,12 +134,13 @@ void processarEntradaLobby(GameScreen *currentScreen) {
     if (IsKeyPressed(KEY_W)) dy = -1;
     if (IsKeyPressed(KEY_S)) dy = 1;
 
+
     movePlayer(dx, dy);
 
-    // Verificar se o jogador está na borda direita
-    if (player_x >= (MAPA_LARGURA - 1) && spaceshipAnimationPlayed) {
-        if (dx == 1) { // Pressionou 'D'
+    if (player_x >= (MAPA_LARGURA - 1) && !telaVaziaBloqueada) {
+        if (dx == 1) { // Pressionou 'D' para ir à telaVazia
             *currentScreen = EMPTY_SCREEN; // Transição para a tela vazia
+            telaVaziaBloqueada = true;    // Bloquear permanentemente o acesso à telaVazia
             return;
         }
     }
@@ -321,6 +324,17 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static double occurrenceTimers[MAX_OCCURRENCES];  // Timers para cada Warning/Explosion
     static bool warningsActive[MAX_OCCURRENCES];     // Status de Warning ativo
     static bool explosionsActive[MAX_OCCURRENCES];   // Status de Explosion ativo
+    #define TOTAL_EXPLOSIONS 20
+
+    // Configurações para as explosões
+    #define TOTAL_EXPLOSIONS 20
+
+    // Configurações para as explosões
+    static Vector2 explosionPositions[TOTAL_EXPLOSIONS]; // Posições das explosões
+    static double explosionTimers[TOTAL_EXPLOSIONS];     // Timers para cada explosão
+    static bool explosionWarnings[TOTAL_EXPLOSIONS];    // Ativação dos warnings
+    static bool explosionActiveStates[TOTAL_EXPLOSIONS];// Ativação das explosões
+    static bool explosionHitboxes[TOTAL_EXPLOSIONS];
 
     static bool initializedWarnings = false;         // Marca inicialização
     static Sound explosionSound; 
@@ -336,6 +350,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static bool fireballActive = false; // Indica se a Fireball está ativa
     static int fireballWave = 1; // Controla qual onda está ativa: 1 ou 2
     static bool waveInProgress = true; // Indica se a onda atual está em progresso
+    static Sound cannonSound;
 
     static int empty_player_x = 1;
     static int empty_player_y = 10;
@@ -356,11 +371,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static int displayedTextLength = 0;
     static double lastTextEndTime = 0;
     static bool hideDialog = false;
-    static bool warWarningActive = false; // Indica se o Warning especial está ativo
-    static bool explosionActive = false; // Indica se a explosão está ativa
-    static double warWarningStartTime = 0; // Tempo em que o Warning começou
     static double explosionStartTime = 0; // Tempo em que a explosão começou
-    static Vector2 warningTilePosition = { MAPA_LARGURA / 2 * TILE_SIZE, MAPA_ALTURA / 2 * TILE_SIZE }; // Posição do Warning no meio do mapa
 
     if (!initialized) {
         empty_personagem = LoadTexture("static/image/newstoppedsprites.png");
@@ -376,9 +387,11 @@ void processarTelaVazia(GameScreen *currentScreen) {
         machineLoadingSound = LoadSound("static/music/machineLoading.wav");
         typingSound = LoadSound("static/music/falas.wav");
         gameOverSoundWar = LoadSound("static/music/deathsound.wav");
+        cannonSound = LoadSound("static/music/cannon.wav");
 
         SetSoundVolume(machineLoadingSound, 1.0f);
         SetSoundVolume(typingSound, 0.8f);
+        SetSoundVolume(cannonSound, 1.0f);
 
         // Configurar posição e velocidade da Fireball
         fireballPositionX = MAPA_LARGURA * TILE_SIZE; // Começa à direita
@@ -438,6 +451,234 @@ void processarTelaVazia(GameScreen *currentScreen) {
             empty_player_y = (empty_player_y < 0) ? 0 : empty_player_y;
             empty_player_y = (empty_player_y >= MAPA_ALTURA) ? MAPA_ALTURA - 1 : empty_player_y;
         }
+    }
+
+    // Adicionar a verificação de proximidade com o vilão aqui
+    int distanceX = abs(empty_player_x - (MAPA_LARGURA - 3)); // Posição X do vilão
+    int distanceY = abs(empty_player_y - 10);                // Posição Y do vilão
+
+    if ((distanceX <= 1 && distanceY == 0) || (distanceY <= 1 && distanceX == 0)) {
+        // O jogador está a 1 tile de distância do vilão
+
+        // Parar músicas e sons
+        StopMusicStream(windMusic);
+        StopMusicStream(battleMusic);
+        StopSound(machineLoadingSound);
+        StopSound(typingSound);
+        StopSound(gameOverSoundWar);
+
+        // Mostrar tela preta
+        double blackStartTime = GetTime();
+        while (GetTime() - blackStartTime < 1.5) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            EndDrawing();
+        }
+
+        // Tocar o som "laugh.wav" após 1.5 segundos
+        Sound laughSound = LoadSound("static/music/laugh.wav");
+        PlaySound(laughSound);
+
+        // Esperar 1 segundo após "laugh.wav" começar a tocar
+        double laughStartTime = GetTime();
+        while (GetTime() - laughStartTime < 1.0) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            EndDrawing();
+        }
+
+        // Configurar textos da textbox
+        const char *dialogTexts[] = {
+            "HahahHahHAhAhA!",
+            "Depois de todo caos que você jurou instaurar em Arrakis, eu vou poder salvá-la do seu mal.",
+            "Foi tão fácil, sua infantaria é tão ridícula...",
+            "Suas últimas palavras...?"
+        };
+        const int dialogCount = sizeof(dialogTexts) / sizeof(dialogTexts[0]);
+        int currentDialogIndex = 0;
+
+        // Variáveis para efeito de digitação
+        char displayedText[256] = "";
+        int displayedTextLength = 0;
+        double textStartTime = GetTime();
+        bool dialogComplete = false;
+
+        // Carregar som de falas
+        Sound falasSound = LoadSound("static/music/falas.wav");
+
+        // Mostrar os diálogos sequencialmente
+        while (currentDialogIndex < dialogCount) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            // Caixa de texto
+            DrawRectangle(50, GetScreenHeight() - 150, GetScreenWidth() - 100, 100, (Color){0, 0, 0, 200});
+            DrawRectangleLines(50, GetScreenHeight() - 150, GetScreenWidth() - 100, 100, WHITE);
+
+            // Efeito de digitação
+            if (displayedTextLength < strlen(dialogTexts[currentDialogIndex])) {
+                if (GetTime() - textStartTime >= displayedTextLength * 0.05) { // Controle de velocidade de digitação
+                    if (displayedTextLength == 0) {
+                        // Iniciar som de falas no início do efeito de digitação
+                        PlaySound(falasSound);
+                    }
+                    displayedText[displayedTextLength] = dialogTexts[currentDialogIndex][displayedTextLength];
+                    displayedTextLength++;
+                    displayedText[displayedTextLength] = '\0';
+                }
+            } else {
+                dialogComplete = true; // Todo o texto foi exibido
+                StopSound(falasSound); // Parar o som de falas
+            }
+
+            // Exibir o texto
+            DrawText(displayedText, 70, GetScreenHeight() - 130, 20, WHITE);
+
+            EndDrawing();
+
+            // Esperar 3 segundos após o texto completo antes de passar para o próximo
+            if (dialogComplete && (GetTime() - textStartTime >= 3.0)) {
+                // Adicionar intervalo de 2 segundos entre os textos
+                double intervalStartTime = GetTime();
+                while (GetTime() - intervalStartTime < 2.0) {
+                    BeginDrawing();
+                    ClearBackground(BLACK);
+                    EndDrawing();
+                }
+
+                currentDialogIndex++;
+                displayedTextLength = 0;
+                displayedText[0] = '\0';
+                textStartTime = GetTime();
+                dialogComplete = false;
+            }
+        }
+
+        // Tela preta por 2 segundos após o último diálogo
+        double finalBlackTime = GetTime();
+        while (GetTime() - finalBlackTime < 2.0) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            EndDrawing();
+        }
+
+        // Exibir texto "Eu só queria prosperar minha casa..." com efeito de digitação mais lento
+        const char *finalText = "Eu só queria prosperar minha casa...";
+        char displayedFinalText[256] = "";
+        int finalTextLength = 0;
+        double finalTextStartTime = GetTime();
+
+        while (finalTextLength < strlen(finalText)) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            // Efeito de digitação mais lento para o texto final
+            if (GetTime() - finalTextStartTime >= finalTextLength * 0.1) { // Controle de velocidade mais lento
+                if (finalTextLength == 0) {
+                    // Iniciar som de falas no início do efeito de digitação
+                    PlaySound(falasSound);
+                }
+                displayedFinalText[finalTextLength] = finalText[finalTextLength];
+                finalTextLength++;
+                displayedFinalText[finalTextLength] = '\0';
+            }
+
+            // Exibir o texto
+            DrawText(
+                displayedFinalText,
+                (GetScreenWidth() - MeasureText(displayedFinalText, 30)) / 2,
+                GetScreenHeight() / 2 - 15,
+                30,
+                WHITE
+            );
+
+            EndDrawing();
+        }
+
+        // Parar sons ao terminar o texto final
+        StopSound(falasSound);
+        StopSound(laughSound);
+
+        // Manter o texto final por 10 segundos
+        double finalTextDisplayTime = GetTime();
+        while (GetTime() - finalTextDisplayTime < 10.0) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            DrawText(
+                finalText,
+                (GetScreenWidth() - MeasureText(finalText, 30)) / 2,
+                GetScreenHeight() / 2 - 15,
+                30,
+                WHITE
+            );
+            EndDrawing();
+        }
+
+        // Exibir novo texto "Ele... Ele não é tão diferente de mim..." com efeito de digitação
+        const char *newText1 = "Ele... Ele não é tão diferente de mim...";
+        const char *newText2 = "Será que vale a pena matá-lo, ou posso me unir a ele?";
+
+        displayedTextLength = 0;
+        memset(displayedText, 0, sizeof(displayedText));
+        double newTextStartTime = GetTime();
+
+        // Efeito de digitação para "Ele... Ele não é tão diferente de mim..."
+        while (displayedTextLength < strlen(newText1)) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            if (GetTime() - newTextStartTime >= displayedTextLength * 0.05) {
+                displayedText[displayedTextLength] = newText1[displayedTextLength];
+                displayedTextLength++;
+                displayedText[displayedTextLength] = '\0';
+            }
+
+            DrawText(displayedText, 70, GetScreenHeight() - 130, 20, WHITE);
+            EndDrawing();
+        }
+
+        StopSound(falasSound);
+
+        // Esperar 3 segundos após "Ele... Ele não é tão diferente de mim..."
+        double pauseAfterNewText1 = GetTime();
+        while (GetTime() - pauseAfterNewText1 < 3.0) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            EndDrawing();
+        }
+
+        // Efeito de digitação para "Será que vale a pena matá-lo, ou posso me unir a ele?"
+        displayedTextLength = 0;
+        memset(displayedText, 0, sizeof(displayedText));
+        newTextStartTime = GetTime();
+
+        while (displayedTextLength < strlen(newText2)) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            if (GetTime() - newTextStartTime >= displayedTextLength * 0.05) {
+                displayedText[displayedTextLength] = newText2[displayedTextLength];
+                displayedTextLength++;
+                displayedText[displayedTextLength] = '\0';
+            }
+
+            DrawText(displayedText, 70, GetScreenHeight() - 130, 20, WHITE);
+            EndDrawing();
+        }
+
+        StopSound(falasSound);
+
+        // Esperar 3 segundos após "Será que vale a pena matá-lo..."
+        double pauseAfterNewText2 = GetTime();
+        while (GetTime() - pauseAfterNewText2 < 3.0) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+            EndDrawing();
+        }
+
+        telaVaziaBloqueada = true; // Bloquear telaVazia após a sequência
+        *currentScreen = LOBBY;
+        return;
     }
 
     if (isWalking) {
@@ -557,6 +798,8 @@ void processarTelaVazia(GameScreen *currentScreen) {
                 fireballPositionX = MAPA_LARGURA * TILE_SIZE; // Reiniciar posição da Fireball
                 fireballActive = true; // Ativar a próxima onda
                 waveInProgress = true; // A onda está em progresso novamente
+
+                PlaySound(cannonSound);
             }
 
             // Desenhar WarningSign
@@ -595,17 +838,17 @@ void processarTelaVazia(GameScreen *currentScreen) {
     }
 
     if (!initializedWarnings) {
-        for (int i = 0; i < MAX_OCCURRENCES; i++) {
-            // Posicionar Warnings mais próximos do centro, à direita
-            warningPositions[i] = (Vector2){
-                (MAPA_LARGURA / 2 + GetRandomValue(1, 5)) * TILE_SIZE, // À direita do centro
-                (MAPA_ALTURA / 2 + GetRandomValue(-2, 2)) * TILE_SIZE  // Altura próxima do centro
+        for (int i = 0; i < TOTAL_EXPLOSIONS; i++) {
+            explosionPositions[i] = (Vector2){
+                (MAPA_LARGURA / 2 + GetRandomValue(3, 8)) * TILE_SIZE, // Posição mais à direita
+                (MAPA_ALTURA / 2 + GetRandomValue(-4, 4)) * TILE_SIZE  // Posição próxima ao centro vertical
             };
-            occurrenceTimers[i] = 0; // Inicializar timer
-            warningsActive[i] = false;
-            explosionsActive[i] = false;
+            explosionTimers[i] = 0;
+            explosionWarnings[i] = false;
+            explosionActiveStates[i] = false;
+            explosionHitboxes[i] = false;
         }
-        explosionSound = LoadSound("static/music/explosionsfx.wav"); // Carregar som de explosão
+        explosionSound = LoadSound("static/music/explosionsfx.wav");
         initializedWarnings = true;
     }
     BeginDrawing();
@@ -637,40 +880,47 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
                 if (CheckCollisionRecs(playerRec, destRecFireball)) {
                     // Parar músicas e tocar som de game over
+                    // Parar músicas e tocar som de game over
                     StopMusicStream(windMusic);
                     StopMusicStream(battleMusic);
                     PlaySound(gameOverSoundWar);
 
-                    // Animação de tela preta e reinício do jogo
+                    // Sequência de morte com fade-in do texto "GAME OVER"
                     double startBlackTime = GetTime();
-                    while (GetTime() - startBlackTime < 2.0) {
+                    float opacity = 0.0f; // Opacidade inicial do texto
+
+                    while (opacity < 1.0f) {
+                        double elapsed = GetTime() - startBlackTime;
+
+                        // Incrementar opacidade gradualmente
+                        opacity = elapsed / 2.0f; // 2 segundos para atingir opacidade máxima
+                        if (opacity > 1.0f) opacity = 1.0f;
+
                         BeginDrawing();
                         ClearBackground(BLACK);
+
+                        sleep(1);
+
+                        // Desenhar texto "GAME OVER" com opacidade
+                        DrawTextEx(
+                            GetFontDefault(),
+                            "GAME OVER",
+                            (Vector2){
+                                (GetScreenWidth() - MeasureText("GAME OVER", 80)) / 2,
+                                GetScreenHeight() / 2 - 40
+                            },
+                            80, // Tamanho da fonte
+                            2,  // Espaçamento
+                            Fade(WHITE, opacity) // Aplicar opacidade ao texto
+                        );
+
                         EndDrawing();
                     }
 
-                    // Bola branca com bordas opacas crescendo mais rápido
-                    double startGrowTime = GetTime();
-                    while (GetTime() - startGrowTime < 3.0) { // Cresce em 3 segundos
-                        BeginDrawing();
-                        ClearBackground(BLACK);
-
-                        float elapsed = GetTime() - startGrowTime;
-                        float radius = (elapsed / 3.0f) * GetScreenWidth() * 2; // Bola cresce até cobrir a tela
-
-                        // Criar efeito de bordas opacas
-                        for (int i = 0; i < 50; i++) {
-                            float innerRadius = radius - i * 2; // Gradiente nas bordas
-                            if (innerRadius > 0) {
-                                DrawCircle(GetScreenWidth() / 2, GetScreenHeight() / 2, innerRadius, Fade(WHITE, 1.0f - i * 0.02f));
-                            }
-                        }
-
-                        EndDrawing();
-                    }
+                    // Esperar 1 segundo com o texto visível antes de continuar
+                    sleep(1);
 
                     // Reiniciar jogo
-                    sleep(1);
                     atualizarRanking(playerName, playerMoney);
                     zerarMonetaria();
                     resetarJogo();
@@ -681,182 +931,126 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
     }
 
-        // Após 2 segundos de iniciar a música de batalha, mostrar o Warning no tile do meio
-        // Lógica para Warning e Explosão no tile central
-    if (battleMusicStarted && !warWarningActive && !explosionActive && GetTime() - startTime >= 2.0) {
-        warWarningActive = true;
-        warWarningStartTime = GetTime();
-    }
-
-    // Desenhar o Warning no centro do tile
-    if (warWarningActive) {
-        if (GetTime() - warWarningStartTime <= 1.5) {
-            // Ajustar posição do Warning no centro do tile
-            Vector2 warningPosition = {
-                warningTilePosition.x, // Centralizado no tile
-                warningTilePosition.y
-            };
-            DrawTextureEx(warningSign, warningPosition, 0.0f, 2.0f, WHITE); // Escala Warning para 192x192
-        } else {
-            // Iniciar a explosão após 1.5 segundos do Warning
-            explosionActive = true;
-            explosionStartTime = GetTime();
-            warWarningActive = false; // Remover o Warning
-        }
-    }
-
-    // Desenhar a explosão se ativa
-    static bool explosionOccurred = false; // Garante que a explosão só aconteça uma vez
-    if (explosionActive && !explosionOccurred) {
-        // Tocar o som de explosão no início da animação
-        static bool explosionSoundPlayed = false;
-        if (!explosionSoundPlayed) {
-            PlaySound(LoadSound("static/music/explosionsfx.wav"));
-            explosionSoundPlayed = true;
-        }
-
-        double elapsedTime = GetTime() - explosionStartTime;
-
-        // Configurar o frame da spritesheet
-        int frameWidth = 96;  // Largura de cada frame na spritesheet
-        int frameHeight = 96; // Altura de cada frame na spritesheet
-        int totalFrames = 1152 / frameWidth; // Número total de frames na spritesheet
-        int currentFrame = (int)((elapsedTime / 1.5) * totalFrames); // Calcular o frame atual
-
-        if (currentFrame < totalFrames) {
-            // Ajustar a posição da explosão para o centro do Warning
-            Rectangle sourceRecExplosion = { currentFrame * frameWidth, 0, frameWidth, frameHeight };
-            float warningX = warningTilePosition.x;
-            float warningY = warningTilePosition.y;
-
-            // Ajustar a posição da explosão
-            Rectangle destRecExplosion = {
-                warningX - 3 * TILE_SIZE + (192 - 96) / 2, // Deslocar 3 tiles à esquerda e centralizar Explosion no Warning no eixo X
-                warningY - 3 * TILE_SIZE + (192 - 96) / 2, // Deslocar 3 tiles acima e centralizar Explosion no Warning no eixo Y
-                192,                                       // Largura proporcional
-                192                                        // Altura proporcional
-            };
-
-            // Desenhar a explosão no tamanho proporcional
-            DrawTexturePro(LoadTexture("static/image/Explosion.png"), sourceRecExplosion, destRecExplosion, (Vector2){0, 0}, 0.0f, WHITE);
-        } else {
-            // Encerrar a explosão após a animação e garantir que ela não aconteça novamente
-            explosionActive = false;
-            explosionOccurred = true; // Marca que a explosão já ocorreu
-        }
-    }
-
-    // Verificar colisão com a explosão
-    if (explosionActive) {
-        Rectangle explosionRec = {
-            warningTilePosition.x,
-            warningTilePosition.y,
-            TILE_SIZE,
-            TILE_SIZE
-        };
-        Rectangle playerRec = {
-            empty_player_x * TILE_SIZE,
-            empty_player_y * TILE_SIZE,
-            TILE_SIZE,
-            TILE_SIZE
-        };
-
-        if (CheckCollisionRecs(playerRec, explosionRec)) {
-            StopMusicStream(windMusic);
-            StopMusicStream(battleMusic);
-
-            PlaySound(gameOverSoundWar);
-
-            double startBlackTime = GetTime();
-            while (GetTime() - startBlackTime < 2.0) {
-                BeginDrawing();
-                ClearBackground(BLACK);
-                EndDrawing();
-            }
-
-            // Bola branca com bordas opacas crescendo mais rápido
-            double startGrowTime = GetTime();
-            while (GetTime() - startGrowTime < 3.0) { // Cresce em 3 segundos
-                BeginDrawing();
-                ClearBackground(BLACK);
-
-                float elapsed = GetTime() - startGrowTime;
-                float radius = (elapsed / 3.0f) * GetScreenWidth() * 2; // Bola cresce até cobrir a tela
-
-                // Criar efeito de bordas opacas
-                for (int i = 0; i < 50; i++) {
-                    float innerRadius = radius - i * 2; // Gradiente nas bordas
-                    if (innerRadius > 0) {
-                        DrawCircle(GetScreenWidth() / 2, GetScreenHeight() / 2, innerRadius, Fade(WHITE, 1.0f - i * 0.02f));
-                    }
-                }
-
-                EndDrawing();
-            }
-
-            // Reiniciar jogo
-            sleep(1);
-            atualizarRanking(playerName, playerMoney);
-            zerarMonetaria();
-            resetarJogo();
-            *currentScreen = RANKINGS;
-            return;
-        }
-    }
-
     if (battleMusicStarted) { // Garantir que as ocorrências só comecem após a música
-        for (int i = 0; i < MAX_OCCURRENCES; i++) {
+        for (int i = 0; i < TOTAL_EXPLOSIONS; i++) {
             double currentTime = GetTime();
 
-            // Ativar o Warning quando o timer atingir o tempo correspondente
-            if (!warningsActive[i] && !explosionsActive[i]) {
-                if (occurrenceTimers[i] == 0) {
-                    // Inicializar o timer após a música começar
-                    occurrenceTimers[i] = currentTime + i * 4.0; // Intervalo de 4 segundos entre as ocorrências
+            // Ativar Warning após intervalo de 4 segundos
+            if (!explosionWarnings[i] && !explosionActiveStates[i]) {
+                if (explosionTimers[i] == 0) {
+                    explosionTimers[i] = currentTime + i * 4.0; // Intervalo de 4 segundos entre os warnings
                 }
-                if (currentTime >= occurrenceTimers[i]) {
-                    warningsActive[i] = true; // Ativar o Warning
-                }
-            }
-
-            // Gerenciar o Warning
-            if (warningsActive[i]) {
-                if (currentTime - occurrenceTimers[i] <= 1.5) {
-                    // Desenhar o Warning
-                    DrawTextureEx(warningSign, warningPositions[i], 0.0f, 2.0f, WHITE);
-                } else {
-                    // Após 1.5 segundos, iniciar a Explosion
-                    warningsActive[i] = false;
-                    explosionsActive[i] = true;
-                    occurrenceTimers[i] = currentTime; // Resetar o timer para a Explosion
+                if (currentTime >= explosionTimers[i]) {
+                    explosionWarnings[i] = true;
                 }
             }
 
-            // Gerenciar a Explosion
-            if (explosionsActive[i]) {
-                double elapsedTime = currentTime - occurrenceTimers[i];
+            // Gerenciar Warnings
+            if (explosionWarnings[i]) {
+                if (currentTime - explosionTimers[i] <= 1.5) {
+                    // Desenhar Warning
+                    DrawTextureEx(warningSign, explosionPositions[i], 0.0f, 2.0f, WHITE);
+                } else if (!explosionActiveStates[i]) {
+                    // Após 1.5 segundos, ativar a explosão
+                    explosionWarnings[i] = false;
+                    explosionActiveStates[i] = true;
+                    explosionTimers[i] = currentTime; // Registrar o tempo inicial da explosão
+                }
+            }
+
+            // Gerenciar Explosões
+            if (explosionActiveStates[i]) {
+                double elapsedTime = currentTime - explosionTimers[i];
                 int frameWidth = 96, frameHeight = 96, totalFrames = 1152 / frameWidth;
                 int currentFrame = (int)((elapsedTime / 1.5) * totalFrames);
 
                 if (currentFrame < totalFrames) {
-                    // Tocar o som no momento da explosão (uma vez por explosão)
                     if (currentFrame == 0 && !IsSoundPlaying(explosionSound)) {
                         PlaySound(explosionSound);
                     }
 
-                    // Ajustar a posição da explosão para o centro do Warning
                     Rectangle sourceRecExplosion = { currentFrame * frameWidth, 0, frameWidth, frameHeight };
                     Rectangle destRecExplosion = {
-                        warningPositions[i].x + TILE_SIZE - 96 / 2, // Centralizar Explosion no Warning no eixo X
-                        warningPositions[i].y + TILE_SIZE - 96 / 2, // Centralizar Explosion no Warning no eixo Y
-                        192,                                       // Largura proporcional
-                        192                                        // Altura proporcional
+                        explosionPositions[i].x + TILE_SIZE - 96 / 2,
+                        explosionPositions[i].y + TILE_SIZE - 96 / 2,
+                        192,
+                        192
                     };
                     DrawTexturePro(LoadTexture("static/image/Explosion.png"), sourceRecExplosion, destRecExplosion, (Vector2){0, 0}, 0.0f, WHITE);
+
+                    // Ativar a hitbox 0.2 segundos após o início da explosão
+                    if (elapsedTime >= 0.2) {
+                        explosionHitboxes[i] = true;
+                    }
                 } else {
-                    // Encerrar a Explosion e reiniciar o ciclo
-                    explosionsActive[i] = false;
-                    occurrenceTimers[i] = currentTime + MAX_OCCURRENCES * 4.0; // Ciclar o timer
+                    // Finalizar explosão e reiniciar ciclo
+                    explosionActiveStates[i] = false;
+                    explosionHitboxes[i] = false; // Desativar hitbox definitivamente
+                    explosionTimers[i] = currentTime + TOTAL_EXPLOSIONS * 4.0; // Agendar próximo ciclo
+                }
+            }
+
+            // Verificar colisão com a hitbox da explosão
+            if (explosionHitboxes[i]) {
+                Rectangle explosionRec = {
+                    explosionPositions[i].x + TILE_SIZE - 96 / 2,
+                    explosionPositions[i].y + TILE_SIZE - 96 / 2,
+                    192,
+                    192
+                };
+
+                Rectangle playerRec = {
+                    empty_player_x * TILE_SIZE,
+                    empty_player_y * TILE_SIZE,
+                    TILE_SIZE,
+                    TILE_SIZE
+                };
+
+                if (CheckCollisionRecs(playerRec, explosionRec)) {
+                    // Parar músicas e tocar som de game over
+                    StopMusicStream(windMusic);
+                    StopMusicStream(battleMusic);
+                    PlaySound(gameOverSoundWar);
+
+                    // Sequência de morte com fade-in do texto "GAME OVER"
+                    double startBlackTime = GetTime();
+                    float opacity = 0.0f; // Opacidade inicial do texto
+
+                    while (opacity < 1.0f) {
+                        double elapsed = GetTime() - startBlackTime;
+
+                        // Incrementar opacidade gradualmente
+                        opacity = elapsed / 2.0f; // 2 segundos para atingir opacidade máxima
+                        if (opacity > 1.0f) opacity = 1.0f;
+
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+
+                        // Desenhar texto "GAME OVER" com opacidade
+                        DrawTextEx(
+                            GetFontDefault(),
+                            "GAME OVER",
+                            (Vector2){
+                                (GetScreenWidth() - MeasureText("GAME OVER", 80)) / 2,
+                                GetScreenHeight() / 2 - 40
+                            },
+                            80, // Tamanho da fonte
+                            2,  // Espaçamento
+                            Fade(WHITE, opacity) // Aplicar opacidade ao texto
+                        );
+
+                        EndDrawing();
+                    }
+
+                    // Esperar 1 segundo com o texto visível antes de continuar
+                    sleep(1);
+
+                    // Reiniciar jogo
+                    atualizarRanking(playerName, playerMoney);
+                    zerarMonetaria();
+                    resetarJogo();
+                    *currentScreen = RANKINGS;
+                    return;
                 }
             }
         }
@@ -1562,6 +1756,8 @@ void drawLobby() {
         }
     } else if (mensagem != NULL) {
         DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, true);
+    } else if (telaVaziaBloqueada){
+        isInteractingWithMerchant = 0;
     } else {
         isInteractingWithMerchant = 0;
     }
