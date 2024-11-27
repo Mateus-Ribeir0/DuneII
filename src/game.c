@@ -59,6 +59,163 @@ static int estadoAposta = 0;
 int playerMoney = 0;
 int deathEmotivaTocando;
 
+#define NUM_FRAMES_COROA 38
+static Texture2D videoFramesCoroa[NUM_FRAMES_COROA]; // Array para armazenar todos os frames de coroa
+
+
+#define NUM_FRAMES 36
+static Texture2D videoFrames[NUM_FRAMES]; // Array para armazenar todos os frames
+
+void carregarFrames() {
+    char filePath[256]; // Buffer para armazenar o caminho completo
+
+    for (int i = 0; i < NUM_FRAMES; i++) {
+        snprintf(filePath, sizeof(filePath), "static/image/VideoCara/ezgif-frame-%03d.png", i + 1);
+        videoFrames[i] = LoadTexture(filePath);
+
+        // Verificar se o frame foi carregado corretamente
+        if (videoFrames[i].id == 0) {
+            printf("Erro ao carregar o frame: %s\n", filePath);
+        }
+    }
+}
+
+void exibirFrames() {
+    const float frameDuration = 1.0f / 12; // Duração de ~1/12 segundos por frame (12 FPS)
+
+    for (int i = 0; i < NUM_FRAMES; i++) {
+        float startTime = GetTime(); // Tempo inicial do frame
+
+        while (GetTime() - startTime < frameDuration) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            // Centraliza e ajusta o tamanho da imagem ao tamanho da tela
+            if (videoFrames[i].id != 0) {
+                Rectangle sourceRec = {0.0f, 0.0f, (float)videoFrames[i].width, (float)videoFrames[i].height};
+                Rectangle destRec = {0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT}; // Ajusta ao tamanho da tela
+                Vector2 origin = {0.0f, 0.0f};
+
+                // Centraliza na tela
+                destRec.x = (SCREEN_WIDTH - destRec.width) / 2;
+                destRec.y = (SCREEN_HEIGHT - destRec.height) / 2;
+
+                // Desenha a imagem ajustada
+                DrawTexturePro(videoFrames[i], sourceRec, destRec, origin, 0.0f, WHITE);
+            } else {
+                DrawText("Erro ao carregar o frame!", 10, 10, 20, RED); // Indica erro no frame
+            }
+
+            EndDrawing();
+        }
+    }
+
+    // Segura no último frame até pressionar Enter
+    while (!IsKeyPressed(KEY_ENTER)) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        if (videoFrames[NUM_FRAMES - 1].id != 0) {
+            Rectangle sourceRec = {0.0f, 0.0f, (float)videoFrames[NUM_FRAMES - 1].width, (float)videoFrames[NUM_FRAMES - 1].height};
+            Rectangle destRec = {0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT}; // Ajusta ao tamanho da tela
+            Vector2 origin = {0.0f, 0.0f};
+
+            // Centraliza na tela
+            destRec.x = (SCREEN_WIDTH - destRec.width) / 2;
+            destRec.y = (SCREEN_HEIGHT - destRec.height) / 2;
+
+            // Desenha o último frame ajustado
+            DrawTexturePro(videoFrames[NUM_FRAMES - 1], sourceRec, destRec, origin, 0.0f, WHITE);
+        } else {
+            DrawText("Erro ao carregar o frame!", 10, 10, 20, RED); // Indica erro no frame
+        }
+
+        DrawText("Pressione ENTER para continuar...", 10, SCREEN_HEIGHT - 50, 20, GRAY);
+
+        EndDrawing();
+    }
+}
+
+void liberarFrames() {
+    for (int i = 0; i < NUM_FRAMES; i++) {
+        if (videoFrames[i].id != 0) {
+            UnloadTexture(videoFrames[i]);
+        }
+    }
+}
+
+void carregarFramesCoroa() {
+    char filePath[256]; // Buffer para armazenar o caminho completo
+
+    for (int i = 0; i < NUM_FRAMES_COROA; i++) {
+        snprintf(filePath, sizeof(filePath), "static/image/VideoCoroa/ezgif-frame-%03d.png", i + 1);
+        videoFramesCoroa[i] = LoadTexture(filePath);
+
+        // Verificar se o frame foi carregado corretamente
+        if (videoFramesCoroa[i].id == 0) {
+            printf("Erro ao carregar o frame: %s\n", filePath);
+        }
+    }
+}
+
+void exibirFramesCoroa() {
+    const float frameDuration = 1.0f / 12; // Duração de ~1/12 segundos por frame (12 FPS)
+
+    for (int i = 0; i < NUM_FRAMES_COROA; i++) {
+        float startTime = GetTime(); // Tempo inicial do frame
+
+        while (GetTime() - startTime < frameDuration) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            if (videoFramesCoroa[i].id != 0) {
+                Rectangle sourceRec = {0.0f, 0.0f, (float)videoFramesCoroa[i].width, (float)videoFramesCoroa[i].height};
+                Rectangle destRec = {0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT}; // Ajusta ao tamanho da tela
+                Vector2 origin = {0.0f, 0.0f};
+
+                destRec.x = (SCREEN_WIDTH - destRec.width) / 2;
+                destRec.y = (SCREEN_HEIGHT - destRec.height) / 2;
+
+                DrawTexturePro(videoFramesCoroa[i], sourceRec, destRec, origin, 0.0f, WHITE);
+            } else {
+                DrawText("Erro ao carregar o frame!", 10, 10, 20, RED);
+            }
+
+            EndDrawing();
+        }
+    }
+
+    while (!IsKeyPressed(KEY_ENTER)) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        if (videoFramesCoroa[NUM_FRAMES_COROA - 1].id != 0) {
+            Rectangle sourceRec = {0.0f, 0.0f, (float)videoFramesCoroa[NUM_FRAMES_COROA - 1].width, (float)videoFramesCoroa[NUM_FRAMES_COROA - 1].height};
+            Rectangle destRec = {0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT};
+            Vector2 origin = {0.0f, 0.0f};
+
+            destRec.x = (SCREEN_WIDTH - destRec.width) / 2;
+            destRec.y = (SCREEN_HEIGHT - destRec.height) / 2;
+
+            DrawTexturePro(videoFramesCoroa[NUM_FRAMES_COROA - 1], sourceRec, destRec, origin, 0.0f, WHITE);
+        } else {
+            DrawText("Erro ao carregar o frame!", 10, 10, 20, RED);
+        }
+
+        DrawText("Pressione ENTER para continuar...", 10, SCREEN_HEIGHT - 50, 20, GRAY);
+
+        EndDrawing();
+    }
+}
+
+void liberarFramesCoroa() {
+    for (int i = 0; i < NUM_FRAMES_COROA; i++) {
+        if (videoFramesCoroa[i].id != 0) {
+            UnloadTexture(videoFramesCoroa[i]);
+        }
+    }
+}
+
 
 Rectangle cerealsSourceRec = { 64, 64, 32, 32 };
 
@@ -601,123 +758,6 @@ void drawGame() {
         }
     }
 
-    // Coordenadas do NPC
-    Vector2 npcPosition = {25 * TILE_SIZE, 10 * TILE_SIZE}; // Posição do NPC no mapa
-    Rectangle npcSourceRec = {0, 192, 64, 64};             // Região na spritesheet (64x64 pixels)
-    Rectangle npcDestRec = {
-        npcPosition.x,          // Posição X no mapa
-        npcPosition.y,          // Posição Y no mapa
-        96,                     // Largura ajustada para 96 pixels
-        96                      // Altura ajustada para 96 pixels
-    };
-    Rectangle npcHitbox = {
-        npcPosition.x,          // Hitbox horizontal
-        npcPosition.y,          // Hitbox vertical
-        TILE_SIZE,              // Largura da hitbox
-        TILE_SIZE               // Altura da hitbox
-    };
-    Vector2 npcOrigin = {0, 0}; // Origem para rotação (não aplicada aqui)
-
-    // Textos para o diálogo do NPC
-    static const char *dialogNpc[] = {
-        "Olá, viajante.",
-        "Este mundo guarda muitos segredos.",
-        "Se precisar de ajuda, não hesite em me procurar.",
-        "Boa sorte em sua jornada!"
-    };
-    static const int totalDialogNpc = sizeof(dialogNpc) / sizeof(dialogNpc[0]);
-    static int dialogIndexNpc = 0;
-    static char textoExibidoNpc[256] = "";
-    static int comprimentoTextoExibidoNpc = 0;
-    static bool exibirDialogNpc = false;
-    static double tempoUltimaMensagemNpc = 0;
-
-    // Verifica se o jogador está perto do NPC
-    if (CheckCollisionRecs((Rectangle){
-                            player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE},
-                        npcHitbox)) {
-        if (!exibirDialogNpc) {
-            exibirDialogNpc = true;
-            dialogIndexNpc = 0;
-            comprimentoTextoExibidoNpc = 0;
-            memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
-            tempoUltimaMensagemNpc = GetTime();
-            estadoAposta = 0; // Reseta o estado da aposta ao iniciar o diálogo
-        }
-    } else {
-        exibirDialogNpc = false;
-    }
-
-    // Exibe o diálogo se o jogador estiver perto do NPC
-    if (exibirDialogNpc) {
-        // Lógica para exibir os textos normais do NPC
-        if (estadoAposta == 0) {
-            if (comprimentoTextoExibidoNpc < strlen(dialogNpc[dialogIndexNpc])) {
-                if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
-                    textoExibidoNpc[comprimentoTextoExibidoNpc] = dialogNpc[dialogIndexNpc][comprimentoTextoExibidoNpc];
-                    comprimentoTextoExibidoNpc++;
-                    textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
-                }
-            } else if (IsKeyPressed(KEY_ENTER)) {
-                if (dialogIndexNpc < totalDialogNpc - 1) {
-                    dialogIndexNpc++;
-                    comprimentoTextoExibidoNpc = 0;
-                    memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
-                } else {
-                    // Após o último texto normal, inicia o fluxo da aposta
-                    estadoAposta = 1; // Transição para os textos da aposta
-                    comprimentoTextoExibidoNpc = 0;
-                    memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
-                }
-            }
-        }
-
-        // Lógica para os textos da aposta
-        const char *textosAposta[] = {
-            "Você quer fazer uma aposta...?",
-            "Vou jogar uma moeda.",
-            "Se cair CARA, eu te dou muitas moedas...",
-            "Mas se cair COROA, eu pego metade da sua água...",
-            "E aí, aceita? Pressione ENTER para apostar."
-        };
-        int totalTextosAposta = sizeof(textosAposta) / sizeof(textosAposta[0]);
-
-        if (estadoAposta > 0 && estadoAposta <= totalTextosAposta) {
-            if (comprimentoTextoExibidoNpc < strlen(textosAposta[estadoAposta - 1])) {
-                if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
-                    textoExibidoNpc[comprimentoTextoExibidoNpc] = textosAposta[estadoAposta - 1][comprimentoTextoExibidoNpc];
-                    comprimentoTextoExibidoNpc++;
-                    textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
-                }
-            } else if (IsKeyPressed(KEY_ENTER)) {
-                if (estadoAposta < totalTextosAposta) {
-                    estadoAposta++;
-                    comprimentoTextoExibidoNpc = 0;
-                    memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
-                } else {
-                    // Ativa a tela preta no último texto
-                    telaPretaAtiva = true;
-                    exibirDialogNpc = false; // Finaliza a interação com o NPC
-                }
-            }
-        }
-
-        // Exibe a caixa de diálogo e o texto acumulado na mesma caixa
-        DrawRectangleRounded((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, (Color){0, 0, 0, 200});
-        DrawRectangleRoundedLines((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, WHITE);
-        DrawText(textoExibidoNpc, 70, SCREEN_HEIGHT - 170, 20, WHITE);
-
-        // Instrução para pressionar Enter
-        if (comprimentoTextoExibidoNpc == strlen(dialogNpc[dialogIndexNpc]) || comprimentoTextoExibidoNpc == strlen(textosAposta[estadoAposta - 1])) {
-            if ((estadoAposta == 0 && dialogIndexNpc < totalDialogNpc - 1) || estadoAposta < totalTextosAposta) {
-                DrawText("Pressione ENTER para continuar...", 260, SCREEN_HEIGHT - 60, 16, GRAY);
-            }
-        }
-    }
-
-    // Desenha o NPC
-    DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
-
     Rectangle bonesSourceRect = {774, 113, 38, 33};
     Vector2 bonesPosition = {30 * TILE_SIZE, 10 * TILE_SIZE};
     Rectangle bonesDestRect = {bonesPosition.x, bonesPosition.y, 38, 33}; 
@@ -788,6 +828,141 @@ void drawGame() {
     Rectangle destRect2_Map1 = {baseSafezonePosition2_Map1.x, baseSafezonePosition2_Map1.y, 64, 96};
     Vector2 origin2_Map1 = {0, 0};
     DrawTexturePro(safezone, safezoneRec, destRect2_Map1, origin2_Map1, 0.0f, RAYWHITE);
+    // Coordenadas do NPC
+    Vector2 npcPosition = {25 * TILE_SIZE, 10 * TILE_SIZE}; // Posição do NPC no mapa
+    Rectangle npcSourceRec = {0, 192, 64, 64};             // Região na spritesheet (64x64 pixels)
+    Rectangle npcDestRec = {
+        npcPosition.x,          // Posição X no mapa
+        npcPosition.y,          // Posição Y no mapa
+        96,                     // Largura ajustada para 96 pixels
+        96                      // Altura da hitbox
+    };
+    Rectangle npcHitbox = {
+        npcPosition.x,          // Hitbox horizontal
+        npcPosition.y,          // Hitbox vertical
+        TILE_SIZE,              // Largura da hitbox
+        TILE_SIZE               // Altura da hitbox
+    };
+    Vector2 npcOrigin = {0, 0}; // Origem para rotação (não aplicada aqui)
+
+    // Variáveis de controle
+    static int estadoAposta = 0;       // Controle do estado da aposta
+    static bool exibirDialogNpc = false; // Controle de exibição do diálogo
+    static bool apostaResolvida = false; // Se o resultado já foi exibido
+    static bool apostaVitoria = false;  // Resultado da aposta (true = vitória)
+    static bool escolhaCara = false;    // Escolha do jogador (true = cara)
+    static bool resultadoCara = false; // Resultado da moeda (true = cara)
+    static char textoExibidoNpc[256] = "";
+    static int comprimentoTextoExibidoNpc = 0;
+    static double tempoUltimaMensagemNpc = 0;
+
+    // Textos da aposta
+    const char *textosAposta[] = {
+        "Você quer fazer uma aposta?",
+        "Escolha: (1) Cara ou (2) Coroa.",
+        "Jogando a moeda...",
+    };
+    const int totalTextosAposta = sizeof(textosAposta) / sizeof(textosAposta[0]);
+
+    // Verifica se o jogador está perto do NPC
+    if (CheckCollisionRecs(
+            (Rectangle){player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE},
+            npcHitbox)) {
+        if (!exibirDialogNpc) {
+            exibirDialogNpc = true;
+            estadoAposta = 1; // Inicia o diálogo da aposta
+            comprimentoTextoExibidoNpc = 0;
+            memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+            tempoUltimaMensagemNpc = GetTime();
+            apostaResolvida = false; // Reseta o estado da aposta
+        }
+    } else {
+        exibirDialogNpc = false;
+    }
+
+    // Exibe o diálogo da aposta
+    if (exibirDialogNpc) {
+        if (estadoAposta > 0 && estadoAposta <= totalTextosAposta) {
+            if (comprimentoTextoExibidoNpc < strlen(textosAposta[estadoAposta - 1])) {
+                if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
+                    textoExibidoNpc[comprimentoTextoExibidoNpc] = textosAposta[estadoAposta - 1][comprimentoTextoExibidoNpc];
+                    comprimentoTextoExibidoNpc++;
+                    textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
+                }
+            } else if (estadoAposta == totalTextosAposta) {
+                // Escolha do jogador
+                if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO)) {
+                    escolhaCara = IsKeyPressed(KEY_ONE);
+                    int chance = GetRandomValue(1, 100);
+
+                    // Determina o resultado da moeda
+                    resultadoCara = (chance <= 50); // 50% de chance para "cara"
+
+                    // Determina vitória ou derrota com base na sorte
+                    if ((escolhaCara && resultadoCara && chance <= playerLucky) ||
+                        (!escolhaCara && !resultadoCara && chance <= playerLucky)) {
+                        apostaVitoria = true; // Vitória
+                        playerMoney += 20000;
+                    } else {
+                        apostaVitoria = false; // Derrota
+                        playerWater *= 0.5; // Perde 50% da água
+                        if (playerWater < 0) playerWater = 0;
+                    }
+
+                    apostaResolvida = true;
+                }
+            } else if (IsKeyPressed(KEY_ENTER)) {
+                estadoAposta++;
+                comprimentoTextoExibidoNpc = 0;
+                memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+            }
+        }
+
+        // Desenha a caixa de diálogo e o texto
+        DrawRectangleRounded((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, (Color){0, 0, 0, 200});
+        DrawRectangleRoundedLines((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, WHITE);
+        DrawText(textoExibidoNpc, 70, SCREEN_HEIGHT - 170, 20, WHITE);
+
+        // Instrução para continuar
+        if (comprimentoTextoExibidoNpc == strlen(textosAposta[estadoAposta - 1])) {
+            if (estadoAposta < totalTextosAposta) {
+                DrawText("Pressione ENTER para continuar...", 260, SCREEN_HEIGHT - 60, 16, GRAY);
+            } else if (estadoAposta == totalTextosAposta) {
+                DrawText("(1) Cara ou (2) Coroa", 260, SCREEN_HEIGHT - 60, 16, GRAY);
+            }
+        }
+    }
+
+    // Exibe o resultado da aposta
+    if (apostaResolvida) {
+        if (apostaVitoria) {
+            if (escolhaCara) {
+                carregarFrames();
+                exibirFrames();
+                liberarFrames();
+            } else {
+                carregarFramesCoroa();
+                exibirFramesCoroa();
+                liberarFramesCoroa();
+            }
+        } else {
+            if (escolhaCara) {
+                carregarFramesCoroa();
+                exibirFramesCoroa();
+                liberarFramesCoroa();
+            } else {
+                carregarFrames();
+                exibirFrames();
+                liberarFrames();
+            }
+        }
+        apostaResolvida = false; // Reseta o estado
+    }
+
+
+    // Desenha o NPC
+    DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
+
 }
  else if (mapaAtual == 2) {
     for (int y = 0; y < MAPA_ALTURA; y++) {
