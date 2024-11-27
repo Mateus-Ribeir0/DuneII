@@ -313,8 +313,6 @@ void verificarProximidadePoco(float playerX, float playerY) {
     }
 }
 
-
-
 void processarTelaVazia(GameScreen *currentScreen) {
     static Texture2D empty_personagem;
     static Texture2D empty_sombra;
@@ -547,16 +545,23 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
             EndDrawing();
 
-            // Esperar 3 segundos após o texto completo antes de passar para o próximo
-            if (dialogComplete && (GetTime() - textStartTime >= 3.0)) {
-                // Adicionar intervalo de 2 segundos entre os textos
-                double intervalStartTime = GetTime();
-                while (GetTime() - intervalStartTime < 2.0) {
+            // Após o texto ser completamente exibido
+            if (dialogComplete && (GetTime() - textStartTime >= displayedTextLength * 0.05 + 2.0)) {
+                // Esperar 2 segundos antes de exibir o próximo texto
+                double waitStartTime = GetTime();
+                while (GetTime() - waitStartTime < 2.0) {
                     BeginDrawing();
                     ClearBackground(BLACK);
+
+                    // Reexibir o texto atual durante a pausa de 2 segundos
+                    DrawRectangle(50, GetScreenHeight() - 150, GetScreenWidth() - 100, 100, (Color){0, 0, 0, 200});
+                    DrawRectangleLines(50, GetScreenHeight() - 150, GetScreenWidth() - 100, 100, WHITE);
+                    DrawText(displayedText, 70, GetScreenHeight() - 130, 20, WHITE);
+
                     EndDrawing();
                 }
 
+                // Passar para o próximo texto
                 currentDialogIndex++;
                 displayedTextLength = 0;
                 displayedText[0] = '\0';
