@@ -59,6 +59,10 @@ static int estadoAposta = 0;
 int playerMoney = 0;
 int deathEmotivaTocando;
 
+#define NUM_FRAMES_COROA 38
+static Texture2D videoFramesCoroa[NUM_FRAMES_COROA]; // Array para armazenar todos os frames de coroa
+
+
 #define NUM_FRAMES 36
 static Texture2D videoFrames[NUM_FRAMES]; // Array para armazenar todos os frames
 
@@ -140,6 +144,77 @@ void liberarFrames() {
     }
 }
 
+void carregarFramesCoroa() {
+    char filePath[256]; // Buffer para armazenar o caminho completo
+
+    for (int i = 0; i < NUM_FRAMES_COROA; i++) {
+        snprintf(filePath, sizeof(filePath), "static/image/VideoCoroa/ezgif-frame-%03d.png", i + 1);
+        videoFramesCoroa[i] = LoadTexture(filePath);
+
+        // Verificar se o frame foi carregado corretamente
+        if (videoFramesCoroa[i].id == 0) {
+            printf("Erro ao carregar o frame: %s\n", filePath);
+        }
+    }
+}
+
+void exibirFramesCoroa() {
+    const float frameDuration = 1.0f / 12; // Duração de ~1/12 segundos por frame (12 FPS)
+
+    for (int i = 0; i < NUM_FRAMES_COROA; i++) {
+        float startTime = GetTime(); // Tempo inicial do frame
+
+        while (GetTime() - startTime < frameDuration) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            if (videoFramesCoroa[i].id != 0) {
+                Rectangle sourceRec = {0.0f, 0.0f, (float)videoFramesCoroa[i].width, (float)videoFramesCoroa[i].height};
+                Rectangle destRec = {0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT}; // Ajusta ao tamanho da tela
+                Vector2 origin = {0.0f, 0.0f};
+
+                destRec.x = (SCREEN_WIDTH - destRec.width) / 2;
+                destRec.y = (SCREEN_HEIGHT - destRec.height) / 2;
+
+                DrawTexturePro(videoFramesCoroa[i], sourceRec, destRec, origin, 0.0f, WHITE);
+            } else {
+                DrawText("Erro ao carregar o frame!", 10, 10, 20, RED);
+            }
+
+            EndDrawing();
+        }
+    }
+
+    while (!IsKeyPressed(KEY_ENTER)) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        if (videoFramesCoroa[NUM_FRAMES_COROA - 1].id != 0) {
+            Rectangle sourceRec = {0.0f, 0.0f, (float)videoFramesCoroa[NUM_FRAMES_COROA - 1].width, (float)videoFramesCoroa[NUM_FRAMES_COROA - 1].height};
+            Rectangle destRec = {0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT};
+            Vector2 origin = {0.0f, 0.0f};
+
+            destRec.x = (SCREEN_WIDTH - destRec.width) / 2;
+            destRec.y = (SCREEN_HEIGHT - destRec.height) / 2;
+
+            DrawTexturePro(videoFramesCoroa[NUM_FRAMES_COROA - 1], sourceRec, destRec, origin, 0.0f, WHITE);
+        } else {
+            DrawText("Erro ao carregar o frame!", 10, 10, 20, RED);
+        }
+
+        DrawText("Pressione ENTER para continuar...", 10, SCREEN_HEIGHT - 50, 20, GRAY);
+
+        EndDrawing();
+    }
+}
+
+void liberarFramesCoroa() {
+    for (int i = 0; i < NUM_FRAMES_COROA; i++) {
+        if (videoFramesCoroa[i].id != 0) {
+            UnloadTexture(videoFramesCoroa[i]);
+        }
+    }
+}
 
 
 Rectangle cerealsSourceRec = { 64, 64, 32, 32 };
@@ -861,26 +936,29 @@ void drawGame() {
     // Exibe o resultado da aposta
     if (apostaResolvida) {
         if (apostaVitoria) {
-            // Vitória: exibe o vídeo com o resultado correto
-            carregarFrames();
-            exibirFrames();
-            liberarFrames();
+            if (escolhaCara) {
+                carregarFrames();
+                exibirFrames();
+                liberarFrames();
+            } else {
+                carregarFramesCoroa();
+                exibirFramesCoroa();
+                liberarFramesCoroa();
+            }
         } else {
             if (escolhaCara) {
-                // Derrota: jogador escolheu "cara", apenas mensagem do NPC
-                DrawRectangleRounded((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, (Color){0, 0, 0, 200});
-                DrawRectangleRoundedLines((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, WHITE);
-                DrawText("Você perdeu!", 70, SCREEN_HEIGHT - 170, 20, WHITE);
+                carregarFramesCoroa();
+                exibirFramesCoroa();
+                liberarFramesCoroa();
             } else {
-                // Derrota: jogador escolheu "coroa", exibe o vídeo da moeda caindo em "cara"
                 carregarFrames();
                 exibirFrames();
                 liberarFrames();
             }
         }
-
         apostaResolvida = false; // Reseta o estado
     }
+
 
     // Desenha o NPC
     DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
