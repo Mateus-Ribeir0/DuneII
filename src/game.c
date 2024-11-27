@@ -48,6 +48,8 @@ static Sound heartbeatSound;
 static bool isHeartbeatPlaying = false;
 static Texture2D npcArmoured;
 Rectangle npcArmouredHitbox;
+static bool telaPretaAtiva = false;
+static int estadoAposta = 0;
 
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
@@ -494,6 +496,30 @@ void drawGame() {
     Rectangle ruinasSourceRec = {0, 0, ruinasDeAreiaGrandes.width, ruinasDeAreiaGrandes.height};
     Rectangle ruinasDestRec = {20, 20, 256, 256};
 
+    if (telaPretaAtiva) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+        DrawText("Você está na aposta. Pressione [ESC] para sair.", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2, 20, WHITE);
+        EndDrawing();
+
+        // Pausa a música e desativa o monstro enquanto a tela preta está ativa
+        if (IsSoundPlaying(musicaMapa1)) StopSound(musicaMapa1);
+        isMonsterActive = false;
+
+        // Garante que o som do monstro não será reproduzido
+        if (IsSoundPlaying(monsterGrowl2)) StopSound(monsterGrowl2);
+
+        // Sai da tela preta ao pressionar ESC
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            telaPretaAtiva = false;
+
+            // Retoma a música do mapa 1
+            PlaySound(musicaMapa1);
+        }
+
+        return; // Impede o restante do desenho do jogo
+    }
+
     if (mapaAtual == 0) {
     for (int y = 0; y < MAPA_ALTURA; y++) {
         for (int x = 0; x < MAPA_LARGURA; x++) {
@@ -616,6 +642,7 @@ void drawGame() {
             comprimentoTextoExibidoNpc = 0;
             memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
             tempoUltimaMensagemNpc = GetTime();
+            estadoAposta = 0; // Reseta o estado da aposta ao iniciar o diálogo
         }
     } else {
         exibirDialogNpc = false;
@@ -623,30 +650,68 @@ void drawGame() {
 
     // Exibe o diálogo se o jogador estiver perto do NPC
     if (exibirDialogNpc) {
-        if (comprimentoTextoExibidoNpc < strlen(dialogNpc[dialogIndexNpc])) {
-            if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
-                textoExibidoNpc[comprimentoTextoExibidoNpc] = dialogNpc[dialogIndexNpc][comprimentoTextoExibidoNpc];
-                comprimentoTextoExibidoNpc++;
-                textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
-            }
-        } else if (IsKeyPressed(KEY_ENTER)) {
-            if (dialogIndexNpc < totalDialogNpc - 1) {
-                dialogIndexNpc++;
-                comprimentoTextoExibidoNpc = 0;
-                memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
-            } else {
-                exibirDialogNpc = false;
+        // Lógica para exibir os textos normais do NPC
+        if (estadoAposta == 0) {
+            if (comprimentoTextoExibidoNpc < strlen(dialogNpc[dialogIndexNpc])) {
+                if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
+                    textoExibidoNpc[comprimentoTextoExibidoNpc] = dialogNpc[dialogIndexNpc][comprimentoTextoExibidoNpc];
+                    comprimentoTextoExibidoNpc++;
+                    textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
+                }
+            } else if (IsKeyPressed(KEY_ENTER)) {
+                if (dialogIndexNpc < totalDialogNpc - 1) {
+                    dialogIndexNpc++;
+                    comprimentoTextoExibidoNpc = 0;
+                    memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+                } else {
+                    // Após o último texto normal, inicia o fluxo da aposta
+                    estadoAposta = 1; // Transição para os textos da aposta
+                    comprimentoTextoExibidoNpc = 0;
+                    memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+                }
             }
         }
 
-        // Exibe a caixa de diálogo e o texto à esquerda
+        // Lógica para os textos da aposta
+        const char *textosAposta[] = {
+            "Você quer fazer uma aposta...?",
+            "Vou jogar uma moeda.",
+            "Se cair CARA, eu te dou muitas moedas...",
+            "Mas se cair COROA, eu pego metade da sua água...",
+            "E aí, aceita? Pressione ENTER para apostar."
+        };
+        int totalTextosAposta = sizeof(textosAposta) / sizeof(textosAposta[0]);
+
+        if (estadoAposta > 0 && estadoAposta <= totalTextosAposta) {
+            if (comprimentoTextoExibidoNpc < strlen(textosAposta[estadoAposta - 1])) {
+                if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
+                    textoExibidoNpc[comprimentoTextoExibidoNpc] = textosAposta[estadoAposta - 1][comprimentoTextoExibidoNpc];
+                    comprimentoTextoExibidoNpc++;
+                    textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
+                }
+            } else if (IsKeyPressed(KEY_ENTER)) {
+                if (estadoAposta < totalTextosAposta) {
+                    estadoAposta++;
+                    comprimentoTextoExibidoNpc = 0;
+                    memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+                } else {
+                    // Ativa a tela preta no último texto
+                    telaPretaAtiva = true;
+                    exibirDialogNpc = false; // Finaliza a interação com o NPC
+                }
+            }
+        }
+
+        // Exibe a caixa de diálogo e o texto acumulado na mesma caixa
         DrawRectangleRounded((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, (Color){0, 0, 0, 200});
         DrawRectangleRoundedLines((Rectangle){50, SCREEN_HEIGHT - 200, 400, 100}, 0.1f, 16, WHITE);
         DrawText(textoExibidoNpc, 70, SCREEN_HEIGHT - 170, 20, WHITE);
 
         // Instrução para pressionar Enter
-        if (comprimentoTextoExibidoNpc == strlen(dialogNpc[dialogIndexNpc]) && dialogIndexNpc < totalDialogNpc - 1) {
-            DrawText("Pressione ENTER para continuar...", 260, SCREEN_HEIGHT - 60, 16, GRAY);
+        if (comprimentoTextoExibidoNpc == strlen(dialogNpc[dialogIndexNpc]) || comprimentoTextoExibidoNpc == strlen(textosAposta[estadoAposta - 1])) {
+            if ((estadoAposta == 0 && dialogIndexNpc < totalDialogNpc - 1) || estadoAposta < totalTextosAposta) {
+                DrawText("Pressione ENTER para continuar...", 260, SCREEN_HEIGHT - 60, 16, GRAY);
+            }
         }
     }
 
