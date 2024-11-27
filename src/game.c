@@ -646,6 +646,12 @@ int direcao = 0;
 
 void drawGame() {
     ClearBackground(RAYWHITE);
+    // Variáveis relacionadas à caixa de diálogo
+    float dialogBoxX = 30;             // Posição X ajustada para reduzir o gap à esquerda
+    float dialogBoxY = SCREEN_HEIGHT - 200; // Posição Y da caixa de diálogo
+    float dialogBoxWidth = 500;        // Largura maior da caixa de diálogo
+    float dialogBoxHeight = 100;       // Altura da caixa de diálogo
+    float scaleFactor = 1.3f;          // Fator de escala para os sprites
 
     Color map0Color = (Color){210, 178, 104, 255};
     Color map1Color = (Color){210, 178, 104, 255};
@@ -859,19 +865,44 @@ void drawGame() {
     static int comprimentoTextoExibidoNpc = 0;
     static double tempoUltimaMensagemNpc = 0;
 
-    // Textos da aposta
+    // Textos da aposta (ajustados com as novas falas)
     const char *textosAposta[] = {
-        "Você quer fazer uma aposta?",
-        "Escolha: (1) Cara ou (2) Coroa.",
-        "Jogando a moeda...",
+        "Eu tenho uma proposta para você.",
+        "Faca a sua aposta no cara ou coroa. Caso\nperca, ficarei com metade de sua agua.",
+        "Se der sorte e ganhar, lhe dou 20.000.",
+        "Escolha: (1) Cara ou (2) Coroa."
     };
     const int totalTextosAposta = sizeof(textosAposta) / sizeof(textosAposta[0]);
+
+    // Verifica se o jogador está perto do NPC
+    // Nova variável para controlar o tempo da última aposta
+    static double ultimoTempoAposta = -60; // Inicializa com um valor negativo para permitir a primeira aposta imediatamente
+
+    // Verifica se o jogador está perto do NPC
+    // Nova variável para controlar o estado do feedback
+    static bool exibirFeedback = false;
+
+    // Verifica se o jogador está perto do NPC
+    // Verifica se o jogador está perto do NPC
+    // Nova variável para controlar o estado da mensagem de "volte mais tarde"
+    static bool mostrarVolteMaisTarde = false;
 
     // Verifica se o jogador está perto do NPC
     if (CheckCollisionRecs(
             (Rectangle){player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE},
             npcHitbox)) {
-        if (!exibirDialogNpc) {
+        double tempoAtual = GetTime();
+
+        if (!exibirFeedback && tempoAtual - ultimoTempoAposta < 60) {
+            // Jogador ainda está no intervalo de tempo restrito
+            exibirDialogNpc = true;
+            mostrarVolteMaisTarde = true; // Ativa o estado para exibir a mensagem
+            comprimentoTextoExibidoNpc = 0;
+            memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc)); // Limpa o buffer do texto
+            strncpy(textoExibidoNpc, "Ainda é muito cedo para apostar, volte mais\ntarde...", sizeof(textoExibidoNpc) - 1);
+            textoExibidoNpc[sizeof(textoExibidoNpc) - 1] = '\0'; // Garante o término da string
+        } else if (!exibirDialogNpc && !exibirFeedback && !mostrarVolteMaisTarde) {
+            // Jogador pode iniciar uma nova aposta
             exibirDialogNpc = true;
             estadoAposta = 1; // Inicia o diálogo da aposta
             comprimentoTextoExibidoNpc = 0;
@@ -881,19 +912,21 @@ void drawGame() {
         }
     } else {
         exibirDialogNpc = false;
+        mostrarVolteMaisTarde = false; // Reseta o estado ao sair da área do NPC
     }
-
-    float scaleFactor = 1.3f;
-
-    // Ajuste da posição e largura da caixa de diálogo
-    float dialogBoxX = 30; // Posição X ajustada para reduzir o gap à esquerda
-    float dialogBoxWidth = 500; // Largura maior da caixa de diálogo
-    float dialogBoxY = SCREEN_HEIGHT - 200; // Posição Y da caixa de diálogo
-    float dialogBoxHeight = 100; // Altura da caixa de diálogo
 
     // Exibe o diálogo da aposta
     if (exibirDialogNpc) {
-        if (estadoAposta > 0 && estadoAposta <= totalTextosAposta) {
+        if (mostrarVolteMaisTarde) {
+            // Exibe a mensagem "volte mais tarde"
+            if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
+                // Aguardar o jogador pressionar ENTER para sair
+                if (IsKeyPressed(KEY_ENTER)) {
+                    mostrarVolteMaisTarde = false; // Desativa a mensagem
+                    exibirDialogNpc = false;      // Fecha o diálogo
+                }
+            }
+        } else if (estadoAposta > 0 && estadoAposta <= totalTextosAposta) {
             // Controle de texto gradual
             if (comprimentoTextoExibidoNpc < strlen(textosAposta[estadoAposta - 1])) {
                 if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
@@ -901,8 +934,14 @@ void drawGame() {
                     comprimentoTextoExibidoNpc++;
                     textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
                 }
+            } else if (estadoAposta < totalTextosAposta) {
+                if (IsKeyPressed(KEY_ENTER)) {
+                    estadoAposta++;
+                    comprimentoTextoExibidoNpc = 0;
+                    memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+                }
             } else if (estadoAposta == totalTextosAposta) {
-                // Lógica de escolha: Cara ou Coroa
+                // Jogador escolhe entre cara ou coroa
                 if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO)) {
                     escolhaCara = IsKeyPressed(KEY_ONE);
                     int chance = GetRandomValue(1, 100);
@@ -910,23 +949,37 @@ void drawGame() {
                     // Resultado da moeda
                     resultadoCara = (chance <= 50);
 
-                    // Determinação de vitória ou derrota
-                    if ((escolhaCara && resultadoCara && chance <= playerLucky) ||
-                        (!escolhaCara && !resultadoCara && chance <= playerLucky)) {
-                        apostaVitoria = true;
+                    // Determinação de vitória ou derrota com base na sorte do jogador
+                    apostaVitoria = (escolhaCara == resultadoCara) && (chance <= playerLucky);
+
+                    // Aplicar resultado ao jogador
+                    if (apostaVitoria) {
                         playerMoney += 20000;
                     } else {
-                        apostaVitoria = false;
                         playerWater *= 0.5;
                         if (playerWater < 0) playerWater = 0;
                     }
 
                     apostaResolvida = true;
+                    comprimentoTextoExibidoNpc = 0;
+                    memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+
+                    // Atualiza o estado da aposta e registra o tempo da última aposta
+                    ultimoTempoAposta = GetTime();
+                    exibirFeedback = true; // Ativa o estado de feedback
                 }
-            } else if (IsKeyPressed(KEY_ENTER)) {
-                estadoAposta++;
-                comprimentoTextoExibidoNpc = 0;
-                memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+            }
+        }
+
+        // Exibe o feedback de vitória ou derrota
+        if (exibirFeedback) {
+            const char *resultadoTexto = apostaVitoria ? "Voce ganhou! Parabens." : "Voce perdeu! Que pena.";
+            strcpy(textoExibidoNpc, resultadoTexto);
+            comprimentoTextoExibidoNpc = strlen(resultadoTexto);
+
+            if (IsKeyPressed(KEY_ENTER)) {
+                exibirFeedback = false; // Sai do estado de feedback
+                exibirDialogNpc = false; // Fecha o diálogo
             }
         }
 
@@ -948,33 +1001,19 @@ void drawGame() {
 
         DrawText(textoExibidoNpc, textX, textY, 20, WHITE);
 
-        // Desenho da sprite da aposta
-        Rectangle apostaSourceRect = {0, 0, apostaSprite.width, apostaSprite.height};
-        Rectangle apostaDestRect = {
-            50, // Posição X
-            SCREEN_HEIGHT - 360, // Posição Y
-            apostaSprite.width * scaleFactor,  // Largura proporcional ao fator de escala
-            apostaSprite.height * scaleFactor  // Altura proporcional ao fator de escala
-        };
-        DrawTexturePro(apostaSprite, apostaSourceRect, apostaDestRect, (Vector2){0, 0}, 0.0f, WHITE);
-
         // Instruções na tela
-        if (comprimentoTextoExibidoNpc == strlen(textosAposta[estadoAposta - 1])) {
-            if (estadoAposta < totalTextosAposta) {
-                DrawText(
-                    "Pressione ENTER para continuar...", 
-                    textX, dialogBoxY + dialogBoxHeight - 30, 
-                    16, GRAY
-                );
-            } else if (estadoAposta == totalTextosAposta) {
-                DrawText(
-                    "(1) Cara ou (2) Coroa", 
-                    textX, dialogBoxY + dialogBoxHeight - 30, 
-                    16, GRAY
-                );
-            }
+        if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
+            DrawText(
+                "Pressione ENTER para continuar...", 
+                dialogBoxX + 20, dialogBoxY + dialogBoxHeight - 30, 
+                16, GRAY
+            );
         }
     }
+
+
+
+
 
     // Exibe o resultado da aposta
     if (apostaResolvida) {
