@@ -849,8 +849,8 @@ void drawGame() {
     Rectangle npcHitbox = {
         npcPosition.x,          // Hitbox horizontal
         npcPosition.y,          // Hitbox vertical
-        TILE_SIZE,              // Largura da hitbox
-        TILE_SIZE               // Altura da hitbox
+        TILE_SIZE+64,              // Largura da hitbox
+        TILE_SIZE+64               // Altura da hitbox
     };
     Vector2 npcOrigin = {0, 0}; // Origem para rotação (não aplicada aqui)
 
