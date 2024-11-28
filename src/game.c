@@ -854,6 +854,11 @@ void drawGame() {
     };
     Vector2 npcOrigin = {0, 0}; // Origem para rotação (não aplicada aqui)
 
+    Rectangle playerRect = {player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+    if (CheckCollisionRecs(playerRect, npcHitbox)) {
+        // Apenas desativa o monstro, sem afetar outras partes do jogo
+        isMonsterActive = false;
+    }
     // Variáveis de controle
     static int estadoAposta = 0;       // Controle do estado da aposta
     static bool exibirDialogNpc = false; // Controle de exibição do diálogo
