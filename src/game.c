@@ -916,17 +916,18 @@ void drawGame() {
 
     // Exibe o diálogo da aposta
     if (exibirDialogNpc) {
+        if (apostaSprite.id == 0) {
+            TraceLog(LOG_WARNING, "Sprite apostaSprite não carregada corretamente!");
+        }
+
         if (mostrarVolteMaisTarde) {
-            // Exibe a mensagem "volte mais tarde"
             if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
-                // Aguarda o jogador pressionar ENTER para sair
                 if (IsKeyPressed(KEY_ENTER)) {
-                    mostrarVolteMaisTarde = false; // Desativa a mensagem
-                    exibirDialogNpc = false;      // Fecha o diálogo
+                    mostrarVolteMaisTarde = false;
+                    exibirDialogNpc = false;
                 }
             }
         } else if (estadoAposta > 0 && estadoAposta <= totalTextosAposta) {
-            // Controle de texto gradual
             if (comprimentoTextoExibidoNpc < strlen(textosAposta[estadoAposta - 1])) {
                 if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
                     textoExibidoNpc[comprimentoTextoExibidoNpc] = textosAposta[estadoAposta - 1][comprimentoTextoExibidoNpc];
@@ -940,28 +941,18 @@ void drawGame() {
                     memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
                 }
             } else if (estadoAposta == totalTextosAposta) {
-                // Jogador escolhe entre cara ou coroa
                 if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO)) {
                     escolhaCara = IsKeyPressed(KEY_ONE);
-                    int chance = GetRandomValue(1, 100); // Número aleatório entre 1 e 100
-
-                    // Determinação do resultado da moeda com base na sorte (lucky)
-                    if (playerLucky > 0) { 
-                        resultadoCara = (chance <= playerLucky - 5); // Penalização de 5% na chance
-                    } else {
-                        resultadoCara = false; // Se lucky for 0, sempre dá "coroa"
-                    }
-
-                    // Verifica se a escolha do jogador coincide com o resultado
+                    int chance = GetRandomValue(1, 100);
+                    resultadoCara = (playerLucky > 0 && chance <= playerLucky - 5);
                     apostaVitoria = (escolhaCara == resultadoCara);
 
-                    // Aplicar resultado ao jogador
                     if (apostaVitoria) {
                         playerMoney += 20000;
-                        playerLucky += 2; // Bônus por vitória
+                        playerLucky += 2;
                     } else {
                         playerWater = (int)(playerWater * 0.5);
-                        playerLucky -= 2; // Redução severa na sorte
+                        playerLucky -= 2;
                         if (playerWater < 0) playerWater = 0;
                         if (playerLucky < 0) playerLucky = 0;
                     }
@@ -969,54 +960,60 @@ void drawGame() {
                     apostaResolvida = true;
                     comprimentoTextoExibidoNpc = 0;
                     memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
-
-                    // Atualiza o estado da aposta e registra o tempo da última aposta
                     ultimoTempoAposta = GetTime();
-                    exibirFeedback = true; // Ativa o estado de feedback
+                    exibirFeedback = true;
                 }
             }
-
         }
 
-        // Exibe o feedback de vitória ou derrota
         if (exibirFeedback) {
             const char *resultadoTexto = apostaVitoria ? "Voce ganhou! Parabens." : "Voce perdeu! Que pena.";
             strcpy(textoExibidoNpc, resultadoTexto);
             comprimentoTextoExibidoNpc = strlen(resultadoTexto);
 
             if (IsKeyPressed(KEY_ENTER)) {
-                exibirFeedback = false; // Sai do estado de feedback
-                exibirDialogNpc = false; // Fecha o diálogo
+                exibirFeedback = false;
+                exibirDialogNpc = false;
             }
         }
 
-        // Desenho da caixa de diálogo
+        // Desenha a sprite aposta.png acima da caixa de diálogo
+        float spriteScale = 1.4f;
+        Rectangle apostaSourceRec = {0.0f, 0.0f, apostaSprite.width, apostaSprite.height};
+        Rectangle apostaDestRec = {
+            dialogBoxX+8, // Posição horizontal
+            dialogBoxY -178, // Posição para ficar acima da caixa
+            apostaSprite.width * spriteScale,
+            apostaSprite.height * spriteScale
+        };
+        DrawTexturePro(apostaSprite, apostaSourceRec, apostaDestRec, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+
+        // Desenha a caixa de diálogo
         DrawRectangleRounded(
-            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight}, 
-            0.1f, 16, 
-            (Color){0, 0, 0, 200}
+            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight},
+            0.1f, 16, (Color){0, 0, 0, 200}
         );
         DrawRectangleRoundedLines(
-            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight}, 
-            0.1f, 16, 
-            WHITE
+            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight},
+            0.1f, 16, WHITE
         );
 
-        // Ajuste da posição do texto para ficar mais centralizado na nova caixa
-        float textX = dialogBoxX + 20; // Margem interna do texto à esquerda
-        float textY = dialogBoxY + 20; // Margem interna do texto acima
+        // Ajusta a posição do texto
+        float textX = dialogBoxX + 10;
+        float textY = dialogBoxY + 10;
 
         DrawText(textoExibidoNpc, textX, textY, 20, WHITE);
 
-        // Instruções na tela
+        // Instrução para continuar
         if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
             DrawText(
-                "Pressione ENTER para continuar...", 
-                dialogBoxX + 20, dialogBoxY + dialogBoxHeight - 30, 
+                "Pressione ENTER para continuar...",
+                dialogBoxX + 20, dialogBoxY + dialogBoxHeight - 30,
                 16, GRAY
             );
         }
     }
+
 
     // Exibe o NPC
     DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
