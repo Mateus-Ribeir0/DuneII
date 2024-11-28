@@ -61,12 +61,12 @@ void iniciarLobby() {
     sombra = LoadTexture("static/image/sombras.png");
     spaceshipTexture = LoadTexture("static/image/spaceships.png");
     warMusic = LoadMusicStream("static/music/warMusic.wav");
-    controlesTexture = LoadTexture("static/image/controls_xbox.png");
+    controlesTexture = LoadTexture("static/image/Xbox_one.png");
 
-    botaoAreas[0] = (Rectangle){120, 0, 105, 105};   // Botão Y
-    botaoAreas[1] = (Rectangle){124, 212, 105, 105};  // Botão A
-    botaoAreas[2] = (Rectangle){248, 106, 105, 105}; // Botão B
-    botaoAreas[3] = (Rectangle){0, 106, 105, 105}; // Botão X
+    botaoAreas[0] = (Rectangle){0, 80, 16, 16};  // Botão Y
+    botaoAreas[1] = (Rectangle){0, 16, 16, 16};  // Botão A
+    botaoAreas[2] = (Rectangle){0, 112, 16, 16}; // Botão B
+    botaoAreas[3] = (Rectangle){0, 48, 16, 16};  // Botão X
 
     if (!isMusicPlaying) {
         lobbyMusic = LoadMusicStream("static/music/Musica_lobby.mp3");

@@ -5,6 +5,8 @@ static Music titleMusic;
 static Sound rankingssfx;
 static Sound controlssfx;
 static float backgroundPosX;
+static Texture2D controlesTexture;
+Rectangle botaoAreas1[4];
 
 void showFadingImage(Texture2D image, float duration) {
     float startTime = GetTime();
@@ -42,6 +44,7 @@ void recebeNomeDoPlayer(GameScreen *currentScreen) {
     while (!WindowShouldClose()) {
         
         UpdateMusicStream(titleMusic);
+        //comandoJogador(&usandoControle);
         BeginDrawing();
         ClearBackground(RAYWHITE);
         desenharBackgroundComLogo();
@@ -49,7 +52,12 @@ void recebeNomeDoPlayer(GameScreen *currentScreen) {
         DrawText("Digite seu nome:", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 50, 25, WHITE);
         DrawRectangle(SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 100, 350, 30, WHITE);
         DrawText(nameBuffer, SCREEN_WIDTH / 2 - 195, SCREEN_HEIGHT / 2 + 105, 25, BLACK);
-        DrawText("Pressione [ENTER / A] para continuar", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 150, 25, WHITE);
+
+        if (usandoControle) {
+            DrawMenuOptionsWithButtons("Pressione [A] para continuar", SCREEN_WIDTH / 2 -  200, SCREEN_HEIGHT / 2 + 150, 25, 1.8f, WHITE, true, controlesTexture, botaoAreas1);
+        } else {
+            DrawText("Pressione [ENTER] para continuar", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 150, 25, WHITE);
+        }
 
         EndDrawing();
 
@@ -97,7 +105,7 @@ void displayCutscene(Texture2D image, const char* text, Music titleMusic, float 
     float scrollX = 0.0f;
     float timer = 0.0f;
 
-    while (timer < duration && !IsKeyPressed(KEY_SPACE)) {
+    while (timer < duration && !IsKeyPressed(KEY_SPACE) && !IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
         BeginDrawing();
         ClearBackground(BLACK);
 
@@ -201,6 +209,12 @@ void iniciarMenu(GameScreen *currentScreen) {
     rankingssfx = LoadSound("static/music/rankings.wav");
     SetSoundVolume(controlssfx, 0.6f);
     SetSoundVolume(rankingssfx, 0.6f);
+    controlesTexture = LoadTexture("static/image/Xbox_one.png");
+
+    botaoAreas1[0] = (Rectangle){0, 80, 16, 16};  // Botão Y
+    botaoAreas1[1] = (Rectangle){0, 16, 16, 16};  // Botão A
+    botaoAreas1[2] = (Rectangle){0, 112, 16, 16}; // Botão B
+    botaoAreas1[3] = (Rectangle){0, 48, 16, 16};  // Botão X
 
     PlayMusicStream(titleMusic);
     SetTargetFPS(60);
@@ -217,6 +231,8 @@ void iniciarMenu(GameScreen *currentScreen) {
 void atualizarMenu(GameScreen *currentScreen) {
     UpdateMusicStream(titleMusic);
 
+    comandoJogador(&usandoControle);
+    
     backgroundPosX += 0.2f;
     if (backgroundPosX >= background.width) {
         backgroundPosX = 0;
@@ -261,9 +277,17 @@ void drawMenu() {
 
     BeginDrawing();
     desenharBackgroundComLogo();
-    DrawText("Pressione [ENTER / A] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 30) / 2, mainTextY, 30, WHITE);
-    DrawText("[R / X] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, textSize, WHITE);
-    DrawText("[C / B] Controles", centerX + spacingX, optionsY, textSize, WHITE);
+    
+    if (usandoControle) {
+        DrawMenuOptionsWithButtons("Pressione [A] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 22) / 2, mainTextY, 30, 2.0f, WHITE, true, controlesTexture, botaoAreas1);
+        DrawMenuOptionsWithButtons("[X] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, 25, 1.8f, WHITE, true, controlesTexture, botaoAreas1);
+        DrawMenuOptionsWithButtons("[B] Controles", centerX + spacingX, optionsY, 25, 1.8f, WHITE, true, controlesTexture, botaoAreas1);
+    } else {
+        DrawText("Pressione [ENTER] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 30) / 2, mainTextY, 30, WHITE);
+        DrawText("[R] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, textSize, WHITE);
+        DrawText("[C] Controles", centerX + spacingX, optionsY, textSize, WHITE);
+    }
+
     EndDrawing();
 }
 
@@ -272,6 +296,7 @@ void finalizarMenu() {
     UnloadTexture(logo);
     StopMusicStream(titleMusic);
     UnloadMusicStream(titleMusic);
+    UnloadTexture(controlesTexture);
     UnloadTexture(objetivoImage); 
     CloseWindow();
 }
