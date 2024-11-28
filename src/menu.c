@@ -2,7 +2,6 @@
 
 static Texture2D background, logo, objetivoImage;
 static Music titleMusic;
-static Sound swordsfx;
 static Sound rankingssfx;
 static Sound controlssfx;
 static float backgroundPosX;
@@ -50,7 +49,7 @@ void recebeNomeDoPlayer(GameScreen *currentScreen) {
         DrawText("Digite seu nome:", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 50, 25, WHITE);
         DrawRectangle(SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 100, 350, 30, WHITE);
         DrawText(nameBuffer, SCREEN_WIDTH / 2 - 195, SCREEN_HEIGHT / 2 + 105, 25, BLACK);
-        DrawText("Pressione [ENTER] para continuar", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 150, 25, WHITE);
+        DrawText("Pressione [ENTER / A] para continuar", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 150, 25, WHITE);
 
         EndDrawing();
 
@@ -68,7 +67,7 @@ void recebeNomeDoPlayer(GameScreen *currentScreen) {
             nameBuffer[strlen(nameBuffer) - 1] = '\0';
         }
 
-        if (IsKeyPressed(KEY_ENTER) && strlen(nameBuffer) > 0) {
+        if ((IsKeyPressed(KEY_ENTER) && strlen(nameBuffer) > 0) || (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) && strlen(nameBuffer) > 0)) {
             strcpy(playerName, nameBuffer);
             *currentScreen = CUTSCENE;
             break;
@@ -218,24 +217,17 @@ void iniciarMenu(GameScreen *currentScreen) {
 void atualizarMenu(GameScreen *currentScreen) {
     UpdateMusicStream(titleMusic);
 
-    if (*currentScreen == TITLE) {
-        backgroundPosX += 0.2f;
-        if (backgroundPosX >= background.width) {
-            backgroundPosX = 0;
-        }       
-        if (IsKeyPressed(KEY_ENTER)) {
-            PlaySound(swordsfx);
-            *currentScreen = GAME;
-        } else if (IsKeyPressed(KEY_C)) {
-            PlaySound(controlssfx);
-            *currentScreen = OBJETIVO;  
-        } else if (IsKeyPressed(KEY_R)) {
-            PlaySound(rankingssfx);
-            *currentScreen = RANKINGS;  
-        }
-    } else if (*currentScreen == RANKINGS && IsKeyPressed(KEY_Q)) {
-        *currentScreen = TITLE;
-        ResumeMusicStream(titleMusic);
+    backgroundPosX += 0.2f;
+    if (backgroundPosX >= background.width) {
+        backgroundPosX = 0;
+    }       
+    
+    if (IsKeyPressed(KEY_C) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) {
+        PlaySound(controlssfx);
+        *currentScreen = OBJETIVO;  
+    } else if (IsKeyPressed(KEY_R) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_LEFT)) {
+        PlaySound(rankingssfx);
+        *currentScreen = RANKINGS;  
     }
 }
 
@@ -253,7 +245,7 @@ void exibirObjetivo(GameScreen *currentScreen) {
         DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE);
         EndDrawing();
 
-        if (IsKeyPressed(KEY_Q)) {
+        if (IsKeyPressed(KEY_Q) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
             *currentScreen = TITLE;
             break;
         }
@@ -269,9 +261,9 @@ void drawMenu() {
 
     BeginDrawing();
     desenharBackgroundComLogo();
-    DrawText("Pressione [ENTER] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 30) / 2, mainTextY, 30, WHITE);
-    DrawText("[R] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, textSize, WHITE);
-    DrawText("[C] Controles", centerX + spacingX, optionsY, textSize, WHITE);
+    DrawText("Pressione [ENTER / A] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 30) / 2, mainTextY, 30, WHITE);
+    DrawText("[R / X] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, textSize, WHITE);
+    DrawText("[C / B] Controles", centerX + spacingX, optionsY, textSize, WHITE);
     EndDrawing();
 }
 

@@ -849,8 +849,8 @@ void drawGame() {
     Rectangle npcHitbox = {
         npcPosition.x,          // Hitbox horizontal
         npcPosition.y,          // Hitbox vertical
-        TILE_SIZE+64,              // Largura da hitbox
-        TILE_SIZE+64               // Altura da hitbox
+        TILE_SIZE + 64,         // Largura da hitbox
+        TILE_SIZE + 64          // Altura da hitbox
     };
     Vector2 npcOrigin = {0, 0}; // Origem para rotação (não aplicada aqui)
 
@@ -859,6 +859,7 @@ void drawGame() {
         // Apenas desativa o monstro, sem afetar outras partes do jogo
         isMonsterActive = false;
     }
+
     // Variáveis de controle
     static int estadoAposta = 0;       // Controle do estado da aposta
     static bool exibirDialogNpc = false; // Controle de exibição do diálogo
@@ -881,24 +882,17 @@ void drawGame() {
 
     // Verifica se o jogador está perto do NPC
     // Nova variável para controlar o tempo da última aposta
-    static double ultimoTempoAposta = -60; // Inicializa com um valor negativo para permitir a primeira aposta imediatamente
-
-    // Verifica se o jogador está perto do NPC
-    // Nova variável para controlar o estado do feedback
+    // Atualiza o tempo da última aposta
+    static double ultimoTempoAposta = -60; // Inicializa para permitir a primeira aposta imediatamente
     static bool exibirFeedback = false;
-
-    // Verifica se o jogador está perto do NPC
-    // Verifica se o jogador está perto do NPC
-    // Nova variável para controlar o estado da mensagem de "volte mais tarde"
     static bool mostrarVolteMaisTarde = false;
 
-    // Verifica se o jogador está perto do NPC
     if (CheckCollisionRecs(
             (Rectangle){player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE},
             npcHitbox)) {
         double tempoAtual = GetTime();
 
-        if (!exibirFeedback && tempoAtual - ultimoTempoAposta < 60) {
+        if (tempoAtual - ultimoTempoAposta < 60) {
             // Jogador ainda está no intervalo de tempo restrito
             exibirDialogNpc = true;
             mostrarVolteMaisTarde = true; // Ativa o estado para exibir a mensagem
@@ -906,7 +900,7 @@ void drawGame() {
             memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc)); // Limpa o buffer do texto
             strncpy(textoExibidoNpc, "Ainda é muito cedo para apostar, volte mais\ntarde...", sizeof(textoExibidoNpc) - 1);
             textoExibidoNpc[sizeof(textoExibidoNpc) - 1] = '\0'; // Garante o término da string
-        } else if (!exibirDialogNpc && !exibirFeedback && !mostrarVolteMaisTarde) {
+        } else if (!exibirDialogNpc && !exibirFeedback) {
             // Jogador pode iniciar uma nova aposta
             exibirDialogNpc = true;
             estadoAposta = 1; // Inicia o diálogo da aposta
@@ -922,17 +916,18 @@ void drawGame() {
 
     // Exibe o diálogo da aposta
     if (exibirDialogNpc) {
+        if (apostaSprite.id == 0) {
+            TraceLog(LOG_WARNING, "Sprite apostaSprite não carregada corretamente!");
+        }
+
         if (mostrarVolteMaisTarde) {
-            // Exibe a mensagem "volte mais tarde"
             if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
-                // Aguardar o jogador pressionar ENTER para sair
                 if (IsKeyPressed(KEY_ENTER)) {
-                    mostrarVolteMaisTarde = false; // Desativa a mensagem
-                    exibirDialogNpc = false;      // Fecha o diálogo
+                    mostrarVolteMaisTarde = false;
+                    exibirDialogNpc = false;
                 }
             }
         } else if (estadoAposta > 0 && estadoAposta <= totalTextosAposta) {
-            // Controle de texto gradual
             if (comprimentoTextoExibidoNpc < strlen(textosAposta[estadoAposta - 1])) {
                 if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
                     textoExibidoNpc[comprimentoTextoExibidoNpc] = textosAposta[estadoAposta - 1][comprimentoTextoExibidoNpc];
@@ -946,79 +941,82 @@ void drawGame() {
                     memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
                 }
             } else if (estadoAposta == totalTextosAposta) {
-                // Jogador escolhe entre cara ou coroa
                 if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO)) {
                     escolhaCara = IsKeyPressed(KEY_ONE);
                     int chance = GetRandomValue(1, 100);
+                    resultadoCara = (playerLucky > 0 && chance <= playerLucky - 5);
+                    apostaVitoria = (escolhaCara == resultadoCara);
 
-                    // Resultado da moeda
-                    resultadoCara = (chance <= 50);
-
-                    // Determinação de vitória ou derrota com base na sorte do jogador
-                    apostaVitoria = (escolhaCara == resultadoCara) && (chance <= playerLucky);
-
-                    // Aplicar resultado ao jogador
                     if (apostaVitoria) {
                         playerMoney += 20000;
+                        playerLucky += 2;
                     } else {
-                        playerWater *= 0.5;
+                        playerWater = (int)(playerWater * 0.5);
+                        playerLucky -= 2;
                         if (playerWater < 0) playerWater = 0;
+                        if (playerLucky < 0) playerLucky = 0;
                     }
 
                     apostaResolvida = true;
                     comprimentoTextoExibidoNpc = 0;
                     memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
-
-                    // Atualiza o estado da aposta e registra o tempo da última aposta
                     ultimoTempoAposta = GetTime();
-                    exibirFeedback = true; // Ativa o estado de feedback
+                    exibirFeedback = true;
                 }
             }
         }
 
-        // Exibe o feedback de vitória ou derrota
         if (exibirFeedback) {
             const char *resultadoTexto = apostaVitoria ? "Voce ganhou! Parabens." : "Voce perdeu! Que pena.";
             strcpy(textoExibidoNpc, resultadoTexto);
             comprimentoTextoExibidoNpc = strlen(resultadoTexto);
 
             if (IsKeyPressed(KEY_ENTER)) {
-                exibirFeedback = false; // Sai do estado de feedback
-                exibirDialogNpc = false; // Fecha o diálogo
+                exibirFeedback = false;
+                exibirDialogNpc = false;
             }
         }
 
-        // Desenho da caixa de diálogo
+        // Desenha a sprite aposta.png acima da caixa de diálogo
+        float spriteScale = 1.4f;
+        Rectangle apostaSourceRec = {0.0f, 0.0f, apostaSprite.width, apostaSprite.height};
+        Rectangle apostaDestRec = {
+            dialogBoxX+8, // Posição horizontal
+            dialogBoxY -178, // Posição para ficar acima da caixa
+            apostaSprite.width * spriteScale,
+            apostaSprite.height * spriteScale
+        };
+        DrawTexturePro(apostaSprite, apostaSourceRec, apostaDestRec, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+
+        // Desenha a caixa de diálogo
         DrawRectangleRounded(
-            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight}, 
-            0.1f, 16, 
-            (Color){0, 0, 0, 200}
+            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight},
+            0.1f, 16, (Color){0, 0, 0, 200}
         );
         DrawRectangleRoundedLines(
-            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight}, 
-            0.1f, 16, 
-            WHITE
+            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight},
+            0.1f, 16, WHITE
         );
 
-        // Ajuste da posição do texto para ficar mais centralizado na nova caixa
-        float textX = dialogBoxX + 20; // Margem interna do texto à esquerda
-        float textY = dialogBoxY + 20; // Margem interna do texto acima
+        // Ajusta a posição do texto
+        float textX = dialogBoxX + 10;
+        float textY = dialogBoxY + 10;
 
         DrawText(textoExibidoNpc, textX, textY, 20, WHITE);
 
-        // Instruções na tela
+        // Instrução para continuar
         if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
             DrawText(
-                "Pressione ENTER para continuar...", 
-                dialogBoxX + 20, dialogBoxY + dialogBoxHeight - 30, 
+                "Pressione ENTER para continuar...",
+                dialogBoxX + 20, dialogBoxY + dialogBoxHeight - 30,
                 16, GRAY
             );
         }
     }
 
 
-
-
+    // Exibe o NPC
+    DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
 
     // Exibe o resultado da aposta
     if (apostaResolvida) {
@@ -1133,19 +1131,22 @@ void drawGame() {
     static float walkingTimer = 0.0f;
     static bool isWalking = false; 
 
-    if (IsKeyPressed(KEY_W)) {
+    if (IsKeyPressed(KEY_W) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
         lastDirection = 1;
         isWalking = true;
         walkingTimer = 0.3f;
-    } else if (IsKeyPressed(KEY_A)) {
+    }
+    else if (IsKeyPressed(KEY_A) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) {
         lastDirection = 2;
         isWalking = true;
         walkingTimer = 0.3f;
-    } else if (IsKeyPressed(KEY_S)) {
+    }
+    else if (IsKeyPressed(KEY_S) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
         lastDirection = 3;
         isWalking = true;
         walkingTimer = 0.3f;
-    } else if (IsKeyPressed(KEY_D)) {
+    }
+    else if (IsKeyPressed(KEY_D) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) {
         lastDirection = 4;
         isWalking = true;
         walkingTimer = 0.3f;
@@ -1408,20 +1409,41 @@ void playGame(GameScreen *currentScreen) {
             resetarJogo();
             return;
         }
+
+        if (IsGamepadAvailable(0)) {
+            if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
+                dy = -1;
+                movimento = 'w';
+            }
+            if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
+                dy = 1;
+                movimento = 's';
+            }
+            if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) {
+                dx = -1;
+                movimento = 'a';
+            }
+            if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) {
+                dx = 1;
+                movimento = 'd';
+            }
+        }
+
+        // Movimentação com o teclado
         if (IsKeyPressed(KEY_W)) { dy = -1; movimento = 'w'; }
         if (IsKeyPressed(KEY_S)) { dy = 1; movimento = 's'; }
         if (IsKeyPressed(KEY_A)) { dx = -1; movimento = 'a'; }
         if (IsKeyPressed(KEY_D)) { dx = 1; movimento = 'd'; }
 
         if (isPlayerNearPortal()) {
-            mensagem = "Você deseja voltar para o lobby? Pressione [P]";
+            mensagem = "Você deseja voltar para o lobby? Pressione [P / Y]";
             pertoDoPortal = true;
         } else {
             mensagem = NULL;
             pertoDoPortal = false;
         }
 
-        if (pertoDoPortal && IsKeyPressed(KEY_P)) {
+        if (pertoDoPortal && (IsKeyPressed(KEY_P) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP))) {
             if (mapaAtual == 0) {
                 player_x = PORTAL_LOBBY_MAPA1_X + (PORTAL_HORIZONTAL_LARGURA / 2);
                 player_y = PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1;

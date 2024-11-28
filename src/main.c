@@ -16,7 +16,7 @@ int main() {
             case TITLE:
                 atualizarMenu(&currentScreen);
                 drawMenu();
-                if (IsKeyPressed(KEY_ENTER)) {
+                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
                     currentScreen = NAME_INPUT;
                 }
                 break;

@@ -81,5 +81,9 @@ extern float playerWater;
 extern float playerLucky;
 extern double lastWaterUpdateTime;
 extern char playerName[MAX_NAME_LENGTH];
+extern bool usandoControle;
+
+void comandoJogador(bool *usandoControle);
+void DrawDialogBoxWithButtons(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool usandoControle, Texture2D texture, Rectangle *botaoAreas);
 
 #endif

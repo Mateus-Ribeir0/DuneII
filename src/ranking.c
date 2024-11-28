@@ -121,9 +121,9 @@ void exibirRankingScreen(GameScreen *currentScreen) {
             position++;
         }
 
-        const char *instrucoes = "Q => para voltar ao menu principal";
-        const char *anterior = "A => para página anterior";
-        const char *proxima = "D => para próxima página";
+        const char *instrucoes = "Q / Y => para voltar ao menu principal";
+        const char *anterior = "A / <-- => para página anterior";
+        const char *proxima = "D / --> => para próxima página";
 
         int totalWidth = MeasureText(anterior, 20) + MeasureText(" | ", 20) * 2 + MeasureText(instrucoes, 20) + MeasureText(proxima, 20);
         int instrY = GetScreenHeight() - 150;
@@ -143,13 +143,13 @@ void exibirRankingScreen(GameScreen *currentScreen) {
 
         EndDrawing();
 
-        if (IsKeyPressed(KEY_A) && paginaAtual > 0) {
+        if ((paginaAtual > 0 && IsKeyPressed(KEY_A)) || (paginaAtual > 0 && IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT))) {
             paginaAtual--;
         }
-        if (IsKeyPressed(KEY_D) && atual) {
+        if ((atual && IsKeyPressed(KEY_D)) || (atual && IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT))) {
             paginaAtual++;
         }
-        if (IsKeyPressed(KEY_Q)) {
+        if (IsKeyPressed(KEY_Q) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
             *currentScreen = TITLE;
             break;
         }
