@@ -849,8 +849,8 @@ void drawGame() {
     Rectangle npcHitbox = {
         npcPosition.x,          // Hitbox horizontal
         npcPosition.y,          // Hitbox vertical
-        TILE_SIZE+64,              // Largura da hitbox
-        TILE_SIZE+64               // Altura da hitbox
+        TILE_SIZE + 64,         // Largura da hitbox
+        TILE_SIZE + 64          // Altura da hitbox
     };
     Vector2 npcOrigin = {0, 0}; // Origem para rotação (não aplicada aqui)
 
@@ -859,6 +859,7 @@ void drawGame() {
         // Apenas desativa o monstro, sem afetar outras partes do jogo
         isMonsterActive = false;
     }
+
     // Variáveis de controle
     static int estadoAposta = 0;       // Controle do estado da aposta
     static bool exibirDialogNpc = false; // Controle de exibição do diálogo
@@ -881,24 +882,17 @@ void drawGame() {
 
     // Verifica se o jogador está perto do NPC
     // Nova variável para controlar o tempo da última aposta
-    static double ultimoTempoAposta = -60; // Inicializa com um valor negativo para permitir a primeira aposta imediatamente
-
-    // Verifica se o jogador está perto do NPC
-    // Nova variável para controlar o estado do feedback
+    // Atualiza o tempo da última aposta
+    static double ultimoTempoAposta = -60; // Inicializa para permitir a primeira aposta imediatamente
     static bool exibirFeedback = false;
-
-    // Verifica se o jogador está perto do NPC
-    // Verifica se o jogador está perto do NPC
-    // Nova variável para controlar o estado da mensagem de "volte mais tarde"
     static bool mostrarVolteMaisTarde = false;
 
-    // Verifica se o jogador está perto do NPC
     if (CheckCollisionRecs(
             (Rectangle){player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE},
             npcHitbox)) {
         double tempoAtual = GetTime();
 
-        if (!exibirFeedback && tempoAtual - ultimoTempoAposta < 60) {
+        if (tempoAtual - ultimoTempoAposta < 60) {
             // Jogador ainda está no intervalo de tempo restrito
             exibirDialogNpc = true;
             mostrarVolteMaisTarde = true; // Ativa o estado para exibir a mensagem
@@ -906,7 +900,7 @@ void drawGame() {
             memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc)); // Limpa o buffer do texto
             strncpy(textoExibidoNpc, "Ainda é muito cedo para apostar, volte mais\ntarde...", sizeof(textoExibidoNpc) - 1);
             textoExibidoNpc[sizeof(textoExibidoNpc) - 1] = '\0'; // Garante o término da string
-        } else if (!exibirDialogNpc && !exibirFeedback && !mostrarVolteMaisTarde) {
+        } else if (!exibirDialogNpc && !exibirFeedback) {
             // Jogador pode iniciar uma nova aposta
             exibirDialogNpc = true;
             estadoAposta = 1; // Inicia o diálogo da aposta
@@ -925,7 +919,7 @@ void drawGame() {
         if (mostrarVolteMaisTarde) {
             // Exibe a mensagem "volte mais tarde"
             if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
-                // Aguardar o jogador pressionar ENTER para sair
+                // Aguarda o jogador pressionar ENTER para sair
                 if (IsKeyPressed(KEY_ENTER)) {
                     mostrarVolteMaisTarde = false; // Desativa a mensagem
                     exibirDialogNpc = false;      // Fecha o diálogo
@@ -949,20 +943,27 @@ void drawGame() {
                 // Jogador escolhe entre cara ou coroa
                 if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO)) {
                     escolhaCara = IsKeyPressed(KEY_ONE);
-                    int chance = GetRandomValue(1, 100);
+                    int chance = GetRandomValue(1, 100); // Número aleatório entre 1 e 100
 
-                    // Resultado da moeda
-                    resultadoCara = (chance <= 50);
+                    // Determinação do resultado da moeda com base na sorte (lucky)
+                    if (playerLucky > 0) { 
+                        resultadoCara = (chance <= playerLucky - 5); // Penalização de 5% na chance
+                    } else {
+                        resultadoCara = false; // Se lucky for 0, sempre dá "coroa"
+                    }
 
-                    // Determinação de vitória ou derrota com base na sorte do jogador
-                    apostaVitoria = (escolhaCara == resultadoCara) && (chance <= playerLucky);
+                    // Verifica se a escolha do jogador coincide com o resultado
+                    apostaVitoria = (escolhaCara == resultadoCara);
 
                     // Aplicar resultado ao jogador
                     if (apostaVitoria) {
                         playerMoney += 20000;
+                        playerLucky += 2; // Bônus por vitória
                     } else {
-                        playerWater *= 0.5;
+                        playerWater = (int)(playerWater * 0.5);
+                        playerLucky -= 2; // Redução severa na sorte
                         if (playerWater < 0) playerWater = 0;
+                        if (playerLucky < 0) playerLucky = 0;
                     }
 
                     apostaResolvida = true;
@@ -974,6 +975,7 @@ void drawGame() {
                     exibirFeedback = true; // Ativa o estado de feedback
                 }
             }
+
         }
 
         // Exibe o feedback de vitória ou derrota
@@ -1016,9 +1018,8 @@ void drawGame() {
         }
     }
 
-
-
-
+    // Exibe o NPC
+    DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
 
     // Exibe o resultado da aposta
     if (apostaResolvida) {
