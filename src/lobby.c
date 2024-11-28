@@ -786,10 +786,85 @@ void processarTelaVazia(GameScreen *currentScreen) {
                     StopSound(breathingSound); // Parar o som de respiração
                     StopSound(suspenseSound);  // Parar o som de suspense
 
+                    Texture2D portraitProtagonist = LoadTexture("static/image/portraitProtagonist.png");
+                    Sound deathSound = LoadSound("static/sound/deathSound.wav");
+
+                    // Configurações de opacidade e escala
+                    float opacities[] = { 0.3f, 0.7f, 1.0f };
+                    float scales[] = { 1.0f, 1.5f, 2.0f };
+                    double durations[] = { 1.0, 1.0, 2.0 }; // Duração de cada fase (em segundos)
+
+                    // Posição base do sprite
+                    float positionX, positionY;
+
+                    for (int i = 0; i < 3; i++) {
+                        // Calcular escala e posição para manter na borda inferior direita
+                        float scale = scales[i];
+                        positionX = GetScreenWidth() - portraitProtagonist.width * scale;
+                        positionY = GetScreenHeight() - portraitProtagonist.height * scale;
+
+                        // Tocar o som de morte entre as fases
+                        if (i > 0) {
+                            PlaySound(deathSound);
+                        }
+
+                        // Desenhar o sprite com opacidade e escala configuradas
+                        double startTime = GetTime();
+                        while (GetTime() - startTime < durations[i]) {
+                            BeginDrawing();
+                            ClearBackground(BLACK);
+
+                            Rectangle sourceRec = { 0, 0, portraitProtagonist.width, portraitProtagonist.height };
+                            Rectangle destRec = {
+                                positionX,
+                                positionY,
+                                portraitProtagonist.width * scale,
+                                portraitProtagonist.height * scale
+                            };
+                            Vector2 origin = { 0, 0 };
+
+                            DrawTexturePro(portraitProtagonist, sourceRec, destRec, origin, 0.0f, Fade(WHITE, opacities[i]));
+
+                            EndDrawing();
+                        }
+                    }
+
+                    // Carregar o segundo sprite do protagonista
+                    Texture2D portraitProtagonist2 = LoadTexture("static/image/portraitProtagonist2.png");
+
+                    // Desenhar o segundo sprite com o mesmo tamanho e posição
+                    double secondPortraitStartTime = GetTime();
+                    while (GetTime() - secondPortraitStartTime < 2.0) { // 2 segundos de duração
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+
+                        Rectangle sourceRec = { 0, 0, portraitProtagonist2.width, portraitProtagonist2.height };
+                        Rectangle destRec = {
+                            positionX, // Mesma posição que o portraitProtagonist
+                            positionY,
+                            portraitProtagonist2.width * scales[2], // Mesma escala que o último estágio de portraitProtagonist
+                            portraitProtagonist2.height * scales[2]
+                        };
+                        Vector2 origin = { 0, 0 };
+
+                        DrawTexturePro(portraitProtagonist2, sourceRec, destRec, origin, 0.0f, WHITE); // Opacidade total (WHITE)
+
+                        EndDrawing();
+                    }
+
+                    // Liberar o recurso do segundo sprite
+                    UnloadTexture(portraitProtagonist2);
+
+                    // Libera os recursos do sprite e do som
+                    UnloadTexture(portraitProtagonist);
+                    UnloadSound(deathSound);
+
                     // Carregar o sprite para a animação de "slash"
                     Texture2D slashSprite = LoadTexture("static/image/slash.png");
+
+                    // Carregar o som "slashing.wav"
                     Sound slashingSound = LoadSound("static/music/slashing.wav");
-                    SetSoundVolume(slashingSound, 1.0f);
+                    SetSoundVolume(slashingSound, 1.0f); // Ajustar o volume, se necessário
 
                     // Configuração da animação
                     const int frameWidth = 128;  // Largura de cada quadro na spritesheet
@@ -813,6 +888,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                     int animationCycles = 0;
                     const int maxCycles = 3;
 
+                    // Tocar o som no início da animação
                     PlaySound(slashingSound);
 
                     // Executar a animação 3 vezes
@@ -844,10 +920,14 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         EndDrawing();
                     }
 
+
+
+                    // Parar o som após a animação
                     StopSound(slashingSound);
 
-                    // Libera o recurso do sprite
+                    // Libera os recursos
                     UnloadTexture(slashSprite);
+                    UnloadSound(slashingSound);
                 }
             }
         }
