@@ -8,7 +8,7 @@
 #include <string.h>
 #include "raylib.h"
 
-typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RANKINGS } GameScreen;
+typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RANKINGS, EMPTY_SCREEN } GameScreen;
 
 #define TILE_SIZE 32
 #define MAPA_LARGURA 40
@@ -61,6 +61,15 @@ typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RA
 #define PRECO_GARRAFA_MEDIA 5000
 #define PRECO_GARRAFA_GRANDE 7000
 
+#define FERRADURA_PRECO 3000
+#define AMULETO_PRECO 7000
+#define TREVO_PRECO 10000
+
+#define FERRADURA_SORTE 20.0f
+#define AMULETO_SORTE 30.0f
+#define TREVO_SORTE 50.0f
+
+
 extern int player_x;
 extern int player_y;
 extern int mapaAtual;
@@ -69,6 +78,7 @@ extern int playerMoney;
 extern const char* mensagem;
 extern int MAX_ESPECIARIAS;
 extern float playerWater;
+extern float playerLucky;
 extern double lastWaterUpdateTime;
 extern char playerName[MAX_NAME_LENGTH];
 extern bool usandoControle;

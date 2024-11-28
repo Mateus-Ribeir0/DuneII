@@ -2,6 +2,8 @@
 
 Bem-vindo ao **Dune II**, um jogo inspirado no épico universo de Duna. Sua missão é sobreviver aos perigos do deserto de Arrakis enquanto coleta especiarias valiosas para prosperar sua casa.
 
+https://github.com/user-attachments/assets/c1749e92-e1b6-4c50-9db6-64a134f48493
+
 ---
 
 ## **Objetivo do Jogo**

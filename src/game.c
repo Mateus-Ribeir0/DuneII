@@ -4,6 +4,7 @@
 static Texture2D personagem;
 static Texture2D sandRuins2;
 static Texture2D sandRuins3;
+static Texture2D luckyTexture; 
 static Texture2D sandRuins4;
 static Texture2D personagemAndando;
 static Texture2D cerealsTexture;
@@ -45,6 +46,10 @@ static double nextMonsterCheckTime = 0.0;
 static int lastMap = -1;
 static Sound heartbeatSound;
 static bool isHeartbeatPlaying = false;
+static Texture2D npcArmoured;
+Rectangle npcArmouredHitbox;
+static bool telaPretaAtiva = false;
+static int estadoAposta = 0;
 
 #define NUM_ITEMS 5
 #define MAX_HISTORICO 1000
@@ -54,12 +59,171 @@ static bool isHeartbeatPlaying = false;
 int playerMoney = 0;
 int deathEmotivaTocando;
 
+#define NUM_FRAMES_COROA 38
+static Texture2D videoFramesCoroa[NUM_FRAMES_COROA]; // Array para armazenar todos os frames de coroa
+
+
+#define NUM_FRAMES 36
+static Texture2D videoFrames[NUM_FRAMES]; // Array para armazenar todos os frames
+
+void carregarFrames() {
+    char filePath[256]; // Buffer para armazenar o caminho completo
+
+    for (int i = 0; i < NUM_FRAMES; i++) {
+        snprintf(filePath, sizeof(filePath), "static/image/VideoCara/ezgif-frame-%03d.png", i + 1);
+        videoFrames[i] = LoadTexture(filePath);
+
+        // Verificar se o frame foi carregado corretamente
+        if (videoFrames[i].id == 0) {
+            printf("Erro ao carregar o frame: %s\n", filePath);
+        }
+    }
+}
+
+void exibirFrames() {
+    const float frameDuration = 1.0f / 12; // Duração de ~1/12 segundos por frame (12 FPS)
+
+    for (int i = 0; i < NUM_FRAMES; i++) {
+        float startTime = GetTime(); // Tempo inicial do frame
+
+        while (GetTime() - startTime < frameDuration) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            // Centraliza e ajusta o tamanho da imagem ao tamanho da tela
+            if (videoFrames[i].id != 0) {
+                Rectangle sourceRec = {0.0f, 0.0f, (float)videoFrames[i].width, (float)videoFrames[i].height};
+                Rectangle destRec = {0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT}; // Ajusta ao tamanho da tela
+                Vector2 origin = {0.0f, 0.0f};
+
+                // Centraliza na tela
+                destRec.x = (SCREEN_WIDTH - destRec.width) / 2;
+                destRec.y = (SCREEN_HEIGHT - destRec.height) / 2;
+
+                // Desenha a imagem ajustada
+                DrawTexturePro(videoFrames[i], sourceRec, destRec, origin, 0.0f, WHITE);
+            } else {
+                DrawText("Erro ao carregar o frame!", 10, 10, 20, RED); // Indica erro no frame
+            }
+
+            EndDrawing();
+        }
+    }
+
+    // Segura no último frame até pressionar Enter
+    while (!IsKeyPressed(KEY_ENTER)) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        if (videoFrames[NUM_FRAMES - 1].id != 0) {
+            Rectangle sourceRec = {0.0f, 0.0f, (float)videoFrames[NUM_FRAMES - 1].width, (float)videoFrames[NUM_FRAMES - 1].height};
+            Rectangle destRec = {0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT}; // Ajusta ao tamanho da tela
+            Vector2 origin = {0.0f, 0.0f};
+
+            // Centraliza na tela
+            destRec.x = (SCREEN_WIDTH - destRec.width) / 2;
+            destRec.y = (SCREEN_HEIGHT - destRec.height) / 2;
+
+            // Desenha o último frame ajustado
+            DrawTexturePro(videoFrames[NUM_FRAMES - 1], sourceRec, destRec, origin, 0.0f, WHITE);
+        } else {
+            DrawText("Erro ao carregar o frame!", 10, 10, 20, RED); // Indica erro no frame
+        }
+
+        DrawText("Pressione ENTER para continuar...", 10, SCREEN_HEIGHT - 50, 20, GRAY);
+
+        EndDrawing();
+    }
+}
+
+void liberarFrames() {
+    for (int i = 0; i < NUM_FRAMES; i++) {
+        if (videoFrames[i].id != 0) {
+            UnloadTexture(videoFrames[i]);
+        }
+    }
+}
+
+void carregarFramesCoroa() {
+    char filePath[256]; // Buffer para armazenar o caminho completo
+
+    for (int i = 0; i < NUM_FRAMES_COROA; i++) {
+        snprintf(filePath, sizeof(filePath), "static/image/VideoCoroa/ezgif-frame-%03d.png", i + 1);
+        videoFramesCoroa[i] = LoadTexture(filePath);
+
+        // Verificar se o frame foi carregado corretamente
+        if (videoFramesCoroa[i].id == 0) {
+            printf("Erro ao carregar o frame: %s\n", filePath);
+        }
+    }
+}
+
+void exibirFramesCoroa() {
+    const float frameDuration = 1.0f / 12; // Duração de ~1/12 segundos por frame (12 FPS)
+
+    for (int i = 0; i < NUM_FRAMES_COROA; i++) {
+        float startTime = GetTime(); // Tempo inicial do frame
+
+        while (GetTime() - startTime < frameDuration) {
+            BeginDrawing();
+            ClearBackground(BLACK);
+
+            if (videoFramesCoroa[i].id != 0) {
+                Rectangle sourceRec = {0.0f, 0.0f, (float)videoFramesCoroa[i].width, (float)videoFramesCoroa[i].height};
+                Rectangle destRec = {0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT}; // Ajusta ao tamanho da tela
+                Vector2 origin = {0.0f, 0.0f};
+
+                destRec.x = (SCREEN_WIDTH - destRec.width) / 2;
+                destRec.y = (SCREEN_HEIGHT - destRec.height) / 2;
+
+                DrawTexturePro(videoFramesCoroa[i], sourceRec, destRec, origin, 0.0f, WHITE);
+            } else {
+                DrawText("Erro ao carregar o frame!", 10, 10, 20, RED);
+            }
+
+            EndDrawing();
+        }
+    }
+
+    while (!IsKeyPressed(KEY_ENTER)) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        if (videoFramesCoroa[NUM_FRAMES_COROA - 1].id != 0) {
+            Rectangle sourceRec = {0.0f, 0.0f, (float)videoFramesCoroa[NUM_FRAMES_COROA - 1].width, (float)videoFramesCoroa[NUM_FRAMES_COROA - 1].height};
+            Rectangle destRec = {0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT};
+            Vector2 origin = {0.0f, 0.0f};
+
+            destRec.x = (SCREEN_WIDTH - destRec.width) / 2;
+            destRec.y = (SCREEN_HEIGHT - destRec.height) / 2;
+
+            DrawTexturePro(videoFramesCoroa[NUM_FRAMES_COROA - 1], sourceRec, destRec, origin, 0.0f, WHITE);
+        } else {
+            DrawText("Erro ao carregar o frame!", 10, 10, 20, RED);
+        }
+
+        DrawText("Pressione ENTER para continuar...", 10, SCREEN_HEIGHT - 50, 20, GRAY);
+
+        EndDrawing();
+    }
+}
+
+void liberarFramesCoroa() {
+    for (int i = 0; i < NUM_FRAMES_COROA; i++) {
+        if (videoFramesCoroa[i].id != 0) {
+            UnloadTexture(videoFramesCoroa[i]);
+        }
+    }
+}
+
+
 Rectangle cerealsSourceRec = { 64, 64, 32, 32 };
 
 Texture2D loadingImagesMap0[4];
 Texture2D loadingImagesMap1[4];
 Texture2D loadingImagesMap2[4];
 Texture2D loadingImagesLobby[4];
+Texture2D apostaSprite;
 
 const float loadingImageDisplayTimes[4] = {2.5f, 3.0f, 3.5f, 4.0f};  
 
@@ -113,6 +277,7 @@ void initializeLoadingScreen() {
 }
 
 void iniciarGame() {
+    apostaSprite = LoadTexture("static/image/aposta.png");
     personagem = LoadTexture("static/image/newstoppedsprites.png");
     sandRuins2 = LoadTexture("static/image/Sand_ruins2.png");
     sandRuins3 = LoadTexture("static/image/Sand_ruins3.png");
@@ -128,6 +293,7 @@ void iniciarGame() {
     environment3_1 = LoadTexture("static/image/finallevel.png");
     environment3_2 = LoadTexture("static/image/Rock8_3.png");
     safezone = LoadTexture ("static/image/desert_tileset2.png");
+    luckyTexture = LoadTexture("static/image/lucky.png");
     ruinasDeAreiaPequenas = LoadTexture("static/image/Sand_ruins5.png");
     goldTexture = LoadTexture("static/image/gold.png");
     aguaTexture = LoadTexture("static/image/agua.png");
@@ -138,6 +304,7 @@ void iniciarGame() {
     map0 = LoadTexture("static/image/map0.png");
     EpressSprite = LoadTexture("static/image/Epress.png");
     monsters = LoadTexture("static/image/monsters.png");
+    npcArmoured = LoadTexture("static/image/spriteNpcArmoured.png");
 
     musicaMapa0 = LoadSound("static/music/mapa0musica.mp3");
     SetSoundVolume(musicaMapa0, 0.7f);
@@ -159,6 +326,7 @@ void iniciarGame() {
 }
 
 void finalizarGame() {
+    UnloadTexture(apostaSprite);
     UnloadTexture(personagem);
     UnloadTexture(sandRuins2);
     UnloadTexture(sandRuins3);
@@ -174,12 +342,14 @@ void finalizarGame() {
     UnloadTexture(environment3_2);
     UnloadTexture(ruinasDeAreiaPequenas);
     UnloadTexture(goldTexture);
+    UnloadTexture(luckyTexture);
     UnloadTexture(aguaTexture);
     UnloadTexture(characterBack);
     UnloadTexture(sandworm);
     UnloadTexture(portal);
     UnloadTexture(map0);
     UnloadTexture(EpressSprite);
+    UnloadTexture(npcArmoured);
 
     UnloadSound(musicaMapa0);
     UnloadSound(musicaMapa1);
@@ -261,6 +431,12 @@ void checkItemCollection() {
                 case 0: especiariasGanhas = 1; break;
                 case 1: especiariasGanhas = 2; break;
                 case 2: especiariasGanhas = 4; break;
+            }
+
+            // Verificar chance extra com base na sorte
+            int chanceExtra = GetRandomValue(1, 100); // Gera um número entre 1 e 100
+            if (chanceExtra <= playerLucky) {
+                especiariasGanhas++; // Ganha uma especiaria extra
             }
 
             itemsCollected += especiariasGanhas;
@@ -365,6 +541,10 @@ void movePlayer(int dx, int dy) {
 
     Rectangle playerRect = { new_x * TILE_SIZE, new_y * TILE_SIZE, TILE_SIZE, TILE_SIZE };
 
+    if (CheckCollisionRecs(playerRect, npcArmouredHitbox)) {
+        return; // Impede o jogador de entrar na área do NPC
+    }
+
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool colidiuComDuna = false;
         bool colidiuComPedra = false;
@@ -466,6 +646,12 @@ int direcao = 0;
 
 void drawGame() {
     ClearBackground(RAYWHITE);
+    // Variáveis relacionadas à caixa de diálogo
+    float dialogBoxX = 30;             // Posição X ajustada para reduzir o gap à esquerda
+    float dialogBoxY = SCREEN_HEIGHT - 200; // Posição Y da caixa de diálogo
+    float dialogBoxWidth = 500;        // Largura maior da caixa de diálogo
+    float dialogBoxHeight = 100;       // Altura da caixa de diálogo
+    float scaleFactor = 1.3f;          // Fator de escala para os sprites
 
     Color map0Color = (Color){210, 178, 104, 255};
     Color map1Color = (Color){210, 178, 104, 255};
@@ -475,6 +661,30 @@ void drawGame() {
 
     Rectangle ruinasSourceRec = {0, 0, ruinasDeAreiaGrandes.width, ruinasDeAreiaGrandes.height};
     Rectangle ruinasDestRec = {20, 20, 256, 256};
+
+    if (telaPretaAtiva) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+        DrawText("Você está na aposta. Pressione [ESC] para sair.", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2, 20, WHITE);
+        EndDrawing();
+
+        // Pausa a música e desativa o monstro enquanto a tela preta está ativa
+        if (IsSoundPlaying(musicaMapa1)) StopSound(musicaMapa1);
+        isMonsterActive = false;
+
+        // Garante que o som do monstro não será reproduzido
+        if (IsSoundPlaying(monsterGrowl2)) StopSound(monsterGrowl2);
+
+        // Sai da tela preta ao pressionar ESC
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            telaPretaAtiva = false;
+
+            // Retoma a música do mapa 1
+            PlaySound(musicaMapa1);
+        }
+
+        return; // Impede o restante do desenho do jogo
+    }
 
     if (mapaAtual == 0) {
     for (int y = 0; y < MAPA_ALTURA; y++) {
@@ -556,6 +766,7 @@ void drawGame() {
             DrawRectangle(tilePosition.x, tilePosition.y, TILE_SIZE, TILE_SIZE, map1Color);
         }
     }
+
     Rectangle bonesSourceRect = {774, 113, 38, 33};
     Vector2 bonesPosition = {30 * TILE_SIZE, 10 * TILE_SIZE};
     Rectangle bonesDestRect = {bonesPosition.x, bonesPosition.y, 38, 33}; 
@@ -626,6 +837,216 @@ void drawGame() {
     Rectangle destRect2_Map1 = {baseSafezonePosition2_Map1.x, baseSafezonePosition2_Map1.y, 64, 96};
     Vector2 origin2_Map1 = {0, 0};
     DrawTexturePro(safezone, safezoneRec, destRect2_Map1, origin2_Map1, 0.0f, RAYWHITE);
+    // Coordenadas do NPC
+    Vector2 npcPosition = {25 * TILE_SIZE, 10 * TILE_SIZE}; // Posição do NPC no mapa
+    Rectangle npcSourceRec = {0, 192, 64, 64};             // Região na spritesheet (64x64 pixels)
+    Rectangle npcDestRec = {
+        npcPosition.x,          // Posição X no mapa
+        npcPosition.y,          // Posição Y no mapa
+        96,                     // Largura ajustada para 96 pixels
+        96                      // Altura da hitbox
+    };
+    Rectangle npcHitbox = {
+        npcPosition.x,          // Hitbox horizontal
+        npcPosition.y,          // Hitbox vertical
+        TILE_SIZE + 64,         // Largura da hitbox
+        TILE_SIZE + 64          // Altura da hitbox
+    };
+    Vector2 npcOrigin = {0, 0}; // Origem para rotação (não aplicada aqui)
+
+    Rectangle playerRect = {player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
+    if (CheckCollisionRecs(playerRect, npcHitbox)) {
+        // Apenas desativa o monstro, sem afetar outras partes do jogo
+        isMonsterActive = false;
+    }
+
+    // Variáveis de controle
+    static int estadoAposta = 0;       // Controle do estado da aposta
+    static bool exibirDialogNpc = false; // Controle de exibição do diálogo
+    static bool apostaResolvida = false; // Se o resultado já foi exibido
+    static bool apostaVitoria = false;  // Resultado da aposta (true = vitória)
+    static bool escolhaCara = false;    // Escolha do jogador (true = cara)
+    static bool resultadoCara = false; // Resultado da moeda (true = cara)
+    static char textoExibidoNpc[256] = "";
+    static int comprimentoTextoExibidoNpc = 0;
+    static double tempoUltimaMensagemNpc = 0;
+
+    // Textos da aposta (ajustados com as novas falas)
+    const char *textosAposta[] = {
+        "Eu tenho uma proposta para você.",
+        "Faca a sua aposta no cara ou coroa. Caso\nperca, ficarei com metade de sua agua.",
+        "Se der sorte e ganhar, lhe dou 20.000.",
+        "Escolha: (1) Cara ou (2) Coroa."
+    };
+    const int totalTextosAposta = sizeof(textosAposta) / sizeof(textosAposta[0]);
+
+    // Verifica se o jogador está perto do NPC
+    // Nova variável para controlar o tempo da última aposta
+    // Atualiza o tempo da última aposta
+    static double ultimoTempoAposta = -60; // Inicializa para permitir a primeira aposta imediatamente
+    static bool exibirFeedback = false;
+    static bool mostrarVolteMaisTarde = false;
+
+    if (CheckCollisionRecs(
+            (Rectangle){player_x * TILE_SIZE, player_y * TILE_SIZE, TILE_SIZE, TILE_SIZE},
+            npcHitbox)) {
+        double tempoAtual = GetTime();
+
+        if (tempoAtual - ultimoTempoAposta < 60) {
+            // Jogador ainda está no intervalo de tempo restrito
+            exibirDialogNpc = true;
+            mostrarVolteMaisTarde = true; // Ativa o estado para exibir a mensagem
+            comprimentoTextoExibidoNpc = 0;
+            memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc)); // Limpa o buffer do texto
+            strncpy(textoExibidoNpc, "Ainda é muito cedo para apostar, volte mais\ntarde...", sizeof(textoExibidoNpc) - 1);
+            textoExibidoNpc[sizeof(textoExibidoNpc) - 1] = '\0'; // Garante o término da string
+        } else if (!exibirDialogNpc && !exibirFeedback) {
+            // Jogador pode iniciar uma nova aposta
+            exibirDialogNpc = true;
+            estadoAposta = 1; // Inicia o diálogo da aposta
+            comprimentoTextoExibidoNpc = 0;
+            memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+            tempoUltimaMensagemNpc = GetTime();
+            apostaResolvida = false; // Reseta o estado da aposta
+        }
+    } else {
+        exibirDialogNpc = false;
+        mostrarVolteMaisTarde = false; // Reseta o estado ao sair da área do NPC
+    }
+
+    // Exibe o diálogo da aposta
+    if (exibirDialogNpc) {
+        if (apostaSprite.id == 0) {
+            TraceLog(LOG_WARNING, "Sprite apostaSprite não carregada corretamente!");
+        }
+
+        if (mostrarVolteMaisTarde) {
+            if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
+                if (IsKeyPressed(KEY_ENTER)) {
+                    mostrarVolteMaisTarde = false;
+                    exibirDialogNpc = false;
+                }
+            }
+        } else if (estadoAposta > 0 && estadoAposta <= totalTextosAposta) {
+            if (comprimentoTextoExibidoNpc < strlen(textosAposta[estadoAposta - 1])) {
+                if (GetTime() - tempoUltimaMensagemNpc >= 0.05 * comprimentoTextoExibidoNpc) {
+                    textoExibidoNpc[comprimentoTextoExibidoNpc] = textosAposta[estadoAposta - 1][comprimentoTextoExibidoNpc];
+                    comprimentoTextoExibidoNpc++;
+                    textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
+                }
+            } else if (estadoAposta < totalTextosAposta) {
+                if (IsKeyPressed(KEY_ENTER)) {
+                    estadoAposta++;
+                    comprimentoTextoExibidoNpc = 0;
+                    memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+                }
+            } else if (estadoAposta == totalTextosAposta) {
+                if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO)) {
+                    escolhaCara = IsKeyPressed(KEY_ONE);
+                    int chance = GetRandomValue(1, 100);
+                    resultadoCara = (playerLucky > 0 && chance <= playerLucky - 5);
+                    apostaVitoria = (escolhaCara == resultadoCara);
+
+                    if (apostaVitoria) {
+                        playerMoney += 20000;
+                        playerLucky += 2;
+                    } else {
+                        playerWater = (int)(playerWater * 0.5);
+                        playerLucky -= 2;
+                        if (playerWater < 0) playerWater = 0;
+                        if (playerLucky < 0) playerLucky = 0;
+                    }
+
+                    apostaResolvida = true;
+                    comprimentoTextoExibidoNpc = 0;
+                    memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
+                    ultimoTempoAposta = GetTime();
+                    exibirFeedback = true;
+                }
+            }
+        }
+
+        if (exibirFeedback) {
+            const char *resultadoTexto = apostaVitoria ? "Voce ganhou! Parabens." : "Voce perdeu! Que pena.";
+            strcpy(textoExibidoNpc, resultadoTexto);
+            comprimentoTextoExibidoNpc = strlen(resultadoTexto);
+
+            if (IsKeyPressed(KEY_ENTER)) {
+                exibirFeedback = false;
+                exibirDialogNpc = false;
+            }
+        }
+
+        // Desenha a sprite aposta.png acima da caixa de diálogo
+        float spriteScale = 1.4f;
+        Rectangle apostaSourceRec = {0.0f, 0.0f, apostaSprite.width, apostaSprite.height};
+        Rectangle apostaDestRec = {
+            dialogBoxX+8, // Posição horizontal
+            dialogBoxY -178, // Posição para ficar acima da caixa
+            apostaSprite.width * spriteScale,
+            apostaSprite.height * spriteScale
+        };
+        DrawTexturePro(apostaSprite, apostaSourceRec, apostaDestRec, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+
+        // Desenha a caixa de diálogo
+        DrawRectangleRounded(
+            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight},
+            0.1f, 16, (Color){0, 0, 0, 200}
+        );
+        DrawRectangleRoundedLines(
+            (Rectangle){dialogBoxX, dialogBoxY, dialogBoxWidth, dialogBoxHeight},
+            0.1f, 16, WHITE
+        );
+
+        // Ajusta a posição do texto
+        float textX = dialogBoxX + 10;
+        float textY = dialogBoxY + 10;
+
+        DrawText(textoExibidoNpc, textX, textY, 20, WHITE);
+
+        // Instrução para continuar
+        if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
+            DrawText(
+                "Pressione ENTER para continuar...",
+                dialogBoxX + 20, dialogBoxY + dialogBoxHeight - 30,
+                16, GRAY
+            );
+        }
+    }
+
+
+    // Exibe o NPC
+    DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
+
+    // Exibe o resultado da aposta
+    if (apostaResolvida) {
+        if (apostaVitoria) {
+            if (escolhaCara) {
+                carregarFrames();
+                exibirFrames();
+                liberarFrames();
+            } else {
+                carregarFramesCoroa();
+                exibirFramesCoroa();
+                liberarFramesCoroa();
+            }
+        } else {
+            if (escolhaCara) {
+                carregarFramesCoroa();
+                exibirFramesCoroa();
+                liberarFramesCoroa();
+            } else {
+                carregarFrames();
+                exibirFrames();
+                liberarFrames();
+            }
+        }
+        apostaResolvida = false; // Reseta o estado
+    }
+
+    // Desenha o NPC
+    DrawTexturePro(npcArmoured, npcSourceRec, npcDestRec, npcOrigin, 0.0f, WHITE);
+
 }
  else if (mapaAtual == 2) {
     for (int y = 0; y < MAPA_ALTURA; y++) {
@@ -777,7 +1198,7 @@ void drawGame() {
     int infoBoxX = SCREEN_WIDTH - 230;
     int infoBoxY = 10;
     int infoBoxWidth = 220;
-    int infoBoxHeight = 100;
+    int infoBoxHeight = 126;
 
     DrawRectangleRounded((Rectangle){infoBoxX, infoBoxY, infoBoxWidth, infoBoxHeight}, 0.1f, 16, (Color){205, 133, 63, 255});
 
@@ -799,12 +1220,37 @@ void drawGame() {
     DrawTexturePro(goldTexture, goldSourceRec, goldDestRec, (Vector2){0, 0}, 0.0f, WHITE);
     DrawText(TextFormat("Dinheiro: %d", playerMoney), infoBoxX + 50, infoBoxY + 40, 18, WHITE);
 
+    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
+
+
     Vector2 aguaIconPos = { infoBoxX + 18, infoBoxY + 65 };
     Rectangle aguaSourceRec = { 0, 0, aguaTexture.width, aguaTexture.height };
     Rectangle aguaDestRec = { aguaIconPos.x, aguaIconPos.y, 24, 24 };
 
     DrawTexturePro(aguaTexture, aguaSourceRec, aguaDestRec, (Vector2){0, 0}, 0.0f, WHITE);
-    DrawText(TextFormat("Água: %.0f%%", playerWater), infoBoxX + 55, infoBoxY + 70, 18, WHITE);
+     // Sorte (Lucky)
+    Vector2 luckyIconPos = { infoBoxX + 18, infoBoxY + 95 }; // Alinhado ao layout do HUD
+    Rectangle luckySourceRec;
+
+    // Verificar o valor de sorte e alterar o ícone conforme necessário
+    if (playerLucky == 50) {
+        luckySourceRec = (Rectangle){ 164, 44, 107, 108 }; // Coordenadas do ícone para 50% de sorte
+    } else if (playerLucky == 30) {
+        luckySourceRec = (Rectangle){ 480, 176, 122, 129 }; // Coordenadas do ícone para 30% de sorte
+    } else if (playerLucky == 20) {
+        luckySourceRec = (Rectangle){ 494, 41, 107, 107 }; // Coordenadas do ícone para 20% de sorte
+    } else {
+        luckySourceRec = (Rectangle){ 164, 186, 107, 115 }; // Coordenadas do ícone padrão
+    }
+
+    Rectangle luckyDestRec = { luckyIconPos.x, luckyIconPos.y, 24, 24 }; // Reduzido para o HUD
+
+    // Desenhar o ícone de sorte
+    DrawTexturePro(luckyTexture, luckySourceRec, luckyDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+    // Adicionar o texto correspondente
+    DrawText(TextFormat("Sorte: %.0f%%", playerLucky), infoBoxX + 50, infoBoxY + 100, 18, WHITE);
+
 
     portalAnimationTimer += GetFrameTime();
     if (portalAnimationTimer >= 0.1) {
@@ -913,6 +1359,7 @@ bool isPlayerNearPortal() {
 
 void playGame(GameScreen *currentScreen) {
     mapaEntradaTime = GetTime();
+
     ClearBackground(BLACK);
     BeginDrawing();
     EndDrawing();
@@ -1245,6 +1692,121 @@ void playGame(GameScreen *currentScreen) {
                     }
                 }
 
+                // Se o jogador tentar se mover, ele morre
+                float lastInputTime = 0.0f;
+                float cooldown = 0.5f;
+                if ((GetTime() - lastInputTime) >= cooldown) {
+                    if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_A) || IsKeyPressed(KEY_S) || IsKeyPressed(KEY_D)) {
+                        StopSound(monsterGrowl2);
+
+                        StopSound(musicaMapa0);
+                        StopSound(musicaMapa1);
+                        StopSound(musicaMapa2);
+
+                        sleep(1);
+                        PlaySound(gameOverSound);
+                        sleep(1);
+
+                        Texture2D personagemMorto = LoadTexture("static/image/dead.png");
+                        ClearBackground(BLACK);
+                        desenharAnimacaoMorte(personagem, personagemMorto);
+                        deathEmotivaTocando = 1;
+                        PlaySound(deathEmotiva);
+                        sleep(3);
+
+                        Vector2 spritePos = {GetScreenWidth() / 2, GetScreenHeight() / 2};
+                        float scale = 10.0f;
+                        Rectangle frames[3] = {
+                            {128, 192, 64, 64},
+                            {64, 192, 64, 64},
+                            {0, 192, 64, 64}
+                        };
+                        int frameIndex = 0;
+                        float frameTime = 1.0f;
+                        float moveSpeed = 20.0f;
+                        float startTime = GetTime();
+                        float elapsedTime = 0.0f;
+                        float maxScreenTime = 5.0f;
+
+                        PlaySound(barulhoMonstro);
+                        Vector2 monstersPos = {850, spritePos.y};
+
+                        while ((GetTime() - startTime < maxScreenTime) && !WindowShouldClose()) {
+                            BeginDrawing();
+                            ClearBackground(BLACK);
+
+                            elapsedTime = GetTime() - startTime;
+
+                            Rectangle destMonsters = {monstersPos.x, monstersPos.y, 128 * scale, 128 * scale};
+                            Rectangle srcMonsters;
+                            Vector2 originMonsters = {64 * scale, 64 * scale};
+
+                            if (frameIndex == 0) {
+                                srcMonsters = (Rectangle){352, 320, 128, 128};
+                            } else if (frameIndex == 1) {
+                                srcMonsters = (Rectangle){240, 320, 128, 128};
+                            } else if (frameIndex == 2) {
+                                srcMonsters = (Rectangle){128, 320, 128, 128};
+                            }
+
+                            DrawTexturePro(monsters, srcMonsters, destMonsters, originMonsters, 0.0f, WHITE);
+
+                            Rectangle dest = {
+                                spritePos.x, spritePos.y,
+                                frames[frameIndex].width * scale,
+                                frames[frameIndex].height * scale
+                            };
+                            Vector2 origin = {frames[frameIndex].width / 2, frames[frameIndex].height / 2};
+
+                            DrawTexturePro(personagemMorto, frames[frameIndex], dest, origin, 0.0f, WHITE);
+
+                            spritePos.x -= moveSpeed * GetFrameTime();
+                            monstersPos.x -= moveSpeed * GetFrameTime();
+
+                            if (elapsedTime >= frameTime * (frameIndex + 1) && frameIndex < 2) {
+                                frameIndex++;
+                            }
+
+                            DrawText(TextFormat("GAME OVER - Você tentou fugir!"), 10, 40, 20, RED);
+
+                            EndDrawing();
+
+                            sleep(0.5);
+                        }
+                        ClearBackground(BLACK);
+
+                        sleep(2);
+
+                        const char *euFalhei = "Eu... Eu falhei minha missão...";
+                        int caractereExibido = 0;
+                        float tempoPorCaractere = 0.2f;
+                        float timer = 0;
+
+                        while (caractereExibido < strlen(euFalhei) && !WindowShouldClose()) {
+                            BeginDrawing();
+                            ClearBackground(BLACK);
+                            timer += GetFrameTime();
+
+                            if (timer >= tempoPorCaractere) {
+                                caractereExibido++;
+                                timer = 0;
+                            }
+
+                            DrawText(TextSubtext(euFalhei, 0, caractereExibido), 
+                                    GetScreenWidth() / 2 - MeasureText(euFalhei, 20) / 2, 
+                                    GetScreenHeight() / 2, 20, RAYWHITE);
+                            EndDrawing();
+                        }
+
+                        sleep(2);
+
+                        atualizarRanking(playerName, playerMoney);
+                        zerarMonetaria();
+                        resetarJogo();
+                        *currentScreen = RANKINGS;
+                        return;
+                    }
+                }
                 EndDrawing();
             }
 
@@ -1252,7 +1814,7 @@ void playGame(GameScreen *currentScreen) {
                 isMonsterActive = false;
             }
 
-            if (GetTime() - monsterStartTime > 4.5f && ePressCount < 3) {
+            if ((GetTime() - monsterStartTime > 4.5f && ePressCount < 3)) {
                 StopSound(monsterGrowl2);
 
                 StopSound(musicaMapa0);

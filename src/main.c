@@ -59,6 +59,9 @@ int main() {
             case RANKINGS:
                 exibirRankingScreen(&currentScreen);
                 break;
+            case EMPTY_SCREEN:
+                processarTelaVazia(&currentScreen);
+                break;
         }
     }
 
