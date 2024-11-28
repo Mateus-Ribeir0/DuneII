@@ -14,6 +14,8 @@ static Texture2D sombra;
 static Music lobbyMusic; 
 static Texture2D velho;
 static Sound troca;
+static Texture2D controlesTexture;
+Rectangle botaoAreas[4];
 
 int MAX_ESPECIARIAS = BOLSA_CAPACIDADE_PEQUENA;
 static float portalAnimationTimer = 0.0f;
@@ -44,6 +46,12 @@ void iniciarLobby() {
     monstersTexture = LoadTexture("static/image/monsters.png");
     bonesTexture = LoadTexture("static/image/bones.png");
     sombra = LoadTexture("static/image/sombras.png");
+    controlesTexture = LoadTexture("static/image/controls_xbox.png");
+
+    botaoAreas[0] = (Rectangle){120, 0, 105, 105};   // Botão Y
+    botaoAreas[1] = (Rectangle){124, 212, 105, 105};  // Botão A
+    botaoAreas[2] = (Rectangle){248, 106, 105, 105}; // Botão B
+    botaoAreas[3] = (Rectangle){0, 106, 105, 105}; // Botão X
 
     if (!isMusicPlaying) {
         lobbyMusic = LoadMusicStream("static/music/Musica_lobby.mp3");
@@ -67,6 +75,7 @@ void finalizarLobby() {
     UnloadTexture(goldTexture);
     UnloadTexture(aguaTexture);
     UnloadSound(troca);
+    UnloadTexture(controlesTexture);
     
     if (isMusicPlaying) {
         PauseMusicStream(lobbyMusic);
@@ -100,20 +109,41 @@ void processarEntradaLobby(GameScreen *currentScreen) {
 
     updateWaterLevel(currentScreen);
     UpdateMusicStream(lobbyMusic);
+    comandoJogador(&usandoControle);
 
-    if (IsKeyPressed(KEY_D)) dx = 1;
-    if (IsKeyPressed(KEY_A)) dx = -1;
+    if (IsGamepadAvailable(0)) {
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
+            dy = -1;
+        }
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
+            dy = 1;
+        }
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) {
+            dx = -1;
+        }
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) {
+            dx = 1;
+        }
+    }
+
     if (IsKeyPressed(KEY_W)) dy = -1;
-    if (IsKeyPressed(KEY_S)) dy = 1;
+    if (IsKeyPressed(KEY_S)) dy = 1; 
+    if (IsKeyPressed(KEY_A)) dx = -1;
+    if (IsKeyPressed(KEY_D)) dx = 1;
 
     movePlayer(dx, dy);
 
     if ((player_x >= PORTAL_LOBBY_MAPA1_X - 1 && player_x < PORTAL_LOBBY_MAPA1_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
         (player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
-        mensagem = "Você deseja viajar para Zamirat?\nPressione [P]\n\nDificuldade: Fácil";
+        if (usandoControle) {
+            mensagem = "Deseja viajar para Zamirat?\nDificuldade: Facil\nPressione: [Y]";
+        } else {
+            mensagem = "Deseja viajar para Zamirat?\nDificuldade: Facil\nPressione: [P]";
+        }
+
         pertoDePortal = true;
-        if (IsKeyPressed(KEY_P)) {
+        if (IsKeyPressed(KEY_P) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
             *currentScreen = GAME;
             mapaAtual = 0;
             mensagem = NULL;
@@ -123,9 +153,14 @@ void processarEntradaLobby(GameScreen *currentScreen) {
     if ((player_x >= PORTAL_LOBBY_MAPA2_X - 1 && player_x < PORTAL_LOBBY_MAPA2_X + PORTAL_VERTICAL_LARGURA + 1) &&
         (player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA + 1)) {
         
-        mensagem = "Você deseja viajar para Bashir'har?\nPressione [P]\n\nDificuldade: Média";
+        if (usandoControle) {
+            mensagem = "Deseja viajar para Bashir'har?\nDificuldade: Media\nPressione: [Y]";
+        } else {
+            mensagem = "Deseja viajar para Bashir'har?\nDificuldade: Media\nPressione: [P]";;
+        }
+
         pertoDePortal = true;
-        if (IsKeyPressed(KEY_P)) {
+        if (IsKeyPressed(KEY_P) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
             *currentScreen = GAME;
             mapaAtual = 1;
             mensagem = NULL;
@@ -135,9 +170,14 @@ void processarEntradaLobby(GameScreen *currentScreen) {
     if ((player_x >= PORTAL_LOBBY_MAPA3_X - 1 && player_x < PORTAL_LOBBY_MAPA3_X + PORTAL_HORIZONTAL_LARGURA + 1) &&
         (player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
-        mensagem = "Você deseja viajar para Qasr'Rahim?\nPressione [P]\n\nDificuldade: Difícil";
+        if (usandoControle) {
+            mensagem = "Deseja viajar para Qasr'Rahim?\nDificuldade: Dificil\nPressione: [Y]";
+        } else {
+            mensagem = "Deseja viajar para Qasr'Rahim?\nDificuldade: Dificil\nPressione: [P]";
+        }
+
         pertoDePortal = true;
-        if (IsKeyPressed(KEY_P)) {
+        if (IsKeyPressed(KEY_P) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
             *currentScreen = GAME;
             mapaAtual = 2;
             mensagem = NULL;
@@ -316,19 +356,22 @@ void drawLobby() {
     DrawTexturePro(bonesTexture, sourceRecbones10, (Rectangle){ positionBones10.x, positionBones10.y, 43, 32 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
     DrawTexturePro(cityTexture, hitboxVendinha, destRecVendinha, (Vector2){0, 0}, 0.0f, WHITE);
 
-    if (IsKeyPressed(KEY_W)) {
+    if (IsKeyPressed(KEY_W) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
         lastDirection = 1;
         isWalking = true;
         walkingTimer = 0.3f;
-    } else if (IsKeyPressed(KEY_A)) {
+    }
+    else if (IsKeyPressed(KEY_A) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) {
         lastDirection = 2;
         isWalking = true;
         walkingTimer = 0.3f;
-    } else if (IsKeyPressed(KEY_S)) {
+    }
+    else if (IsKeyPressed(KEY_S) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
         lastDirection = 3;
         isWalking = true;
         walkingTimer = 0.3f;
-    } else if (IsKeyPressed(KEY_D)) {
+    }
+    else if (IsKeyPressed(KEY_D) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) {
         lastDirection = 4;
         isWalking = true;
         walkingTimer = 0.3f;
@@ -711,7 +754,7 @@ void drawLobby() {
             }   
         }
     } else if (mensagem != NULL) {
-        DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, true);
+       DrawDialogBoxWithButtons(mensagem, 110, 550, 400, 110, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas);
     } else {
         isInteractingWithMerchant = 0;
     }

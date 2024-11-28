@@ -710,19 +710,22 @@ void drawGame() {
     static float walkingTimer = 0.0f;
     static bool isWalking = false; 
 
-    if (IsKeyPressed(KEY_W)) {
+    if (IsKeyPressed(KEY_W) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
         lastDirection = 1;
         isWalking = true;
         walkingTimer = 0.3f;
-    } else if (IsKeyPressed(KEY_A)) {
+    }
+    else if (IsKeyPressed(KEY_A) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) {
         lastDirection = 2;
         isWalking = true;
         walkingTimer = 0.3f;
-    } else if (IsKeyPressed(KEY_S)) {
+    }
+    else if (IsKeyPressed(KEY_S) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
         lastDirection = 3;
         isWalking = true;
         walkingTimer = 0.3f;
-    } else if (IsKeyPressed(KEY_D)) {
+    }
+    else if (IsKeyPressed(KEY_D) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) {
         lastDirection = 4;
         isWalking = true;
         walkingTimer = 0.3f;
@@ -959,20 +962,41 @@ void playGame(GameScreen *currentScreen) {
             resetarJogo();
             return;
         }
+
+        if (IsGamepadAvailable(0)) {
+            if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
+                dy = -1;
+                movimento = 'w';
+            }
+            if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
+                dy = 1;
+                movimento = 's';
+            }
+            if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) {
+                dx = -1;
+                movimento = 'a';
+            }
+            if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) {
+                dx = 1;
+                movimento = 'd';
+            }
+        }
+
+        // Movimentação com o teclado
         if (IsKeyPressed(KEY_W)) { dy = -1; movimento = 'w'; }
         if (IsKeyPressed(KEY_S)) { dy = 1; movimento = 's'; }
         if (IsKeyPressed(KEY_A)) { dx = -1; movimento = 'a'; }
         if (IsKeyPressed(KEY_D)) { dx = 1; movimento = 'd'; }
 
         if (isPlayerNearPortal()) {
-            mensagem = "Você deseja voltar para o lobby? Pressione [P]";
+            mensagem = "Você deseja voltar para o lobby? Pressione [P / Y]";
             pertoDoPortal = true;
         } else {
             mensagem = NULL;
             pertoDoPortal = false;
         }
 
-        if (pertoDoPortal && IsKeyPressed(KEY_P)) {
+        if (pertoDoPortal && (IsKeyPressed(KEY_P) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP))) {
             if (mapaAtual == 0) {
                 player_x = PORTAL_LOBBY_MAPA1_X + (PORTAL_HORIZONTAL_LARGURA / 2);
                 player_y = PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1;
