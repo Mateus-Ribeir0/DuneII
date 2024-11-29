@@ -469,7 +469,7 @@ Vector2 posicoesPedras[NUM_PEDRAS] = {
 #define DUNAS_MAPA3 10
 
 Point posicoesDunasMapa1[DUNAS_MAPA1] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5} };
-Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}};
+Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {26, 11}};
 Point posicoesDunasMapa3[DUNAS_MAPA3] = {
     {8, 8}, 
     {14, 12},
@@ -544,6 +544,7 @@ void movePlayer(int dx, int dy) {
     if (CheckCollisionRecs(playerRect, npcArmouredHitbox)) {
         return; // Impede o jogador de entrar na área do NPC
     }
+    
 
     if (new_x >= 0 && new_x < MAPA_LARGURA && new_y >= 0 && new_y < MAPA_ALTURA) {
         bool colidiuComDuna = false;
@@ -589,13 +590,13 @@ void movePlayer(int dx, int dy) {
             }
         } else if (mapaAtual == 1) {
             for (int i = 0; i < DUNAS_MAPA2; i++) {
-                if ((new_x >= posicoesDunasMapa2[i].x && new_x < posicoesDunasMapa2[i].x + 3) &&
-                    (new_y >= posicoesDunasMapa2[i].y && new_y < posicoesDunasMapa2[i].y + 2)) {
+                if (new_x == posicoesDunasMapa2[i].x && new_y == posicoesDunasMapa2[i].y) {
                     colidiuComDuna = true;
                     break;
                 }
             }
-        } else if (mapaAtual == 2) {
+        }
+else if (mapaAtual == 2) {
             for (int i = 0; i < DUNAS_MAPA3; i++) {
                 if ((new_x >= posicoesDunasMapa3[i].x && new_x < posicoesDunasMapa3[i].x + 3) &&
                     (new_y >= posicoesDunasMapa3[i].y && new_y < posicoesDunasMapa3[i].y + 2)) {
@@ -978,11 +979,11 @@ void drawGame() {
         }
 
         // Desenha a sprite aposta.png acima da caixa de diálogo
-        float spriteScale = 1.4f;
+        float spriteScale = 1.2f;
         Rectangle apostaSourceRec = {0.0f, 0.0f, apostaSprite.width, apostaSprite.height};
         Rectangle apostaDestRec = {
             dialogBoxX+8, // Posição horizontal
-            dialogBoxY -178, // Posição para ficar acima da caixa
+            dialogBoxY -150, // Posição para ficar acima da caixa
             apostaSprite.width * spriteScale,
             apostaSprite.height * spriteScale
         };
