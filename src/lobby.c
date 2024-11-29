@@ -7,7 +7,7 @@ static Texture2D cerealsTexture;
 static Texture2D desertTileset;
 static Texture2D bonesTexture;
 static Texture2D aguaTexture;
-
+static Texture2D npcslobbyTexture;
 
 static Texture2D cityTexture;
 static Texture2D goldTexture;
@@ -44,6 +44,10 @@ static bool isWarMusicPlaying = false;
 
 static bool telaVaziaBloqueada = false; // Variável para bloquear a telaVazia após a sequência final
 
+
+Rectangle npcslobbyCollisionBox;
+Rectangle npcslobby2CollisionBox;
+
 void iniciarLobby() {
     velho = LoadTexture("static/image/velho.png");
     cityTexture = LoadTexture("static/image/city.png");
@@ -55,6 +59,7 @@ void iniciarLobby() {
     goldTexture = LoadTexture("static/image/gold.png");
     luckyTexture = LoadTexture("static/image/lucky.png");
     aguaTexture = LoadTexture("static/image/agua.png");
+    npcslobbyTexture = LoadTexture("static/image/npcslobby.png");
     troca = LoadSound("static/music/trocaDeDinheiro.wav");
     monstersTexture = LoadTexture("static/image/monsters.png");
     bonesTexture = LoadTexture("static/image/bones.png");
@@ -90,6 +95,7 @@ void finalizarLobby() {
     UnloadTexture(goldTexture);
     UnloadTexture(luckyTexture);
     UnloadTexture(aguaTexture);
+    UnloadTexture(npcslobbyTexture);
     UnloadSound(troca);
     UnloadTexture(spaceshipTexture);
     UnloadMusicStream(warMusic);
@@ -1636,6 +1642,8 @@ void drawLobby() {
     Rectangle destRecVendinha = { 20, 20, 123* 0.8 , 120* 0.8  };
     Rectangle sourceRecMonster = { 282, 13, 106, 116 };
     Rectangle sourceRecbones1 = { 557, 60, 45, 37 };
+    Rectangle npcslobby = { 0, 0, 64, 64 };
+    Rectangle npcslobby2 = { 0, 128, 64, 64 };
     Rectangle sourceRecbones2 = { 557, 60, 45, 37 };
     Rectangle sourceRecbones3 = { 557, 60, 45, 37 };
     Rectangle sourceRecbones4 = { 557, 60, 45, 37 };
@@ -1758,6 +1766,26 @@ void drawLobby() {
         PlayMusicStream(lobbyMusic);
     }
     UpdateMusicStream(lobbyMusic);
+
+    // Desenhar a sprite do NPC no centro do mapa com tamanho igual ao sprite do jogador
+    Vector2 npcCenterPosition = { 
+        (MAPA_LARGURA * TILE_SIZE) / 2 - 48,  // Centralizar horizontalmente, ajustando para tamanho 96x96
+        (MAPA_ALTURA * TILE_SIZE) / 2 - 48   // Centralizar verticalmente
+    };
+    Rectangle npcSourceRec = { 0, 0, 64, 64 }; // Fonte da textura
+    Rectangle npcDestRec = { npcCenterPosition.x+300, npcCenterPosition.y-120, 96, 96 }; // Destino com tamanho do jogador
+
+    DrawTexturePro(npcslobbyTexture, npcSourceRec, npcDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle npcSourceRec2 = { 0, 128, 64, 64 }; // Fonte da textura
+    Rectangle npcDestRec2 = { npcCenterPosition.x-320, npcCenterPosition.y+180, 96, 96 }; // Destino com tamanho do jogador
+
+    DrawTexturePro(npcslobbyTexture, npcSourceRec2, npcDestRec2, (Vector2){0, 0}, 0.0f, WHITE);
+
+
+
+    npcslobbyCollisionBox = (Rectangle){npcCenterPosition.x + 348, npcCenterPosition.y - 64, 4, 0};
+    npcslobby2CollisionBox = (Rectangle){npcCenterPosition.x - 300, npcCenterPosition.y + 220, 2, 0};
 
     DrawTexturePro(monstersTexture, sourceRecMonster, (Rectangle){ positionMonster.x, positionMonster.y, 106, 116 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
     DrawTexturePro(bonesTexture, sourceRecbones1, (Rectangle){ positionBones.x, positionBones.y, 45, 37 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
