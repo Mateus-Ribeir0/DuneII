@@ -1633,11 +1633,17 @@ void drawLobby() {
     BeginDrawing();
 
 
-    static bool isNearNpc = false;                // Indica se o jogador está próximo ao NPC
-    static char displayedMessage[256] = "";      // Mensagem atualmente exibida
-    static int messageLength = 0;                // Número de caracteres já exibidos
-    static double messageStartTime = 0;          // Tempo em que a mensagem começou a ser exibida
-    const char *npcMessage = "Parece que você anda coletando muitas\nespeciarias, cuidado, você pode acabar\ngerando uma guerra com os Zarnax's..."; // Mensagem do NPC
+    static bool isNearNpc1 = false;               // Indica se o jogador está próximo ao NPC1
+    static bool isNearNpc2 = false;               // Indica se o jogador está próximo ao NPC2
+    static char displayedMessage1[256] = "";      // Mensagem atualmente exibida para NPC1
+    static char displayedMessage2[256] = "";      // Mensagem atualmente exibida para NPC2
+    static int messageLength1 = 0;                // Número de caracteres exibidos para NPC1
+    static int messageLength2 = 0;                // Número de caracteres exibidos para NPC2
+    static double messageStartTime1 = 0;          // Tempo inicial da mensagem para NPC1
+    static double messageStartTime2 = 0;          // Tempo inicial da mensagem para NPC2
+
+    const char *npcMessage1 = "Parece que você anda coletando muitas\nespeciarias, cuidado, você pode acabar\ngerando uma guerra com os Zarnax's...";
+    const char *npcMessage2 = "Ola principe de Arrakis, você não\nparece estar com uma boa sorte hoje..."; // Mensagem para o segundo NPC
 
     bool soundPlayed = false;
     static int lastDirection = 3;
@@ -2372,63 +2378,93 @@ void drawLobby() {
     
     verificarProximidadePoco(player_x * TILE_SIZE, player_y * TILE_SIZE);
 
-    // Verificar proximidade do jogador com o NPC (1 bloco de distância)
     Vector2 playerPosition = { player_x * TILE_SIZE, player_y * TILE_SIZE };
 
-    // Define a área de proximidade como 1 bloco ao redor do NPC
-    Rectangle npcProximityBox = {
-        npcslobbyCollisionBox.x - TILE_SIZE, 
+    // Define a área de proximidade para NPC1
+    Rectangle npcProximityBox1 = {
+        npcslobbyCollisionBox.x - TILE_SIZE,
         npcslobbyCollisionBox.y - TILE_SIZE,
         npcslobbyCollisionBox.width + (TILE_SIZE * 2),
         npcslobbyCollisionBox.height + (TILE_SIZE * 2)
     };
 
-    // Se o jogador estiver na proximidade do NPC
-    if (CheckCollisionRecs(
-            (Rectangle){playerPosition.x, playerPosition.y, TILE_SIZE, TILE_SIZE}, // Posição do jogador
-            npcProximityBox)) {                                                   // Área de proximidade do NPC
-        if (!isNearNpc) {
-            isNearNpc = true;               // Marca que o jogador está próximo
-            messageLength = 0;              // Reseta a mensagem
-            messageStartTime = GetTime();   // Inicia o tempo da mensagem
+    // Define a área de proximidade para NPC2
+    Rectangle npcProximityBox2 = {
+        npcslobby2CollisionBox.x - TILE_SIZE,
+        npcslobby2CollisionBox.y - TILE_SIZE,
+        npcslobby2CollisionBox.width + (TILE_SIZE * 2),
+        npcslobby2CollisionBox.height + (TILE_SIZE * 2)
+    };
+
+    // Verificar proximidade do jogador com NPC1
+    if (CheckCollisionRecs((Rectangle){playerPosition.x, playerPosition.y, TILE_SIZE, TILE_SIZE}, npcProximityBox1)) {
+        if (!isNearNpc1) {
+            isNearNpc1 = true;
+            messageLength1 = 0;
+            messageStartTime1 = GetTime();
         }
 
-        // Verificar se o jogador pressionou espaço para pular o texto
         if (IsKeyPressed(KEY_SPACE)) {
-            messageLength = strlen(npcMessage); // Exibe o texto completo
-            strncpy(displayedMessage, npcMessage, messageLength);
-            displayedMessage[messageLength] = '\0';
-        } else if (messageLength < strlen(npcMessage)) {
-            // Exibição gradual da mensagem
-            if (GetTime() - messageStartTime >= 0.1) { // Controle de tempo para exibir letra por letra
-                messageLength++;
-                messageStartTime = GetTime(); // Atualiza o tempo
+            messageLength1 = strlen(npcMessage1);
+            strncpy(displayedMessage1, npcMessage1, messageLength1);
+            displayedMessage1[messageLength1] = '\0';
+        } else if (messageLength1 < strlen(npcMessage1)) {
+            if (GetTime() - messageStartTime1 >= 0.1) {
+                messageLength1++;
+                messageStartTime1 = GetTime();
             }
-            strncpy(displayedMessage, npcMessage, messageLength);
-            displayedMessage[messageLength] = '\0'; // Garante que a string termina corretamente
+            strncpy(displayedMessage1, npcMessage1, messageLength1);
+            displayedMessage1[messageLength1] = '\0';
         }
-                // Adicionar a sprite "homem.png" ao lado da caixa de diálogo
-        Rectangle spriteSourceRec = { 0, 0, homemTexture.width, homemTexture.height }; // Configurar o recorte da sprite
-        Rectangle spriteDestRec = { 88, 390, homemTexture.width*0.5, homemTexture.height*0.5 }; // Ajustar posição e tamanho
+
+        // Adicionar a sprite "homem.png" ao lado da caixa de diálogo para NPC1
+        Rectangle spriteSourceRec = { 0, 0, homemTexture.width, homemTexture.height };
+        Rectangle spriteDestRec = { 88, 390, homemTexture.width * 0.5, homemTexture.height * 0.5 };
         DrawTexturePro(homemTexture, spriteSourceRec, spriteDestRec, (Vector2){0, 0}, 0.0f, WHITE);
 
-        // Exibir a mensagem em uma caixa de diálogo
-        DrawDialogBox(displayedMessage, 
-                    100,   // Posição X fixa (mesma do mercador)
-                    550,   // Posição Y fixa (mesma do mercador)
-                    400,   // Largura da caixa
-                    110,   // Altura da caixa
-                    WHITE, // Cor do fundo
-                    BLACK, // Cor do texto
-                    true); // Desenha borda
-
+        // Exibir mensagem para NPC1
+        DrawDialogBox(displayedMessage1, 100, 550, 400, 110, WHITE, BLACK, true);
 
     } else {
-        isNearNpc = false; // Jogador se afastou
-        messageLength = 0; // Reseta o comprimento da mensagem
-        displayedMessage[0] = '\0';
+        isNearNpc1 = false;
+        messageLength1 = 0;
+        displayedMessage1[0] = '\0';
     }
 
+    // Verificar proximidade do jogador com NPC2
+    if (CheckCollisionRecs((Rectangle){playerPosition.x, playerPosition.y, TILE_SIZE, TILE_SIZE}, npcProximityBox2)) {
+        if (!isNearNpc2) {
+            isNearNpc2 = true;
+            messageLength2 = 0;
+            messageStartTime2 = GetTime();
+        }
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            messageLength2 = strlen(npcMessage2);
+            strncpy(displayedMessage2, npcMessage2, messageLength2);
+            displayedMessage2[messageLength2] = '\0';
+        } else if (messageLength2 < strlen(npcMessage2)) {
+            if (GetTime() - messageStartTime2 >= 0.1) {
+                messageLength2++;
+                messageStartTime2 = GetTime();
+            }
+            strncpy(displayedMessage2, npcMessage2, messageLength2);
+            displayedMessage2[messageLength2] = '\0';
+        }
+
+        // Adicionar a sprite "mulher.png" ao lado da caixa de diálogo para NPC2
+        Rectangle spriteSourceRec = { 0, 0, mulherTexture.width, mulherTexture.height };
+        Rectangle spriteDestRec = { 88, 390, mulherTexture.width * 0.5, mulherTexture.height * 0.5 };
+        DrawTexturePro(mulherTexture, spriteSourceRec, spriteDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+        // Exibir mensagem para NPC2
+        DrawDialogBox(displayedMessage2, 100, 550, 400, 110, WHITE, BLACK, true);
+
+    } else {
+        isNearNpc2 = false;
+        messageLength2 = 0;
+        displayedMessage2[0] = '\0';
+    }
 
     EndDrawing();
 }
