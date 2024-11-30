@@ -1081,10 +1081,19 @@ void processarTelaVazia(GameScreen *currentScreen) {
                             "Carlos Espósito - @carlosesposito22",
                             "Foi muito divertido desenvolver esse jogo...",
                             "E, certamente, ele foi muito importante pra nós...",
+                            "Obrigado Pâmela...",
+                            "e Tiaguinho pela iniciativa",
+                            "...e pela oportunidade.",
+                            "E agora, os créditos..."
+                            "a quem nos prestou serviços:",
                             "Créditos a GiveHeartRecords...",
                             "Samuel Kim Music",
                             "todos os sites de spritesheets...",
                             "e todos os canais de SFX do YouTube...",
+                            "Esse jogo foi desenvolvido usando a Raylib",
+                            "...e não tem intenção comercial.",
+                            "Todas as músicas são covers de copyright free",
+                            "...e os SFX são de uso grátis.",                    
                             "Obrigado por jogarem DUNE II"
                         };
                         const int totalTexts = sizeof(texts) / sizeof(texts[0]);
@@ -1672,8 +1681,8 @@ void drawLobby() {
     static double messageStartTime1 = 0;          // Tempo inicial da mensagem para NPC1
     static double messageStartTime2 = 0;          // Tempo inicial da mensagem para NPC2
 
-    const char *npcMessage1 = "Parece que você anda coletando muitas\nespeciarias, cuidado, você pode acabar\ngerando uma guerra com os Zarnax's...";
-    const char *npcMessage2 = "Ola principe de Arrakis, você não\nparece estar com uma boa sorte hoje..."; // Mensagem para o segundo NPC
+    const char *npcMessage1 = "Parece que você anda coletando muitas\nespeciarias. Cuidado, você pode acabar\ngerando uma guerra com os Zarnax's...";
+    const char *npcMessage2 = "Olá, príncipe de Arrakis. Você não\nparece estar com uma boa sorte hoje..."; // Mensagem para o segundo NPC
 
     bool soundPlayed = false;
     static int lastDirection = 3;
@@ -1820,15 +1829,6 @@ void drawLobby() {
         (MAPA_LARGURA * TILE_SIZE) / 2 - 48,  // Centralizar horizontalmente, ajustando para tamanho 96x96
         (MAPA_ALTURA * TILE_SIZE) / 2 - 48   // Centralizar verticalmente
     };
-    Rectangle npcSourceRec = { 0, 0, 64, 64 }; // Fonte da textura
-    Rectangle npcDestRec = { npcCenterPosition.x+300, npcCenterPosition.y-120, 96, 96 }; // Destino com tamanho do jogador
-
-    DrawTexturePro(npcslobbyTexture, npcSourceRec, npcDestRec, (Vector2){0, 0}, 0.0f, WHITE);
-
-    Rectangle npcSourceRec2 = { 0, 128, 64, 64 }; // Fonte da textura
-    Rectangle npcDestRec2 = { npcCenterPosition.x-320, npcCenterPosition.y+180, 96, 96 }; // Destino com tamanho do jogador
-
-    DrawTexturePro(npcslobbyTexture, npcSourceRec2, npcDestRec2, (Vector2){0, 0}, 0.0f, WHITE);
 
 
 
@@ -1923,6 +1923,16 @@ void drawLobby() {
     DrawTexturePro(portal, portalSourceRec, portalDestRec1, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec2, origin, 0.0f, WHITE);
     DrawTexturePro(portal, portalSourceRec, portalDestRec3, origin, 0.0f, WHITE);
+
+    Rectangle npcSourceRec = { 0, 0, 64, 64 }; // Fonte da textura
+    Rectangle npcDestRec = { npcCenterPosition.x+300, npcCenterPosition.y-120, 96, 96 }; // Destino com tamanho do jogador
+
+    DrawTexturePro(npcslobbyTexture, npcSourceRec, npcDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle npcSourceRec2 = { 0, 128, 64, 64 }; // Fonte da textura
+    Rectangle npcDestRec2 = { npcCenterPosition.x-320, npcCenterPosition.y+180, 96, 96 }; // Destino com tamanho do jogador
+
+    DrawTexturePro(npcslobbyTexture, npcSourceRec2, npcDestRec2, (Vector2){0, 0}, 0.0f, WHITE);
 
     if (itemsCollected >= 3 && !spaceshipAnimationPlayed) {
         static float spaceshipTimer = 0.0f;
