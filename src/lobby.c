@@ -182,7 +182,7 @@ void processarEntradaLobby(GameScreen *currentScreen) {
     movePlayer(dx, dy);
 
     if (player_x >= MAPA_LARGURA - 1) { // Jogador tenta sair pelo limite direito do mapa
-        if (itemsCollected >= 3 && spaceshipAnimationPlayed && contFinal) {
+        if (itemsCollected >= 10 && spaceshipAnimationPlayed && contFinal) {
             telaVaziaBloqueada = false; // Verifica se o jogador tem mais de 4 especiarias
             contFinal = false;
             *currentScreen = EMPTY_SCREEN;

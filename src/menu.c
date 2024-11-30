@@ -140,17 +140,17 @@ void displayCutscene(Texture2D image, const char* text, Music titleMusic, float 
 
 void cutsceneArrakis() {
 
-    const char* text1 = "Arrakis. Um vasto deserto, onde a areia carrega\ncicatrizes das guerras travadas pela raras especiarias.";
-    const char* text2 = "E eu vim em busca desse raro tesouro, mas cada\npasso é uma batalha. As especiarias não são fáceis\nde conquistar.";
-    const char* text3 = "Elas nascem nas profundezas traiçoeiras de \nArrakis, onde os vermes gigantes da areia,estão sempre\na espreita e emergem ao menor sinal de vibração.";
-    const char* text4 = "Eles são monstros antigos, vastos e indomáveis,\ncapazes de engolir tudo que cruza seu caminho.";
-    const char* text5 = "Aqui, cada grão de especiaria custa suor, água, sangue\ne, muitas vezes, vidas.";
-    const char* text6 = "No calor abrasador e sob o constante risco de ser\ndetectado por essas criaturas, eu preciso seguir\nem frente.";
-    const char* text7 = "Cada grão de especiaria que eu consigo arrancar\nda areia é uma pequena vitória, mas essencial para\nmim e minha família.";
-    const char* text8 = "Minha missão é sobreviver, extrair o que posso e sair\nde Arrakis com o que é preciso para mudar o\ndestino de minha casa.";
-    const char* text9 = "Mas neste deserto, cada erro é fatal, e os vermes\nestão sempre à espreita.";
+    const char* text1 = "Arrakis é um vasto deserto marcado pelas cicatrizes\ndas guerras travadas pela rara especiaria.";
+    const char* text2 = "Eu vim em busca desse tesouro precioso, mas cada\npasso é uma batalha. As especiarias não são\nfáceis de conquistar.";
+    const char* text3 = "Elas nascem nas profundezas traiçoeiras, onde vermes\ngigantes emergem ao menor sinal de vibração,\nprontos para destruir tudo.";
+    const char* text4 = "Essas criaturas indomáveis são o maior perigo deste\ndeserto. Cada grão de especiaria custa suor,\nsangue e, muitas vezes, vidas.";
+    const char* text5 = "No calor abrasador e sob constante risco, cada\npequena vitória significa esperança para mim\ne para minha família.";
+    const char* text6 = "Minha missão é clara: sobreviver, extrair o que posso\ne sair de Arrakis com o suficiente para mudar\no destino de minha casa.";
+    //const char* text7 = "Cada grão de especiaria que eu consigo arrancar\nda areia é uma pequena vitória, mas essencial para\nmim e minha família.";
+    //const char* text8 = "Minha missão é sobreviver, extrair o que posso e sair\nde Arrakis com o que é preciso para mudar o\ndestino de minha casa.";
+    //const char* text9 = "Mas neste deserto, cada erro é fatal, e os vermes\nestão sempre à espreita.";
     char text10[128];
-    sprintf(text10, "Meu nome é %s e a minha jornada começa AGORA", playerName);
+    sprintf(text10, "Meu nome é %s e a minha jornada começa\nAGORA!", playerName);
 
     float speed = 30.0f; 
     float scale = 0.6f;
@@ -180,17 +180,17 @@ void cutsceneArrakis() {
     displayCutscene(cutsceneImage6, text6, titleMusic, speed, scale, duration);
     UnloadTexture(cutsceneImage6);
 
-    Texture2D cutsceneImage7 = LoadTexture("static/image/cutscene7.png");
-    displayCutscene(cutsceneImage7, text7, titleMusic, speed, scale, duration);
-    UnloadTexture(cutsceneImage7);
+    //Texture2D cutsceneImage7 = LoadTexture("static/image/cutscene7.png");
+    //displayCutscene(cutsceneImage7, text7, titleMusic, speed, scale, duration);
+    //UnloadTexture(cutsceneImage7);
 
-    Texture2D cutsceneImage8 = LoadTexture("static/image/cutscene8.png");
-    displayCutscene(cutsceneImage8, text8, titleMusic, speed, scale, duration);
-    UnloadTexture(cutsceneImage8);
+    //Texture2D cutsceneImage8 = LoadTexture("static/image/cutscene8.png");
+    //displayCutscene(cutsceneImage8, text8, titleMusic, speed, scale, duration);
+    //UnloadTexture(cutsceneImage8);
 
-    Texture2D cutsceneImage9 = LoadTexture("static/image/cutscene9.png");
-    displayCutscene(cutsceneImage9, text9, titleMusic, speed, scale, duration);
-    UnloadTexture(cutsceneImage9);
+    //Texture2D cutsceneImage9 = LoadTexture("static/image/cutscene9.png");
+    //displayCutscene(cutsceneImage9, text9, titleMusic, speed, scale, duration);
+    //UnloadTexture(cutsceneImage9);
 
     Texture2D cutsceneImage10 = LoadTexture("static/image/cutscene10.png");
     displayCutscene(cutsceneImage10, text10, titleMusic, speed, scale, duration);

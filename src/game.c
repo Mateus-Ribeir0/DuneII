@@ -1747,7 +1747,7 @@ void playGame(GameScreen *currentScreen) {
                         lastEPressTime = currentTime;
                     }
 
-                    if (ePressCount >= 3) {
+                    if (ePressCount >= 2) {
                         isMonsterActive = false;
                     }
                 }
