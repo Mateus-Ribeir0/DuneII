@@ -7,8 +7,9 @@ static Texture2D cerealsTexture;
 static Texture2D desertTileset;
 static Texture2D bonesTexture;
 static Texture2D aguaTexture;
-
-
+static Texture2D npcslobbyTexture;
+static Texture2D homemTexture;
+static Texture2D mulherTexture;
 static Texture2D cityTexture;
 static Texture2D goldTexture;
 static Texture2D luckyTexture;
@@ -44,6 +45,10 @@ static bool isWarMusicPlaying = false;
 
 static bool telaVaziaBloqueada = false; // Variável para bloquear a telaVazia após a sequência final
 
+
+Rectangle npcslobbyCollisionBox;
+Rectangle npcslobby2CollisionBox;
+
 void iniciarLobby() {
     velho = LoadTexture("static/image/velho.png");
     cityTexture = LoadTexture("static/image/city.png");
@@ -55,6 +60,9 @@ void iniciarLobby() {
     goldTexture = LoadTexture("static/image/gold.png");
     luckyTexture = LoadTexture("static/image/lucky.png");
     aguaTexture = LoadTexture("static/image/agua.png");
+    npcslobbyTexture = LoadTexture("static/image/npcslobby.png");
+    homemTexture = LoadTexture("static/image/homem.png");
+    mulherTexture = LoadTexture("static/image/mulher.png");
     troca = LoadSound("static/music/trocaDeDinheiro.wav");
     monstersTexture = LoadTexture("static/image/monsters.png");
     bonesTexture = LoadTexture("static/image/bones.png");
@@ -90,6 +98,9 @@ void finalizarLobby() {
     UnloadTexture(goldTexture);
     UnloadTexture(luckyTexture);
     UnloadTexture(aguaTexture);
+    UnloadTexture(npcslobbyTexture);
+    UnloadTexture(homemTexture);
+    UnloadTexture(mulherTexture);
     UnloadSound(troca);
     UnloadTexture(spaceshipTexture);
     UnloadMusicStream(warMusic);
@@ -406,6 +417,8 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static int fireballWave = 1; // Controla qual onda está ativa: 1 ou 2
     static bool waveInProgress = true; // Indica se a onda atual está em progresso
     static Sound cannonSound;
+    static Texture2D explosionSprite;
+                    
 
     static int empty_player_x = 1;
     static int empty_player_y = 10;
@@ -443,6 +456,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
         typingSound = LoadSound("static/music/falas.wav");
         gameOverSoundWar = LoadSound("static/music/deathsound.wav");
         cannonSound = LoadSound("static/music/cannon.wav");
+        explosionSprite = LoadTexture("static/image/Explosion.png");
 
         SetSoundVolume(machineLoadingSound, 1.0f);
         SetSoundVolume(typingSound, 0.8f);
@@ -555,7 +569,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
         // Variáveis para efeito de digitação
         char displayedText[256] = "";
         int displayedTextLength = 0;
-        double textStartTime = GetTime();
+        double textStartTime1 = GetTime();
         bool dialogComplete = false;
 
         // Carregar som de falas
@@ -572,7 +586,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
             // Efeito de digitação
             if (displayedTextLength < strlen(dialogTexts[currentDialogIndex])) {
-                if (GetTime() - textStartTime >= displayedTextLength * 0.05) { // Controle de velocidade de digitação
+                if (GetTime() - textStartTime1 >= displayedTextLength * 0.05) { // Controle de velocidade de digitação
                     if (displayedTextLength == 0) {
                         // Iniciar som de falas no início do efeito de digitação
                         PlaySound(falasSound);
@@ -592,7 +606,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
             EndDrawing();
 
             // Após o texto ser completamente exibido
-            if (dialogComplete && (GetTime() - textStartTime >= displayedTextLength * 0.05 + 2.0)) {
+            if (dialogComplete && (GetTime() - textStartTime1 >= displayedTextLength * 0.05 + 2.0)) {
                 // Esperar 2 segundos antes de exibir o próximo texto
                 double waitStartTime = GetTime();
                 while (GetTime() - waitStartTime < 2.0) {
@@ -611,7 +625,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                 currentDialogIndex++;
                 displayedTextLength = 0;
                 displayedText[0] = '\0';
-                textStartTime = GetTime();
+                textStartTime1 = GetTime();
                 dialogComplete = false;
             }
         }
@@ -794,28 +808,29 @@ void processarTelaVazia(GameScreen *currentScreen) {
                     StopSound(suspenseSound);  // Parar o som de suspense
 
                     Texture2D portraitProtagonist = LoadTexture("static/image/portraitProtagonist.png");
+                    Texture2D portraitProtagonist2 = LoadTexture("static/image/portraitProtagonist2.png");
+                    Texture2D portraitProtagonist3 = LoadTexture("static/image/portraitProtagonist3.png");
                     Sound deathSound = LoadSound("static/sound/deathSound.wav");
+                    Sound typingSound = LoadSound("static/sound/falas.wav");
 
                     // Configurações de opacidade e escala
                     float opacities[] = { 0.3f, 0.7f, 1.0f };
                     float scales[] = { 1.0f, 1.5f, 2.0f };
-                    double durations[] = { 1.0, 1.0, 2.0 }; // Duração de cada fase (em segundos)
+                    double durations[] = { 0.5, 0.5, 1.0 }; // Duração reduzida para transições mais rápidas
 
                     // Posição base do sprite
                     float positionX, positionY;
 
+                    // Exibir `portraitProtagonist` com fases de opacidade e escala
                     for (int i = 0; i < 3; i++) {
-                        // Calcular escala e posição para manter na borda inferior direita
                         float scale = scales[i];
                         positionX = GetScreenWidth() - portraitProtagonist.width * scale;
                         positionY = GetScreenHeight() - portraitProtagonist.height * scale;
 
-                        // Tocar o som de morte entre as fases
                         if (i > 0) {
-                            PlaySound(deathSound);
+                            PlaySound(deathSound); // Tocar som entre as fases
                         }
 
-                        // Desenhar o sprite com opacidade e escala configuradas
                         double startTime = GetTime();
                         while (GetTime() - startTime < durations[i]) {
                             BeginDrawing();
@@ -836,36 +851,85 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         }
                     }
 
-                    // Carregar o segundo sprite do protagonista
-                    Texture2D portraitProtagonist2 = LoadTexture("static/image/portraitProtagonist2.png");
-
-                    // Desenhar o segundo sprite com o mesmo tamanho e posição
+                    // Exibir `portraitProtagonist2` por 1.5 segundos
                     double secondPortraitStartTime = GetTime();
-                    while (GetTime() - secondPortraitStartTime < 2.0) { // 2 segundos de duração
+                    while (GetTime() - secondPortraitStartTime < 1.5) {
                         BeginDrawing();
                         ClearBackground(BLACK);
 
                         Rectangle sourceRec = { 0, 0, portraitProtagonist2.width, portraitProtagonist2.height };
                         Rectangle destRec = {
-                            positionX, // Mesma posição que o portraitProtagonist
+                            positionX,
                             positionY,
-                            portraitProtagonist2.width * scales[2], // Mesma escala que o último estágio de portraitProtagonist
+                            portraitProtagonist2.width * scales[2],
                             portraitProtagonist2.height * scales[2]
                         };
                         Vector2 origin = { 0, 0 };
 
-                        DrawTexturePro(portraitProtagonist2, sourceRec, destRec, origin, 0.0f, WHITE); // Opacidade total (WHITE)
+                        DrawTexturePro(portraitProtagonist2, sourceRec, destRec, origin, 0.0f, WHITE);
 
                         EndDrawing();
                     }
 
-                    // Liberar o recurso do segundo sprite
-                    UnloadTexture(portraitProtagonist2);
+                    // Exibir `portraitProtagonist3` com caixa de texto simultânea
+                    const char *text = "Eu já queria fazer isso há um tempo.";
+                    char displayedText[256] = "";
+                    int totalChars = strlen(text);
+                    int displayedChars = 0;
+                    double textStartTime2 = GetTime();
+                    bool dialogComplete = false;
+                    double textboxEndTime = 0;
 
-                    // Libera os recursos do sprite e do som
-                    UnloadTexture(portraitProtagonist);
-                    UnloadSound(deathSound);
+                    while (!dialogComplete || (textboxEndTime != 0 && GetTime() - textboxEndTime < 2.0)) {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
 
+                        // Desenhar o `portraitProtagonist3`
+                        Rectangle sourceRec = { 0, 0, portraitProtagonist3.width, portraitProtagonist3.height };
+                        Rectangle destRec = {
+                            positionX,
+                            positionY,
+                            portraitProtagonist3.width * scales[2],
+                            portraitProtagonist3.height * scales[2]
+                        };
+                        Vector2 origin = { 0, 0 };
+                        DrawTexturePro(portraitProtagonist3, sourceRec, destRec, origin, 0.0f, WHITE);
+
+                        // Configuração dinâmica da caixa de texto
+                        int textWidth = MeasureText(text, 20); // Largura do texto na fonte escolhida
+                        int boxWidth = textWidth + 20; // Largura da caixa (texto + margem)
+                        int boxHeight = 60; // Altura fixa
+                        float boxX = positionX - boxWidth - 20; // Caixa posicionada à esquerda do sprite
+                        float boxY = positionY + (portraitProtagonist3.height * scales[2] / 4); // Centralizada na altura do sprite
+
+                        DrawRectangle(boxX, boxY, boxWidth, boxHeight, WHITE); // Fundo da caixa
+                        DrawRectangleLines(boxX, boxY, boxWidth, boxHeight, BLACK); // Contorno da caixa
+
+                        // Efeito de digitação
+                        if (!dialogComplete) {
+                            double elapsed = GetTime() - textStartTime2;
+                            displayedChars = (int)((elapsed / 0.5) * totalChars); // Exibir caracteres proporcionalmente ao tempo
+                            if (displayedChars > totalChars) {
+                                displayedChars = totalChars;
+                                dialogComplete = true; // Todo o texto foi exibido
+                                textboxEndTime = GetTime(); // Marcar o tempo final da exibição
+                            }
+                            strncpy(displayedText, text, displayedChars);
+                            displayedText[displayedChars] = '\0';
+
+                            // Tocar som enquanto o texto é exibido
+                            if (displayedChars > 0 && displayedChars < totalChars && !IsSoundPlaying(typingSound)) {
+                                PlaySound(typingSound);
+                            }
+                        }
+
+                        // Exibir o texto na caixa
+                        DrawText(displayedText, boxX + 10, boxY + 20, 20, BLACK);
+
+                        EndDrawing();
+                    }
+
+                    // Parte do "slashing"
                     // Carregar o sprite para a animação de "slash"
                     Texture2D slashSprite = LoadTexture("static/image/slash.png");
 
@@ -927,27 +991,288 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         EndDrawing();
                     }
 
+                    Sound creditosMusicRun = LoadSound("static/music/creditosMusic.wav");
+                    PlaySound(creditosMusicRun);
 
+                    double startTimeRun1 = GetTime();
+                    while (GetTime() - startTimeRun1 < 3.0) {
 
-                    // Parar o som após a animação
-                    StopSound(slashingSound);
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+                        EndDrawing();
+                    }
+                        Texture2D mountainsSprite = LoadTexture("static/image/mountains.png");
+                        Texture2D farMountainsSprite = LoadTexture("static/image/far-mountains.png");
+                        Texture2D personagemRunningRun = LoadTexture("static/image/personagemRunning.png");
+                        Texture2D platformsSpriteRun = LoadTexture("static/image/platforms2.png");
 
-                    // Libera os recursos
-                    UnloadTexture(slashSprite);
-                    UnloadSound(slashingSound);
+                        // Configurações de escala
+                        float runningSpriteScaleRun = 6.0f;
+                        float spriteWidthRun = 64 * runningSpriteScaleRun;
+                        float spriteHeightRun = 64 * runningSpriteScaleRun;
+
+                        float platformsScaleRun = 10.0f;
+                        float platformsSpriteWidthRun = platformsSpriteRun.width * platformsScaleRun;
+                        float platformsSpriteHeightRun = platformsSpriteRun.height * platformsScaleRun;
+
+                        float mountainsScale = 3.0f;
+                        float mountainsSpriteWidth = mountainsSprite.width * mountainsScale;
+                        float mountainsSpriteHeight = mountainsSprite.height * mountainsScale;
+
+                        float farMountainsScale = 2.0f;
+                        float farMountainsSpriteWidth = farMountainsSprite.width * farMountainsScale;
+                        float farMountainsSpriteHeight = farMountainsSprite.height * farMountainsScale;
+
+                        // Configurações de posição
+                        float runningSpriteXRun = -spriteWidthRun;
+                        float runningSpriteYRun = GetScreenHeight() - platformsSpriteHeightRun - (spriteHeightRun * 0.5f); // Descer um pouco
+
+                        float platformsSpriteYRun = GetScreenHeight() - (platformsSpriteHeightRun * 0.9f);
+                        float mountainsSpriteY = platformsSpriteYRun - mountainsSpriteHeight * 0.8f - 20; // Subir um pouco
+                        float farMountainsSpriteY = (GetScreenHeight() - farMountainsSpriteHeight) / 2;   // Centralizar na tela
+
+                        float finalPositionXRun = (GetScreenWidth() - spriteWidthRun) / 2;
+                        float runningSpeedRun = (finalPositionXRun - runningSpriteXRun) / 15.0f;
+
+                        const int frameWidthRun = 64;
+                        const int frameHeightRun = 64;
+                        const int totalFramesRun = 8;
+                        const float frameTimeRun = 0.1f;
+
+                        float animationTimerRun = 0.0f;
+                        int currentFrameRun = 0;
+
+                        double startRunningTimeRun = GetTime();
+                        bool runningAnimationCompleteRun = false;
+
+                        float platformsScrollOffset = 0.0f;
+                        float platformsScrollSpeed = 150.0f;
+
+                        float mountainsScrollOffset = 0.0f;
+                        float mountainsScrollSpeed = 50.0f;
+
+                        float farMountainsScrollOffset = 0.0f;
+                        float farMountainsScrollSpeed = 20.0f;
+
+                        float rectangleOpacity = 1.0f;
+
+                        // Textos sequenciais
+                        const char *texts[] = {
+                            "CRÉDITOS",
+                            "Agradecemos por termos ido à amostra Tech Design 2024.2",
+                            "Somos gratos também a...",
+                            "JP reizinho de Orobó e",
+                            "Jeraross",
+                            "pela competição saudável...",
+                            "ficamos felizes em crescer junto com vocês.",
+                            "Temos que agradecer especialmente a...",
+                            "Micucci do Borel",
+                            "Por nos apoiar sempre de perto...",
+                            "e se entusiasmar tanto com nosso jogo",
+                            "...esse jogo é especial por você também.",
+                            "Também agradecer a todos os devs do projeto pelo empenho.",
+                            "Mateus Ribeiro - @mateus_ribeir0",
+                            "João Pedro Mamede - @jpmamededs",
+                            "Carlos Espósito - @carlosesposito22",
+                            "Foi muito divertido desenvolver esse jogo...",
+                            "E, certamente, ele foi muito importante pra nós...",
+                            "Créditos a GiveHeartRecords...",
+                            "Samuel Kim Music",
+                            "todos os sites de spritesheets...",
+                            "e todos os canais de SFX do YouTube...",
+                            "Obrigado por jogarem DUNE II"
+                        };
+                        const int totalTexts = sizeof(texts) / sizeof(texts[0]);
+                        int currentTextIndex = 0;
+                        double textStartTime3 = GetTime();
+                        float textOpacity = 1.0f;
+                        const float textDisplayTime = 2.5f;
+                        const float textFadeSpeed = 1.0f;
+
+                        // Controlar quando o fundo RGB(210, 83, 76) e sprites devem ser exibidos
+                        bool elementsVisible = false;
+
+                        // Retângulo branco
+                        float whiteRectangleOpacity = 1.0f;    // Opacidade inicial do retângulo branco
+                        double rectangleStartTime = 0.0;
+
+                        // Animação do personagem até o centro
+                        while (!runningAnimationCompleteRun) {
+                            double elapsedRun = GetTime() - startRunningTimeRun;
+
+                            if (elapsedRun < 15.0) {
+                                runningSpriteXRun += runningSpeedRun * GetFrameTime();
+                            } else {
+                                runningAnimationCompleteRun = true;
+                                runningSpriteXRun = finalPositionXRun;
+                            }
+
+                            animationTimerRun += GetFrameTime();
+                            if (animationTimerRun >= frameTimeRun) {
+                                animationTimerRun = 0.0f;
+                                currentFrameRun = (currentFrameRun + 1) % totalFramesRun;
+                            }
+
+                            BeginDrawing();
+                            ClearBackground(BLACK);
+
+                            int frameXRun = currentFrameRun * frameWidthRun;
+                            int frameYRun = 128;
+
+                            Rectangle sourceRecRun = { frameXRun, frameYRun, frameWidthRun, frameHeightRun };
+                            Rectangle destRecRun = {
+                                runningSpriteXRun,
+                                runningSpriteYRun,
+                                spriteWidthRun,
+                                spriteHeightRun
+                            };
+                            Vector2 originRun = { 0, 0 };
+
+                            DrawTexturePro(personagemRunningRun, sourceRecRun, destRecRun, originRun, 0.0f, WHITE);
+
+                            EndDrawing();
+                        }
+
+                        // Controlar o tempo para exibir os elementos adicionais
+                        double delayStartTime = GetTime();
+                        while (GetTime() - delayStartTime < 0.0) {
+                            animationTimerRun += GetFrameTime();
+                            if (animationTimerRun >= frameTimeRun) {
+                                animationTimerRun = 0.0f;
+                                currentFrameRun = (currentFrameRun + 1) % totalFramesRun;
+                            }
+
+                            BeginDrawing();
+                            ClearBackground(BLACK);
+
+                            int frameXRun = currentFrameRun * frameWidthRun;
+                            int frameYRun = 128;
+
+                            Rectangle sourceRecRun = { frameXRun, frameYRun, frameWidthRun, frameHeightRun };
+                            Rectangle destRecRun = {
+                                finalPositionXRun,
+                                runningSpriteYRun,
+                                spriteWidthRun,
+                                spriteHeightRun
+                            };
+                            Vector2 originRun = { 0, 0 };
+
+                            DrawTexturePro(personagemRunningRun, sourceRecRun, destRecRun, originRun, 0.0f, WHITE);
+
+                            EndDrawing();
+                        }
+
+                        elementsVisible = true;
+
+                        // Loop principal
+                        while (!WindowShouldClose()) {
+                            // Atualizar offsets e animações
+                            farMountainsScrollOffset += farMountainsScrollSpeed * GetFrameTime();
+                            farMountainsScrollOffset = fmod(farMountainsScrollOffset, farMountainsSpriteWidth);
+
+                            mountainsScrollOffset += mountainsScrollSpeed * GetFrameTime();
+                            mountainsScrollOffset = fmod(mountainsScrollOffset, mountainsSpriteWidth);
+
+                            platformsScrollOffset += platformsScrollSpeed * GetFrameTime();
+                            platformsScrollOffset = fmod(platformsScrollOffset, platformsSpriteWidthRun);
+
+                            animationTimerRun += GetFrameTime();
+                            if (animationTimerRun >= frameTimeRun) {
+                                animationTimerRun = 0.0f;
+                                currentFrameRun = (currentFrameRun + 1) % totalFramesRun;
+                            }
+
+                            // Atualizar exibição dos textos
+                            double elapsedTextTime = GetTime() - textStartTime3;
+                            if (elapsedTextTime > textDisplayTime) {
+                                textOpacity -= textFadeSpeed * GetFrameTime(); // Diminuir opacidade gradualmente
+
+                                if (textOpacity <= 0.0f) {
+                                    currentTextIndex++;
+                                    if (currentTextIndex < totalTexts) {
+                                        textStartTime3 = GetTime(); // Reiniciar o tempo para o próximo texto
+                                        textOpacity = 1.0f;        // Restaurar opacidade
+                                    }
+                                }
+                            }
+
+                            BeginDrawing();
+                            ClearBackground((Color){210, 83, 76, 255}); // Fundo na cor definida
+
+                            // Desenhar os elementos do fundo e plataformas
+                            for (float x = -farMountainsScrollOffset; x < GetScreenWidth(); x += farMountainsSpriteWidth) {
+                                Rectangle sourceRec = {0, 0, farMountainsSprite.width, farMountainsSprite.height};
+                                Rectangle destRec = {x, farMountainsSpriteY, farMountainsSpriteWidth, farMountainsSpriteHeight};
+                                Vector2 origin = {0, 0};
+                                DrawTexturePro(farMountainsSprite, sourceRec, destRec, origin, 0.0f, WHITE);
+                            }
+
+                            for (float x = -mountainsScrollOffset; x < GetScreenWidth(); x += mountainsSpriteWidth) {
+                                Rectangle sourceRec = {0, 0, mountainsSprite.width, mountainsSprite.height};
+                                Rectangle destRec = {x, mountainsSpriteY, mountainsSpriteWidth, mountainsSpriteHeight};
+                                Vector2 origin = {0, 0};
+                                DrawTexturePro(mountainsSprite, sourceRec, destRec, origin, 0.0f, WHITE);
+                            }
+
+                            for (float x = -platformsScrollOffset; x < GetScreenWidth(); x += platformsSpriteWidthRun) {
+                                Rectangle sourceRecPlatformsRun = {0, 0, platformsSpriteRun.width, platformsSpriteRun.height};
+                                Rectangle destRecPlatformsRun = {x, platformsSpriteYRun, platformsSpriteWidthRun, platformsSpriteHeightRun};
+                                Vector2 originPlatformsRun = {0, 0};
+                                DrawTexturePro(platformsSpriteRun, sourceRecPlatformsRun, destRecPlatformsRun, originPlatformsRun, 0.0f, WHITE);
+                            }
+
+                            // Desenhar personagem correndo
+                            Rectangle sourceRecRun = {currentFrameRun * frameWidthRun, 128, frameWidthRun, frameHeightRun};
+                            Rectangle destRecRun = {finalPositionXRun, runningSpriteYRun, spriteWidthRun, spriteHeightRun};
+                            Vector2 originRun = {0, 0};
+                            DrawTexturePro(personagemRunningRun, sourceRecRun, destRecRun, originRun, 0.0f, WHITE);
+
+                            // Exibir o texto dos créditos na camada superior
+                            if (currentTextIndex < totalTexts) {
+                                const char *currentText = texts[currentTextIndex];
+                                int fontSize = 40; // Tamanho da fonte aumentado
+                                int textWidth = MeasureText(currentText, fontSize);
+                                float textX = (GetScreenWidth() - textWidth) / 2;
+                                float textY = (GetScreenHeight() / 2) - 100; // Posição ajustada para ficar acima do meio da tela
+                                DrawText(currentText, textX, textY, fontSize, Fade(WHITE, textOpacity));
+                            }
+
+                            // Desenhar o retângulo branco (fade-out)
+                            if (GetTime() - delayStartTime > 0.0) {
+                                if (rectangleStartTime == 0.0) {
+                                    rectangleStartTime = GetTime();
+                                }
+                                double elapsedRectangleTime = GetTime() - rectangleStartTime;
+                                whiteRectangleOpacity = 1.0f - (float)(elapsedRectangleTime / 1.0f);
+                                if (whiteRectangleOpacity < 0.0f) whiteRectangleOpacity = 0.0f;
+
+                                DrawRectangle(0, 0, 1280, 720, Fade(WHITE, whiteRectangleOpacity));
+                            }
+
+                            EndDrawing();
+
+                            // Verificar se o som `creditosMusicRun` terminou
+                            if (!IsSoundPlaying(creditosMusicRun)) {
+                                UnloadTexture(personagemRunningRun);
+                                UnloadTexture(platformsSpriteRun);
+                                UnloadTexture(mountainsSprite);
+                                UnloadTexture(farMountainsSprite);
+                                UnloadSound(creditosMusicRun);
+                                UnloadTexture(empty_villain);
+                                UnloadTexture(villain_sombra);
+
+                                telaVaziaBloqueada = true;
+                                *currentScreen = LOBBY;   
+                                break;                    
+                            }
+                        }
+                        
                 }
             }
         }
 
-        UnloadSound(breathingSound); // Libera o recurso do som de respiração
-        UnloadSound(suspenseSound);  // Libera o recurso da música de suspense
-        UnloadTexture(slashSprite);
-
         EndDrawing();
 
-        telaVaziaBloqueada = true; // Bloquear telaVazia após a sequência
-        *currentScreen = LOBBY;
-        return;
     }
 
     if (isWalking) {
@@ -1245,7 +1570,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         192,
                         192
                     };
-                    DrawTexturePro(LoadTexture("static/image/Explosion.png"), sourceRecExplosion, destRecExplosion, (Vector2){0, 0}, 0.0f, WHITE);
+                    DrawTexturePro(explosionSprite, sourceRecExplosion, destRecExplosion, (Vector2){0, 0}, 0.0f, WHITE);
 
                     // Ativar a hitbox 0.2 segundos após o início da explosão
                     if (elapsedTime >= 0.2) {
@@ -1332,6 +1657,19 @@ void processarTelaVazia(GameScreen *currentScreen) {
 void drawLobby() {
     BeginDrawing();
 
+
+    static bool isNearNpc1 = false;               // Indica se o jogador está próximo ao NPC1
+    static bool isNearNpc2 = false;               // Indica se o jogador está próximo ao NPC2
+    static char displayedMessage1[256] = "";      // Mensagem atualmente exibida para NPC1
+    static char displayedMessage2[256] = "";      // Mensagem atualmente exibida para NPC2
+    static int messageLength1 = 0;                // Número de caracteres exibidos para NPC1
+    static int messageLength2 = 0;                // Número de caracteres exibidos para NPC2
+    static double messageStartTime1 = 0;          // Tempo inicial da mensagem para NPC1
+    static double messageStartTime2 = 0;          // Tempo inicial da mensagem para NPC2
+
+    const char *npcMessage1 = "Parece que você anda coletando muitas\nespeciarias, cuidado, você pode acabar\ngerando uma guerra com os Zarnax's...";
+    const char *npcMessage2 = "Ola principe de Arrakis, você não\nparece estar com uma boa sorte hoje..."; // Mensagem para o segundo NPC
+
     bool soundPlayed = false;
     static int lastDirection = 3;
     static float walkingTimer = 0.0f;
@@ -1347,6 +1685,8 @@ void drawLobby() {
     Rectangle destRecVendinha = { 20, 20, 123* 0.8 , 120* 0.8  };
     Rectangle sourceRecMonster = { 282, 13, 106, 116 };
     Rectangle sourceRecbones1 = { 557, 60, 45, 37 };
+    Rectangle npcslobby = { 0, 0, 64, 64 };
+    Rectangle npcslobby2 = { 0, 128, 64, 64 };
     Rectangle sourceRecbones2 = { 557, 60, 45, 37 };
     Rectangle sourceRecbones3 = { 557, 60, 45, 37 };
     Rectangle sourceRecbones4 = { 557, 60, 45, 37 };
@@ -1469,6 +1809,26 @@ void drawLobby() {
         PlayMusicStream(lobbyMusic);
     }
     UpdateMusicStream(lobbyMusic);
+
+    // Desenhar a sprite do NPC no centro do mapa com tamanho igual ao sprite do jogador
+    Vector2 npcCenterPosition = { 
+        (MAPA_LARGURA * TILE_SIZE) / 2 - 48,  // Centralizar horizontalmente, ajustando para tamanho 96x96
+        (MAPA_ALTURA * TILE_SIZE) / 2 - 48   // Centralizar verticalmente
+    };
+    Rectangle npcSourceRec = { 0, 0, 64, 64 }; // Fonte da textura
+    Rectangle npcDestRec = { npcCenterPosition.x+300, npcCenterPosition.y-120, 96, 96 }; // Destino com tamanho do jogador
+
+    DrawTexturePro(npcslobbyTexture, npcSourceRec, npcDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+    Rectangle npcSourceRec2 = { 0, 128, 64, 64 }; // Fonte da textura
+    Rectangle npcDestRec2 = { npcCenterPosition.x-320, npcCenterPosition.y+180, 96, 96 }; // Destino com tamanho do jogador
+
+    DrawTexturePro(npcslobbyTexture, npcSourceRec2, npcDestRec2, (Vector2){0, 0}, 0.0f, WHITE);
+
+
+
+    npcslobbyCollisionBox = (Rectangle){npcCenterPosition.x + 348, npcCenterPosition.y - 64, 4, 0};
+    npcslobby2CollisionBox = (Rectangle){npcCenterPosition.x - 300, npcCenterPosition.y + 220, 2, 0};
 
     DrawTexturePro(monstersTexture, sourceRecMonster, (Rectangle){ positionMonster.x, positionMonster.y, 106, 116 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
     DrawTexturePro(bonesTexture, sourceRecbones1, (Rectangle){ positionBones.x, positionBones.y, 45, 37 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
@@ -2174,6 +2534,96 @@ void drawLobby() {
     } else {
         isInteractingWithMerchant = 0;
     }
+    
     verificarProximidadePoco(player_x * TILE_SIZE, player_y * TILE_SIZE);
+
+    Vector2 playerPosition = { player_x * TILE_SIZE, player_y * TILE_SIZE };
+
+    // Define a área de proximidade para NPC1
+    Rectangle npcProximityBox1 = {
+        npcslobbyCollisionBox.x - TILE_SIZE,
+        npcslobbyCollisionBox.y - TILE_SIZE,
+        npcslobbyCollisionBox.width + (TILE_SIZE * 2),
+        npcslobbyCollisionBox.height + (TILE_SIZE * 2)
+    };
+
+    // Define a área de proximidade para NPC2
+    Rectangle npcProximityBox2 = {
+        npcslobby2CollisionBox.x - TILE_SIZE,
+        npcslobby2CollisionBox.y - TILE_SIZE,
+        npcslobby2CollisionBox.width + (TILE_SIZE * 2),
+        npcslobby2CollisionBox.height + (TILE_SIZE * 2)
+    };
+
+    // Verificar proximidade do jogador com NPC1
+    if (CheckCollisionRecs((Rectangle){playerPosition.x, playerPosition.y, TILE_SIZE, TILE_SIZE}, npcProximityBox1)) {
+        if (!isNearNpc1) {
+            isNearNpc1 = true;
+            messageLength1 = 0;
+            messageStartTime1 = GetTime();
+        }
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            messageLength1 = strlen(npcMessage1);
+            strncpy(displayedMessage1, npcMessage1, messageLength1);
+            displayedMessage1[messageLength1] = '\0';
+        } else if (messageLength1 < strlen(npcMessage1)) {
+            if (GetTime() - messageStartTime1 >= 0.1) {
+                messageLength1++;
+                messageStartTime1 = GetTime();
+            }
+            strncpy(displayedMessage1, npcMessage1, messageLength1);
+            displayedMessage1[messageLength1] = '\0';
+        }
+
+        // Adicionar a sprite "homem.png" ao lado da caixa de diálogo para NPC1
+        Rectangle spriteSourceRec = { 0, 0, homemTexture.width, homemTexture.height };
+        Rectangle spriteDestRec = { 88, 390, homemTexture.width * 0.5, homemTexture.height * 0.5 };
+        DrawTexturePro(homemTexture, spriteSourceRec, spriteDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+        // Exibir mensagem para NPC1
+        DrawDialogBox(displayedMessage1, 100, 550, 400, 110, WHITE, BLACK, true);
+
+    } else {
+        isNearNpc1 = false;
+        messageLength1 = 0;
+        displayedMessage1[0] = '\0';
+    }
+
+    // Verificar proximidade do jogador com NPC2
+    if (CheckCollisionRecs((Rectangle){playerPosition.x, playerPosition.y, TILE_SIZE, TILE_SIZE}, npcProximityBox2)) {
+        if (!isNearNpc2) {
+            isNearNpc2 = true;
+            messageLength2 = 0;
+            messageStartTime2 = GetTime();
+        }
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            messageLength2 = strlen(npcMessage2);
+            strncpy(displayedMessage2, npcMessage2, messageLength2);
+            displayedMessage2[messageLength2] = '\0';
+        } else if (messageLength2 < strlen(npcMessage2)) {
+            if (GetTime() - messageStartTime2 >= 0.1) {
+                messageLength2++;
+                messageStartTime2 = GetTime();
+            }
+            strncpy(displayedMessage2, npcMessage2, messageLength2);
+            displayedMessage2[messageLength2] = '\0';
+        }
+
+        // Adicionar a sprite "mulher.png" ao lado da caixa de diálogo para NPC2
+        Rectangle spriteSourceRec = { 0, 0, mulherTexture.width, mulherTexture.height };
+        Rectangle spriteDestRec = { 88, 390, mulherTexture.width * 0.5, mulherTexture.height * 0.5 };
+        DrawTexturePro(mulherTexture, spriteSourceRec, spriteDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+        // Exibir mensagem para NPC2
+        DrawDialogBox(displayedMessage2, 100, 550, 400, 110, WHITE, BLACK, true);
+
+    } else {
+        isNearNpc2 = false;
+        messageLength2 = 0;
+        displayedMessage2[0] = '\0';
+    }
+
     EndDrawing();
 }

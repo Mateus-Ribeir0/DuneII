@@ -561,6 +561,12 @@ void movePlayer(int dx, int dy) {
         }
 
         if (mapaAtual == -1) {
+            // Verificar colisão com os NPCs no lobby
+            if (CheckCollisionRecs(playerRect, npcslobbyCollisionBox) ||
+                CheckCollisionRecs(playerRect, npcslobby2CollisionBox)) {
+                return; // Impede o jogador de entrar na área dos NPCs
+            }
+
             if (CheckCollisionRecs(playerRect, vendinhaCollisionBox)) {
                 return;
             }
@@ -572,6 +578,7 @@ void movePlayer(int dx, int dy) {
                 }
             }
         }
+
 
         if (mapaAtual == 0) {
             for (int i = 0; i < NUM_PEDRAS; i++) {
