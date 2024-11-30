@@ -405,6 +405,8 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static int fireballWave = 1; // Controla qual onda está ativa: 1 ou 2
     static bool waveInProgress = true; // Indica se a onda atual está em progresso
     static Sound cannonSound;
+    static Texture2D explosionSprite;
+                    
 
     static int empty_player_x = 1;
     static int empty_player_y = 10;
@@ -442,6 +444,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
         typingSound = LoadSound("static/music/falas.wav");
         gameOverSoundWar = LoadSound("static/music/deathsound.wav");
         cannonSound = LoadSound("static/music/cannon.wav");
+        explosionSprite = LoadTexture("static/image/Explosion.png");
 
         SetSoundVolume(machineLoadingSound, 1.0f);
         SetSoundVolume(typingSound, 0.8f);
@@ -1046,13 +1049,25 @@ void processarTelaVazia(GameScreen *currentScreen) {
                             "CRÉDITOS",
                             "Agradecemos por termos ido à amostra Tech Design 2024.2",
                             "Somos gratos também a...",
-                            "JP reizinho de Orobó",
+                            "JP reizinho de Orobó e",
                             "Jeraross",
-                            "Especialmente, Micucci por apoiar o trabalho.",
-                            "Também agradecer a todos do projeto pelo empenho.",
+                            "pela competição saudável...",
+                            "ficamos felizes em crescer junto com vocês.",
+                            "Temos que agradecer especialmente a...",
+                            "Micucci do Borel",
+                            "Por nos apoiar sempre de perto...",
+                            "e se entusiasmar tanto com nosso jogo",
+                            "...esse jogo é especial por você também.",
+                            "Também agradecer a todos os devs do projeto pelo empenho.",
+                            "Mateus Ribeiro - @mateus_ribeir0",
+                            "João Pedro Mamede - @jpmamededs",
+                            "Carlos Espósito - @carlosesposito22",
+                            "Foi muito divertido desenvolver esse jogo...",
+                            "E, certamente, ele foi muito importante pra nós...",
                             "Créditos a GiveHeartRecords...",
                             "Samuel Kim Music",
-                            "e todos os sites de spritesheets...",
+                            "todos os sites de spritesheets...",
+                            "e todos os canais de SFX do YouTube...",
                             "Obrigado por jogarem DUNE II"
                         };
                         const int totalTexts = sizeof(texts) / sizeof(texts[0]);
@@ -1108,7 +1123,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
                         // Controlar o tempo para exibir os elementos adicionais
                         double delayStartTime = GetTime();
-                        while (GetTime() - delayStartTime < 10.0) {
+                        while (GetTime() - delayStartTime < 0.0) {
                             animationTimerRun += GetFrameTime();
                             if (animationTimerRun >= frameTimeRun) {
                                 animationTimerRun = 0.0f;
@@ -1139,6 +1154,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
                         // Loop principal
                         while (!WindowShouldClose()) {
+                            // Atualizar offsets e animações
                             farMountainsScrollOffset += farMountainsScrollSpeed * GetFrameTime();
                             farMountainsScrollOffset = fmod(farMountainsScrollOffset, farMountainsSpriteWidth);
 
@@ -1154,85 +1170,90 @@ void processarTelaVazia(GameScreen *currentScreen) {
                                 currentFrameRun = (currentFrameRun + 1) % totalFramesRun;
                             }
 
-                            BeginDrawing();
+                            // Atualizar exibição dos textos
+                            double elapsedTextTime = GetTime() - textStartTime3;
+                            if (elapsedTextTime > textDisplayTime) {
+                                textOpacity -= textFadeSpeed * GetFrameTime(); // Diminuir opacidade gradualmente
 
-                            if (elementsVisible) {
-                                ClearBackground((Color){210, 83, 76, 255});
-
-                                for (float x = -farMountainsScrollOffset; x < GetScreenWidth(); x += farMountainsSpriteWidth) {
-                                    Rectangle sourceRec = { 0, 0, farMountainsSprite.width, farMountainsSprite.height };
-                                    Rectangle destRec = {
-                                        x,
-                                        farMountainsSpriteY,
-                                        farMountainsSpriteWidth,
-                                        farMountainsSpriteHeight
-                                    };
-                                    Vector2 origin = { 0, 0 };
-
-                                    DrawTexturePro(farMountainsSprite, sourceRec, destRec, origin, 0.0f, WHITE);
-                                }
-
-                                for (float x = -mountainsScrollOffset; x < GetScreenWidth(); x += mountainsSpriteWidth) {
-                                    Rectangle sourceRec = { 0, 0, mountainsSprite.width, mountainsSprite.height };
-                                    Rectangle destRec = {
-                                        x,
-                                        mountainsSpriteY,
-                                        mountainsSpriteWidth,
-                                        mountainsSpriteHeight
-                                    };
-                                    Vector2 origin = { 0, 0 };
-
-                                    DrawTexturePro(mountainsSprite, sourceRec, destRec, origin, 0.0f, WHITE);
-                                }
-
-                                for (float x = -platformsScrollOffset; x < GetScreenWidth(); x += platformsSpriteWidthRun) {
-                                    Rectangle sourceRecPlatformsRun = { 0, 0, platformsSpriteRun.width, platformsSpriteRun.height };
-                                    Rectangle destRecPlatformsRun = {
-                                        x,
-                                        platformsSpriteYRun,
-                                        platformsSpriteWidthRun,
-                                        platformsSpriteHeightRun
-                                    };
-                                    Vector2 originPlatformsRun = { 0, 0 };
-
-                                    DrawTexturePro(platformsSpriteRun, sourceRecPlatformsRun, destRecPlatformsRun, originPlatformsRun, 0.0f, WHITE);
-                                }
-
-                                Rectangle sourceRecRun = { currentFrameRun * frameWidthRun, 128, frameWidthRun, frameHeightRun };
-                                Rectangle destRecRun = {
-                                    finalPositionXRun,
-                                    runningSpriteYRun,
-                                    spriteWidthRun,
-                                    spriteHeightRun
-                                };
-                                Vector2 originRun = { 0, 0 };
-
-                                DrawTexturePro(personagemRunningRun, sourceRecRun, destRecRun, originRun, 0.0f, WHITE);
-
-                                // Desenhar o retângulo branco após o delay de 10 segundos
-                                if (GetTime() - delayStartTime > 10.0) { // Após 10 segundos do personagem atingir o centro
-                                    if (rectangleStartTime == 0.0) {    // Capturar o tempo inicial do fade
-                                        rectangleStartTime = GetTime();
+                                if (textOpacity <= 0.0f) {
+                                    currentTextIndex++;
+                                    if (currentTextIndex < totalTexts) {
+                                        textStartTime3 = GetTime(); // Reiniciar o tempo para o próximo texto
+                                        textOpacity = 1.0f;        // Restaurar opacidade
                                     }
-
-                                    // Reduzir a opacidade do retângulo branco
-                                    double elapsedRectangleTime = GetTime() - rectangleStartTime;
-                                    whiteRectangleOpacity = 1.0f - (float)(elapsedRectangleTime / 1.0f); // Reduzir em 1 segundo
-                                    if (whiteRectangleOpacity < 0.0f) whiteRectangleOpacity = 0.0f;
-
-                                    // Desenhar o retângulo branco
-                                    DrawRectangle(0, 0, 1280, 720, Fade(WHITE, whiteRectangleOpacity));
                                 }
                             }
 
-                            EndDrawing();
-                        }
+                            BeginDrawing();
+                            ClearBackground((Color){210, 83, 76, 255}); // Fundo na cor definida
 
-                        UnloadTexture(personagemRunningRun);
-                        UnloadTexture(platformsSpriteRun);
-                        UnloadTexture(mountainsSprite);
-                        UnloadTexture(farMountainsSprite);
-                        UnloadSound(creditosMusicRun);
+                            // Desenhar os elementos do fundo e plataformas
+                            for (float x = -farMountainsScrollOffset; x < GetScreenWidth(); x += farMountainsSpriteWidth) {
+                                Rectangle sourceRec = {0, 0, farMountainsSprite.width, farMountainsSprite.height};
+                                Rectangle destRec = {x, farMountainsSpriteY, farMountainsSpriteWidth, farMountainsSpriteHeight};
+                                Vector2 origin = {0, 0};
+                                DrawTexturePro(farMountainsSprite, sourceRec, destRec, origin, 0.0f, WHITE);
+                            }
+
+                            for (float x = -mountainsScrollOffset; x < GetScreenWidth(); x += mountainsSpriteWidth) {
+                                Rectangle sourceRec = {0, 0, mountainsSprite.width, mountainsSprite.height};
+                                Rectangle destRec = {x, mountainsSpriteY, mountainsSpriteWidth, mountainsSpriteHeight};
+                                Vector2 origin = {0, 0};
+                                DrawTexturePro(mountainsSprite, sourceRec, destRec, origin, 0.0f, WHITE);
+                            }
+
+                            for (float x = -platformsScrollOffset; x < GetScreenWidth(); x += platformsSpriteWidthRun) {
+                                Rectangle sourceRecPlatformsRun = {0, 0, platformsSpriteRun.width, platformsSpriteRun.height};
+                                Rectangle destRecPlatformsRun = {x, platformsSpriteYRun, platformsSpriteWidthRun, platformsSpriteHeightRun};
+                                Vector2 originPlatformsRun = {0, 0};
+                                DrawTexturePro(platformsSpriteRun, sourceRecPlatformsRun, destRecPlatformsRun, originPlatformsRun, 0.0f, WHITE);
+                            }
+
+                            // Desenhar personagem correndo
+                            Rectangle sourceRecRun = {currentFrameRun * frameWidthRun, 128, frameWidthRun, frameHeightRun};
+                            Rectangle destRecRun = {finalPositionXRun, runningSpriteYRun, spriteWidthRun, spriteHeightRun};
+                            Vector2 originRun = {0, 0};
+                            DrawTexturePro(personagemRunningRun, sourceRecRun, destRecRun, originRun, 0.0f, WHITE);
+
+                            // Exibir o texto dos créditos na camada superior
+                            if (currentTextIndex < totalTexts) {
+                                const char *currentText = texts[currentTextIndex];
+                                int fontSize = 40; // Tamanho da fonte aumentado
+                                int textWidth = MeasureText(currentText, fontSize);
+                                float textX = (GetScreenWidth() - textWidth) / 2;
+                                float textY = (GetScreenHeight() / 2) - 100; // Posição ajustada para ficar acima do meio da tela
+                                DrawText(currentText, textX, textY, fontSize, Fade(WHITE, textOpacity));
+                            }
+
+                            // Desenhar o retângulo branco (fade-out)
+                            if (GetTime() - delayStartTime > 0.0) {
+                                if (rectangleStartTime == 0.0) {
+                                    rectangleStartTime = GetTime();
+                                }
+                                double elapsedRectangleTime = GetTime() - rectangleStartTime;
+                                whiteRectangleOpacity = 1.0f - (float)(elapsedRectangleTime / 1.0f);
+                                if (whiteRectangleOpacity < 0.0f) whiteRectangleOpacity = 0.0f;
+
+                                DrawRectangle(0, 0, 1280, 720, Fade(WHITE, whiteRectangleOpacity));
+                            }
+
+                            EndDrawing();
+
+                            // Verificar se o som `creditosMusicRun` terminou
+                            if (!IsSoundPlaying(creditosMusicRun)) {
+                                UnloadTexture(personagemRunningRun);
+                                UnloadTexture(platformsSpriteRun);
+                                UnloadTexture(mountainsSprite);
+                                UnloadTexture(farMountainsSprite);
+                                UnloadSound(creditosMusicRun);
+                                UnloadTexture(empty_villain);
+                                UnloadTexture(villain_sombra);
+
+                                telaVaziaBloqueada = true;
+                                *currentScreen = LOBBY;   
+                                break;                    
+                            }
+                        }
                         
                 }
             }
@@ -1240,9 +1261,6 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
         EndDrawing();
 
-        telaVaziaBloqueada = true; // Bloquear telaVazia após a sequência
-        *currentScreen = LOBBY;
-        return;
     }
 
     if (isWalking) {
@@ -1540,7 +1558,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         192,
                         192
                     };
-                    DrawTexturePro(LoadTexture("static/image/Explosion.png"), sourceRecExplosion, destRecExplosion, (Vector2){0, 0}, 0.0f, WHITE);
+                    DrawTexturePro(explosionSprite, sourceRecExplosion, destRecExplosion, (Vector2){0, 0}, 0.0f, WHITE);
 
                     // Ativar a hitbox 0.2 segundos após o início da explosão
                     if (elapsedTime >= 0.2) {
