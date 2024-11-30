@@ -12,6 +12,7 @@ bool usandoControle = true;
 extern bool telaVaziaBloqueada = true;
 bool spaceshipAnimationPlayed = false;
 
+
 void comandoJogador(bool *usandoControle) {
     if (IsGamepadAvailable(0) && (
         IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP) ||
