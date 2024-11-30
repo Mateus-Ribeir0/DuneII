@@ -16,7 +16,7 @@ typedef enum GameScreen { TITLE, NAME_INPUT, CUTSCENE, LOBBY, GAME, OBJETIVO, RA
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 704
 
-#define MAX_NAME_LENGTH 30
+#define MAX_NAME_LENGTH 25
 
 #define MERCHANT_X 2
 #define MERCHANT_Y 2
@@ -84,7 +84,7 @@ extern char playerName[MAX_NAME_LENGTH];
 extern bool usandoControle;
 
 void comandoJogador(bool *usandoControle);
-void DrawDialogBoxWithButtons(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool usandoControle, Texture2D texture, Rectangle *botaoAreas);
+void DrawDialogBoxWithButtons(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool usandoControle, Texture2D texture, Rectangle *botaoAreas, float scale);
 void DrawMenuOptionsWithButtons(const char *text, int posX, int posY, int fontSize, float buttonScale, Color textColor, bool usandoControle, Texture2D texture, Rectangle *botaoAreas);
 
 #endif

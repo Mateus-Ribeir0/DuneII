@@ -279,7 +279,7 @@ void drawMenu() {
     desenharBackgroundComLogo();
     
     if (usandoControle) {
-        DrawMenuOptionsWithButtons("Pressione [A] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 22) / 2, mainTextY, 30, 2.0f, WHITE, true, controlesTexture, botaoAreas1);
+        DrawMenuOptionsWithButtons("Pressione [A] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 24) / 2, mainTextY, 30, 2.0f, WHITE, true, controlesTexture, botaoAreas1);
         DrawMenuOptionsWithButtons("[X] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, 25, 1.8f, WHITE, true, controlesTexture, botaoAreas1);
         DrawMenuOptionsWithButtons("[B] Controles", centerX + spacingX, optionsY, 25, 1.8f, WHITE, true, controlesTexture, botaoAreas1);
     } else {
