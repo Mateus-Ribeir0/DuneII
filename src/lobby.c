@@ -8,7 +8,8 @@ static Texture2D desertTileset;
 static Texture2D bonesTexture;
 static Texture2D aguaTexture;
 static Texture2D npcslobbyTexture;
-
+static Texture2D homemTexture;
+static Texture2D mulherTexture;
 static Texture2D cityTexture;
 static Texture2D goldTexture;
 static Texture2D luckyTexture;
@@ -60,6 +61,8 @@ void iniciarLobby() {
     luckyTexture = LoadTexture("static/image/lucky.png");
     aguaTexture = LoadTexture("static/image/agua.png");
     npcslobbyTexture = LoadTexture("static/image/npcslobby.png");
+    homemTexture = LoadTexture("static/image/homem.png");
+    mulherTexture = LoadTexture("static/image/mulher.png");
     troca = LoadSound("static/music/trocaDeDinheiro.wav");
     monstersTexture = LoadTexture("static/image/monsters.png");
     bonesTexture = LoadTexture("static/image/bones.png");
@@ -96,6 +99,8 @@ void finalizarLobby() {
     UnloadTexture(luckyTexture);
     UnloadTexture(aguaTexture);
     UnloadTexture(npcslobbyTexture);
+    UnloadTexture(homemTexture);
+    UnloadTexture(mulherTexture);
     UnloadSound(troca);
     UnloadTexture(spaceshipTexture);
     UnloadMusicStream(warMusic);
@@ -1645,6 +1650,19 @@ void processarTelaVazia(GameScreen *currentScreen) {
 void drawLobby() {
     BeginDrawing();
 
+
+    static bool isNearNpc1 = false;               // Indica se o jogador está próximo ao NPC1
+    static bool isNearNpc2 = false;               // Indica se o jogador está próximo ao NPC2
+    static char displayedMessage1[256] = "";      // Mensagem atualmente exibida para NPC1
+    static char displayedMessage2[256] = "";      // Mensagem atualmente exibida para NPC2
+    static int messageLength1 = 0;                // Número de caracteres exibidos para NPC1
+    static int messageLength2 = 0;                // Número de caracteres exibidos para NPC2
+    static double messageStartTime1 = 0;          // Tempo inicial da mensagem para NPC1
+    static double messageStartTime2 = 0;          // Tempo inicial da mensagem para NPC2
+
+    const char *npcMessage1 = "Parece que você anda coletando muitas\nespeciarias, cuidado, você pode acabar\ngerando uma guerra com os Zarnax's...";
+    const char *npcMessage2 = "Ola principe de Arrakis, você não\nparece estar com uma boa sorte hoje..."; // Mensagem para o segundo NPC
+
     bool soundPlayed = false;
     static int lastDirection = 3;
     static float walkingTimer = 0.0f;
@@ -2375,6 +2393,96 @@ void drawLobby() {
     } else {
         isInteractingWithMerchant = 0;
     }
+    
     verificarProximidadePoco(player_x * TILE_SIZE, player_y * TILE_SIZE);
+
+    Vector2 playerPosition = { player_x * TILE_SIZE, player_y * TILE_SIZE };
+
+    // Define a área de proximidade para NPC1
+    Rectangle npcProximityBox1 = {
+        npcslobbyCollisionBox.x - TILE_SIZE,
+        npcslobbyCollisionBox.y - TILE_SIZE,
+        npcslobbyCollisionBox.width + (TILE_SIZE * 2),
+        npcslobbyCollisionBox.height + (TILE_SIZE * 2)
+    };
+
+    // Define a área de proximidade para NPC2
+    Rectangle npcProximityBox2 = {
+        npcslobby2CollisionBox.x - TILE_SIZE,
+        npcslobby2CollisionBox.y - TILE_SIZE,
+        npcslobby2CollisionBox.width + (TILE_SIZE * 2),
+        npcslobby2CollisionBox.height + (TILE_SIZE * 2)
+    };
+
+    // Verificar proximidade do jogador com NPC1
+    if (CheckCollisionRecs((Rectangle){playerPosition.x, playerPosition.y, TILE_SIZE, TILE_SIZE}, npcProximityBox1)) {
+        if (!isNearNpc1) {
+            isNearNpc1 = true;
+            messageLength1 = 0;
+            messageStartTime1 = GetTime();
+        }
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            messageLength1 = strlen(npcMessage1);
+            strncpy(displayedMessage1, npcMessage1, messageLength1);
+            displayedMessage1[messageLength1] = '\0';
+        } else if (messageLength1 < strlen(npcMessage1)) {
+            if (GetTime() - messageStartTime1 >= 0.1) {
+                messageLength1++;
+                messageStartTime1 = GetTime();
+            }
+            strncpy(displayedMessage1, npcMessage1, messageLength1);
+            displayedMessage1[messageLength1] = '\0';
+        }
+
+        // Adicionar a sprite "homem.png" ao lado da caixa de diálogo para NPC1
+        Rectangle spriteSourceRec = { 0, 0, homemTexture.width, homemTexture.height };
+        Rectangle spriteDestRec = { 88, 390, homemTexture.width * 0.5, homemTexture.height * 0.5 };
+        DrawTexturePro(homemTexture, spriteSourceRec, spriteDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+        // Exibir mensagem para NPC1
+        DrawDialogBox(displayedMessage1, 100, 550, 400, 110, WHITE, BLACK, true);
+
+    } else {
+        isNearNpc1 = false;
+        messageLength1 = 0;
+        displayedMessage1[0] = '\0';
+    }
+
+    // Verificar proximidade do jogador com NPC2
+    if (CheckCollisionRecs((Rectangle){playerPosition.x, playerPosition.y, TILE_SIZE, TILE_SIZE}, npcProximityBox2)) {
+        if (!isNearNpc2) {
+            isNearNpc2 = true;
+            messageLength2 = 0;
+            messageStartTime2 = GetTime();
+        }
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            messageLength2 = strlen(npcMessage2);
+            strncpy(displayedMessage2, npcMessage2, messageLength2);
+            displayedMessage2[messageLength2] = '\0';
+        } else if (messageLength2 < strlen(npcMessage2)) {
+            if (GetTime() - messageStartTime2 >= 0.1) {
+                messageLength2++;
+                messageStartTime2 = GetTime();
+            }
+            strncpy(displayedMessage2, npcMessage2, messageLength2);
+            displayedMessage2[messageLength2] = '\0';
+        }
+
+        // Adicionar a sprite "mulher.png" ao lado da caixa de diálogo para NPC2
+        Rectangle spriteSourceRec = { 0, 0, mulherTexture.width, mulherTexture.height };
+        Rectangle spriteDestRec = { 88, 390, mulherTexture.width * 0.5, mulherTexture.height * 0.5 };
+        DrawTexturePro(mulherTexture, spriteSourceRec, spriteDestRec, (Vector2){0, 0}, 0.0f, WHITE);
+
+        // Exibir mensagem para NPC2
+        DrawDialogBox(displayedMessage2, 100, 550, 400, 110, WHITE, BLACK, true);
+
+    } else {
+        isNearNpc2 = false;
+        messageLength2 = 0;
+        displayedMessage2[0] = '\0';
+    }
+
     EndDrawing();
 }
