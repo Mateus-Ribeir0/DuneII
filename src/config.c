@@ -98,7 +98,10 @@ void DrawMenuOptionsWithButtons(const char *text, int posX, int posY, int fontSi
 
     const char *ptr = text;
     while (*ptr != '\0') {
-        if (*ptr == '[') {
+        if (*ptr == '\n') {
+            cursorX = posX;
+            cursorY += fontSize + 5;
+        } else if (*ptr == '[') {
             ptr++;
             int botaoIndex = -1;
 

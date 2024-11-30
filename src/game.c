@@ -33,6 +33,8 @@ static Texture2D portal;
 static Texture2D sombra;
 static Texture2D map0;
 static Sound monsterGrowl2;
+static Texture2D controlesTexture;
+Rectangle botaoAreas3[4];
 static bool isMonsterActive = false;
 static double monsterStartTime = 0.0;
 static double lastEPressTime = 0.0;
@@ -111,7 +113,8 @@ void exibirFrames() {
     }
 
     // Segura no último frame até pressionar Enter
-    while (!IsKeyPressed(KEY_ENTER)) {
+    while (true) {
+        comandoJogador(&usandoControle);
         BeginDrawing();
         ClearBackground(BLACK);
 
@@ -130,9 +133,14 @@ void exibirFrames() {
             DrawText("Erro ao carregar o frame!", 10, 10, 20, RED); // Indica erro no frame
         }
 
-        DrawText("Pressione ENTER para continuar...", 10, SCREEN_HEIGHT - 50, 20, GRAY);
+        if (usandoControle) {
+            DrawMenuOptionsWithButtons("Pressione [Y] para continuar...", 10, SCREEN_HEIGHT - 50, 20, 1.30f, GRAY, true, controlesTexture, botaoAreas3);
+        } else {
+            DrawText("Pressione ENTER para continuar...", 10, SCREEN_HEIGHT - 50, 20, GRAY);
+        }
 
         EndDrawing();
+        if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) break;
     }
 }
 
@@ -185,9 +193,11 @@ void exibirFramesCoroa() {
         }
     }
 
-    while (!IsKeyPressed(KEY_ENTER)) {
+    while (true) {
         BeginDrawing();
         ClearBackground(BLACK);
+        comandoJogador(&usandoControle);
+
 
         if (videoFramesCoroa[NUM_FRAMES_COROA - 1].id != 0) {
             Rectangle sourceRec = {0.0f, 0.0f, (float)videoFramesCoroa[NUM_FRAMES_COROA - 1].width, (float)videoFramesCoroa[NUM_FRAMES_COROA - 1].height};
@@ -202,9 +212,14 @@ void exibirFramesCoroa() {
             DrawText("Erro ao carregar o frame!", 10, 10, 20, RED);
         }
 
-        DrawText("Pressione ENTER para continuar...", 10, SCREEN_HEIGHT - 50, 20, GRAY);
+        if (usandoControle) {
+            DrawMenuOptionsWithButtons("Pressione [Y] para continuar...", 10, SCREEN_HEIGHT - 50, 20, 1.30f, GRAY, true, controlesTexture, botaoAreas3);
+        } else {
+            DrawText("Pressione ENTER para continuar...", 10, SCREEN_HEIGHT - 50, 20, GRAY);
+        }
 
         EndDrawing();
+        if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) break;
     }
 }
 
@@ -305,6 +320,12 @@ void iniciarGame() {
     EpressSprite = LoadTexture("static/image/Epress.png");
     monsters = LoadTexture("static/image/monsters.png");
     npcArmoured = LoadTexture("static/image/spriteNpcArmoured.png");
+    controlesTexture = LoadTexture("static/image/Xbox_one.png");
+
+    botaoAreas3[0] = (Rectangle){0, 80, 16, 16};  // Botão Y
+    botaoAreas3[1] = (Rectangle){0, 16, 16, 16};  // Botão A
+    botaoAreas3[2] = (Rectangle){0, 112, 16, 16}; // Botão B
+    botaoAreas3[3] = (Rectangle){0, 48, 16, 16};  // Botão X
 
     musicaMapa0 = LoadSound("static/music/mapa0musica.mp3");
     SetSoundVolume(musicaMapa0, 0.7f);
@@ -350,6 +371,7 @@ void finalizarGame() {
     UnloadTexture(map0);
     UnloadTexture(EpressSprite);
     UnloadTexture(npcArmoured);
+    UnloadTexture(controlesTexture);
 
     UnloadSound(musicaMapa0);
     UnloadSound(musicaMapa1);
@@ -654,6 +676,7 @@ int direcao = 0;
 
 void drawGame() {
     ClearBackground(RAYWHITE);
+    comandoJogador(&usandoControle);
     // Variáveis relacionadas à caixa de diálogo
     float dialogBoxX = 30;             // Posição X ajustada para reduzir o gap à esquerda
     float dialogBoxY = SCREEN_HEIGHT - 200; // Posição Y da caixa de diálogo
@@ -673,7 +696,11 @@ void drawGame() {
     if (telaPretaAtiva) {
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawText("Você está na aposta. Pressione [ESC] para sair.", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2, 20, WHITE);
+        if (usandoControle) {
+            DrawMenuOptionsWithButtons("Você está na aposta. Pressione [B]para sair", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2, 20, 1.30f, WHITE, true, controlesTexture, botaoAreas3);
+        } else {
+            DrawText("Você está na aposta. Pressione [ESC] para sair", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2, 20, WHITE);
+        }
         EndDrawing();
 
         // Pausa a música e desativa o monstro enquanto a tela preta está ativa
@@ -684,7 +711,7 @@ void drawGame() {
         if (IsSoundPlaying(monsterGrowl2)) StopSound(monsterGrowl2);
 
         // Sai da tela preta ao pressionar ESC
-        if (IsKeyPressed(KEY_ESCAPE)) {
+        if (IsKeyPressed(KEY_ESCAPE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) {
             telaPretaAtiva = false;
 
             // Retoma a música do mapa 1
@@ -879,19 +906,23 @@ void drawGame() {
     static int comprimentoTextoExibidoNpc = 0;
     static double tempoUltimaMensagemNpc = 0;
 
-    // Textos da aposta (ajustados com as novas falas)
-    const char *textosAposta[] = {
-        "Eu tenho uma proposta para você.",
-        "Faca a sua aposta no cara ou coroa. Caso\nperca, ficarei com metade de sua agua.",
-        "Se der sorte e ganhar, lhe dou 20.000.",
-        "Escolha: (1) Cara ou (2) Coroa."
-    };
+    const char *textosAposta[4];
+
+    if (usandoControle) {
+        textosAposta[0] = "Eu tenho uma proposta para voce.";
+        textosAposta[1] = "Faca a sua aposta no cara ou coroa. Caso\nperca, ficarei com metade de sua agua.";
+        textosAposta[2] = "Se der sorte e ganhar, lhe dou 20.000.";
+        textosAposta[3] = "Escolha: [A] Cara ou [X] Coroa.";
+    } else {
+        textosAposta[0] = "Eu tenho uma proposta para você.";
+        textosAposta[1] = "Faca a sua aposta no cara ou coroa. Caso\nperca, ficarei com metade de sua agua.";
+        textosAposta[2] = "Se der sorte e ganhar, lhe dou 20.000.";
+        textosAposta[3] = "Escolha: (1) Cara ou (2) Coroa.";
+    }
+
     const int totalTextosAposta = sizeof(textosAposta) / sizeof(textosAposta[0]);
 
-    // Verifica se o jogador está perto do NPC
-    // Nova variável para controlar o tempo da última aposta
-    // Atualiza o tempo da última aposta
-    static double ultimoTempoAposta = -60; // Inicializa para permitir a primeira aposta imediatamente
+    static double ultimoTempoAposta = -60;
     static bool exibirFeedback = false;
     static bool mostrarVolteMaisTarde = false;
 
@@ -906,7 +937,11 @@ void drawGame() {
             mostrarVolteMaisTarde = true; // Ativa o estado para exibir a mensagem
             comprimentoTextoExibidoNpc = 0;
             memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc)); // Limpa o buffer do texto
-            strncpy(textoExibidoNpc, "Ainda é muito cedo para apostar, volte mais\ntarde...", sizeof(textoExibidoNpc) - 1);
+            if (usandoControle) {
+                strncpy(textoExibidoNpc, "Ainda eh muito cedo para apostar,\nvolte mais tarde...", sizeof(textoExibidoNpc) - 1);
+            }else {
+                strncpy(textoExibidoNpc, "Ainda eh muito cedo para apostar, volte mais\ntarde...", sizeof(textoExibidoNpc) - 1);
+            }
             textoExibidoNpc[sizeof(textoExibidoNpc) - 1] = '\0'; // Garante o término da string
         } else if (!exibirDialogNpc && !exibirFeedback) {
             // Jogador pode iniciar uma nova aposta
@@ -930,7 +965,7 @@ void drawGame() {
 
         if (mostrarVolteMaisTarde) {
             if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
-                if (IsKeyPressed(KEY_ENTER)) {
+                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
                     mostrarVolteMaisTarde = false;
                     exibirDialogNpc = false;
                 }
@@ -943,14 +978,14 @@ void drawGame() {
                     textoExibidoNpc[comprimentoTextoExibidoNpc] = '\0';
                 }
             } else if (estadoAposta < totalTextosAposta) {
-                if (IsKeyPressed(KEY_ENTER)) {
+                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
                     estadoAposta++;
                     comprimentoTextoExibidoNpc = 0;
                     memset(textoExibidoNpc, 0, sizeof(textoExibidoNpc));
                 }
             } else if (estadoAposta == totalTextosAposta) {
-                if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO)) {
-                    escolhaCara = IsKeyPressed(KEY_ONE);
+                if (IsKeyPressed(KEY_ONE) || IsKeyPressed(KEY_TWO) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_LEFT)) {
+                    escolhaCara = (IsKeyPressed(KEY_ONE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN));
                     int chance = GetRandomValue(1, 100);
                     resultadoCara = (playerLucky > 0 && chance <= playerLucky - 5);
                     apostaVitoria = (escolhaCara == resultadoCara);
@@ -975,11 +1010,11 @@ void drawGame() {
         }
 
         if (exibirFeedback) {
-            const char *resultadoTexto = apostaVitoria ? "Voce ganhou! Parabens." : "Voce perdeu! Que pena.";
+            const char *resultadoTexto = apostaVitoria ? "Voce ganhou! Parabens." : "Voce perdeu! Que penaaa.";
             strcpy(textoExibidoNpc, resultadoTexto);
             comprimentoTextoExibidoNpc = strlen(resultadoTexto);
 
-            if (IsKeyPressed(KEY_ENTER)) {
+            if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
                 exibirFeedback = false;
                 exibirDialogNpc = false;
             }
@@ -1010,15 +1045,19 @@ void drawGame() {
         float textX = dialogBoxX + 10;
         float textY = dialogBoxY + 10;
 
-        DrawText(textoExibidoNpc, textX, textY, 20, WHITE);
+        if (usandoControle) {
+            DrawMenuOptionsWithButtons(textoExibidoNpc, textX, textY, 20, 1.30f, WHITE, true, controlesTexture, botaoAreas3);
+        } else {
+            DrawText(textoExibidoNpc, textX, textY, 20, WHITE);
+        }
 
         // Instrução para continuar
         if (comprimentoTextoExibidoNpc == strlen(textoExibidoNpc)) {
-            DrawText(
-                "Pressione ENTER para continuar...",
-                dialogBoxX + 20, dialogBoxY + dialogBoxHeight - 30,
-                16, GRAY
-            );
+            if (usandoControle) {
+                DrawMenuOptionsWithButtons("Pressione [Y] para continuar...",  dialogBoxX + 20, dialogBoxY + dialogBoxHeight - 30, 16, 1.00f, GRAY, true, controlesTexture, botaoAreas3);
+            } else {
+                DrawText("Pressione ENTER para continuar...", dialogBoxX + 20, dialogBoxY + dialogBoxHeight - 30, 16, GRAY);
+            }
         }
     }
 
@@ -1275,7 +1314,7 @@ void drawGame() {
     DrawTexturePro(portal, portalSourceRec, portalDestRec, (Vector2){0, 0}, 0.0f, WHITE);
 
     if (mensagem != NULL) {
-        DrawDialogBox(mensagem, 70, 580, 400, 110, WHITE, BLACK, false);
+        DrawDialogBoxWithButtons(mensagem, 110, 550, 400, 110, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas3, 1.50);
     }
 }
 
@@ -1400,6 +1439,7 @@ void playGame(GameScreen *currentScreen) {
         char movimento = '\0';
 
         updateWaterLevel(currentScreen);
+        comandoJogador(&usandoControle);
 
         if (playerWater <= 0.0) {
             StopSound(musicaMapa0);
@@ -1444,7 +1484,11 @@ void playGame(GameScreen *currentScreen) {
         if (IsKeyPressed(KEY_D)) { dx = 1; movimento = 'd'; }
 
         if (isPlayerNearPortal()) {
-            mensagem = "Você deseja voltar para o lobby? Pressione [P / Y]";
+            if (usandoControle) {
+                mensagem = "Voce deseja voltar para o lobby?\n\n\nPressione: [Y]";
+            } else {
+                mensagem = "Voce deseja voltar para o lobby?\n\n\nPressione: [P]";
+            }
             pertoDoPortal = true;
         } else {
             mensagem = NULL;
@@ -1676,15 +1720,22 @@ void playGame(GameScreen *currentScreen) {
                 }
 
                 Vector2 spritePosition = {player_x * TILE_SIZE + TILE_SIZE, player_y * TILE_SIZE};
-                Rectangle sourceRec = (spriteFrameIndex == 0)
-                                        ? (Rectangle){160, 192, 704, 656}
-                                        : (Rectangle){160, 2336, 704, 560};
-                Rectangle destRec = {spritePosition.x, spritePosition.y, 48, 48};
-                Vector2 origin = {0, 0};
 
-                DrawTexturePro(EpressSprite, sourceRec, destRec, origin, 0.0f, WHITE);
+                if (usandoControle) {
+                    Rectangle sourceRec = (spriteFrameIndex == 0)
+                                            ? (Rectangle){0, 48, 16, 16}
+                                            : (Rectangle){0, 64, 16, 16};
+                    Rectangle destRec = {spritePosition.x, spritePosition.y, 48, 48};
+                    DrawTexturePro(controlesTexture, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
+                } else {
+                    Rectangle sourceRec = (spriteFrameIndex == 0)
+                                            ? (Rectangle){160, 192, 704, 656}
+                                            : (Rectangle){160, 2336, 704, 560};
+                    Rectangle destRec = {spritePosition.x, spritePosition.y, 48, 48};
+                    DrawTexturePro(EpressSprite, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
+                }
 
-                if (IsKeyPressed(KEY_E)) {
+                if (IsKeyPressed(KEY_E) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_LEFT)) {
                     double currentTime = GetTime();
 
                     if (lastEPressTime == 0.0 || currentTime - lastEPressTime <= 0.5) {
@@ -1700,11 +1751,11 @@ void playGame(GameScreen *currentScreen) {
                     }
                 }
 
-                // Se o jogador tentar se mover, ele morre
                 float lastInputTime = 0.0f;
                 float cooldown = 0.5f;
                 if ((GetTime() - lastInputTime) >= cooldown) {
-                    if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_A) || IsKeyPressed(KEY_S) || IsKeyPressed(KEY_D)) {
+                    if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_A) || IsKeyPressed(KEY_S) || IsKeyPressed(KEY_D) ||IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)){
+                        
                         StopSound(monsterGrowl2);
 
                         StopSound(musicaMapa0);
