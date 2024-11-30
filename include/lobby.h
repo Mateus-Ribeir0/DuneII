@@ -10,6 +10,8 @@ void tentarRecuperarAguaNoPoco();
 extern Rectangle npcslobbyCollisionBox;  // Zona de colisão para o NPC 1
 extern Rectangle npcslobby2CollisionBox; // Zona de colisão para o NPC 2
 
+
+
 void iniciarLobby();
 void finalizarLobby();
 int isPlayerNearMerchant();

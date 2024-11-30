@@ -1373,6 +1373,8 @@ void resetarJogo() {
     limparHistoricoPassos();
     inicializarEspeciaria();
     playerWater = 100.0;
+    telaVaziaBloqueada = true;
+    spaceshipAnimationPlayed = false;
 
     isMonsterActive = false;
     nextMonsterCheckTime = 0.0;

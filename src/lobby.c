@@ -38,12 +38,10 @@ const char *errorMessage = "";
 static int easterEggCount = 0;
 const int widthMercador = 620;
 const char* mensagem = NULL;
-static bool spaceshipAnimationPlayed = false;
 static float spaceshipPositionX = -128;
-//static bool isInExtendedLobby = false;
+// static bool isInExtendedLobby = false;
 static bool isWarMusicPlaying = false;
 
-static bool telaVaziaBloqueada = false; // Variável para bloquear a telaVazia após a sequência final
 
 
 Rectangle npcslobbyCollisionBox;
@@ -181,15 +179,14 @@ void processarEntradaLobby(GameScreen *currentScreen) {
 
     movePlayer(dx, dy);
 
-    // Condição para acessar o chefe (boss)
     if (player_x >= MAPA_LARGURA - 1) { // Jogador tenta sair pelo limite direito do mapa
-        if (itemsCollected >= 3 && !spaceshipAnimationPlayed) { // Verifica se o jogador tem mais de 4 especiarias
-            *currentScreen = EMPTY_SCREEN; // Transição para a tela do chefe
+        if (itemsCollected >= 3 && spaceshipAnimationPlayed) {
+            static bool telaVaziaBloqueada = false; // Verifica se o jogador tem mais de 4 especiarias
+            *currentScreen = EMPTY_SCREEN; 
             return;
         } else {
-            // Impede o jogador de sair e exibe uma mensagem
-            player_x = MAPA_LARGURA - 2; // Reposiciona o jogador antes do limite
-            mensagem = "Você precisa de mais especiarias para enfrentar o chefe!";
+            static bool telaVaziaBloqueada = true;// Impede o jogador de sair e exibe uma mensagem
+            player_x = MAPA_LARGURA - 1; // Reposiciona o jogador antes do limite
         }
     }
 
@@ -262,6 +259,7 @@ void processarEntradaLobby(GameScreen *currentScreen) {
 
     if (playerWater <= 0.0) {
         *currentScreen = RANKINGS;
+        spaceshipAnimationPlayed = false;
         resetarJogo();
         return;
     }
@@ -819,7 +817,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         "O que você quer, é apenas prosperar o que é seu...",
                         "Assim como eu quero fazer com o que é meu...",
                         "Pensando nisso...",
-                        "Quer unir Arrakis com Zarn."
+                        "Quer unir Arrakis com Zar"
                     };
 
                     const int totalTexts = sizeof(texts) / sizeof(texts[0]);
@@ -1490,6 +1488,8 @@ void processarTelaVazia(GameScreen *currentScreen) {
             sourceRecPersonagem = (Rectangle){0, 0, 64, 64};
             break;
     }
+
+    lastDirection = 4;
 
     Vector2 positionPersonagem = { empty_player_x * TILE_SIZE, empty_player_y * TILE_SIZE };
     Rectangle destRecPersonagem = { positionPersonagem.x - 32, positionPersonagem.y - 32, 96, 96 };
@@ -2230,9 +2230,7 @@ void drawLobby() {
 
 
         DrawTexturePro(velho, currentSprite, destRecVelho, originVelho, 0.0f, WHITE);
-        if (!spaceshipAnimationPlayed){
-            
-        }
+
         if (!isInteractingWithMerchant) {
             merchantMood = 0; 
 
