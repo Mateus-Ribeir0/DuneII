@@ -388,6 +388,8 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static Sound machineLoadingSound;
     static Sound typingSound;
     static Sound gameOverSoundWar;
+    static Texture2D controlesTexture10;
+    Rectangle botaoAreas10[4];
 
     #define MAX_OCCURRENCES 15
     //static Vector2 warningPositions[MAX_OCCURRENCES]; // Posições dos Warnings
@@ -426,7 +428,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
     static int empty_player_x = 1;
     static int empty_player_y = 10;
-    static int lastDirection = 3; // 1 = cima, 2 = esquerda, 3 = baixo, 4 = direita
+    static int lastDirection = 4; // 1 = cima, 2 = esquerda, 3 = baixo, 4 = direita
     static bool isWalking = false;
     static float walkingTimer = 0.0f;
 
@@ -461,6 +463,12 @@ void processarTelaVazia(GameScreen *currentScreen) {
         gameOverSoundWar = LoadSound("static/music/deathsound.wav");
         cannonSound = LoadSound("static/music/cannon.wav");
         explosionSprite = LoadTexture("static/image/Explosion.png");
+        controlesTexture10 = LoadTexture("static/image/Xbox_one.png");
+
+        botaoAreas10[0] = (Rectangle){0, 80, 16, 16};  // Botão Y
+        botaoAreas10[1] = (Rectangle){0, 16, 16, 16};  // Botão A
+        botaoAreas10[2] = (Rectangle){0, 112, 16, 16}; // Botão B
+        botaoAreas10[3] = (Rectangle){0, 48, 16, 16};  // Botão X
 
         SetSoundVolume(machineLoadingSound, 1.0f);
         SetSoundVolume(typingSound, 0.8f);
@@ -490,25 +498,25 @@ void processarTelaVazia(GameScreen *currentScreen) {
     int dx = 0, dy = 0;
 
     if (hideDialog && battleMusicStarted) {
-        if (IsKeyPressed(KEY_D)) {
+        if (IsKeyPressed(KEY_D) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) {
             dx = 1;
             lastDirection = 4; // Direita
             isWalking = true;
             walkingTimer = 0.3f;
         }
-        if (IsKeyPressed(KEY_A)) {
+        if (IsKeyPressed(KEY_A) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) {
             dx = -1;
             lastDirection = 2; // Esquerda
             isWalking = true;
             walkingTimer = 0.3f;
         }
-        if (IsKeyPressed(KEY_W)) {
+        if (IsKeyPressed(KEY_W) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_UP)) {
             dy = -1;
             lastDirection = 1; // Cima
             isWalking = true;
             walkingTimer = 0.3f;
         }
-        if (IsKeyPressed(KEY_S)) {
+        if (IsKeyPressed(KEY_S) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)) {
             dy = 1;
             lastDirection = 3; // Baixo
             isWalking = true;
@@ -756,19 +764,16 @@ void processarTelaVazia(GameScreen *currentScreen) {
             EndDrawing();
         }
 
-        const char *choiceText = "Poupar? [Aperte P] | Matar? [Aperte K]";
-
         BeginDrawing();
         ClearBackground(BLACK);
 
-        // Exibir o texto das escolhas centralizado na tela
-        DrawText(
-            choiceText,
-            (GetScreenWidth() - MeasureText(choiceText, 30)) / 2, // Centralizar horizontalmente
-            GetScreenHeight() / 2 - 15,                          // Posicionar verticalmente
-            30,                                                  // Tamanho da fonte
-            WHITE                                                // Cor do texto
-        );
+        const char *choiceText;
+
+        if (usandoControle) {
+            choiceText = "Poupar? [A] | Matar? [B]";
+        } else {
+            choiceText = "Poupar? [P] | Matar? [K]";
+        }
 
         Sound breathingSound = LoadSound("static/music/breathing.wav");
         Sound suspenseSound = LoadSound("static/music/suspenseMusic.wav");
@@ -784,25 +789,21 @@ void processarTelaVazia(GameScreen *currentScreen) {
             BeginDrawing();
             ClearBackground(BLACK);
 
-            // Exibir o texto das escolhas centralizado na tela
-            const char *choiceText = "Poupar? [Aperte P] | Matar? [Aperte K]";
-            DrawText(
-                choiceText,
-                (GetScreenWidth() - MeasureText(choiceText, 30)) / 2, // Centralizar horizontalmente
-                GetScreenHeight() / 2 - 15,                          // Posicionar verticalmente
-                30,                                                  // Tamanho da fonte
-                WHITE                                                // Cor do texto
-            );
+            if (usandoControle) {
+                DrawMenuOptionsWithButtons(choiceText, (GetScreenWidth() - MeasureText(choiceText, 30)) / 2, GetScreenHeight() / 2 - 15, 30, 2.0f, WHITE, true, controlesTexture10, botaoAreas10);
+            } else {
+                DrawText(choiceText, (GetScreenWidth() - MeasureText(choiceText, 30)) / 2, GetScreenHeight() / 2 - 15, 30, WHITE);
+            }
 
             EndDrawing();
 
             // Verificar entrada do jogador
-            if (IsKeyPressed(KEY_P) || IsKeyPressed(KEY_K)) {
+            if (IsKeyPressed(KEY_P) || IsKeyPressed(KEY_K) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) {
                 StopSound(breathingSound); // Para o som ao pressionar qualquer tecla válida
                 StopSound(suspenseSound); // Para a música de suspense
                 waitingForInput = false;
 
-                if (IsKeyPressed(KEY_P)) {
+                if (IsKeyPressed(KEY_P) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
                     // Carregar sons
                     Sound sparingMusic = LoadSound("static/music/sparingMusic.wav");
                     Sound knifeStab = LoadSound("static/music/knifeStab.wav");
@@ -983,7 +984,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                     UnloadSound(throatCut);
                     UnloadSound(falasVillain);
                 }
-                if (IsKeyPressed(KEY_K)) {
+                if (IsKeyPressed(KEY_K) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) {
                     StopSound(breathingSound); // Parar o som de respiração
                     StopSound(suspenseSound);  // Parar o som de suspense
 
@@ -1445,6 +1446,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                                 UnloadSound(creditosMusicRun);
                                 UnloadTexture(empty_villain);
                                 UnloadTexture(villain_sombra);
+                                UnloadTexture(controlesTexture10);
 
                                 telaVaziaBloqueada = true;
                                 *currentScreen = LOBBY;   
@@ -1486,7 +1488,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
             break;
     }
 
-    lastDirection = 4;
+    //lastDirection = 3;
 
     Vector2 positionPersonagem = { empty_player_x * TILE_SIZE, empty_player_y * TILE_SIZE };
     Rectangle destRecPersonagem = { positionPersonagem.x - 32, positionPersonagem.y - 32, 96, 96 };
@@ -1530,7 +1532,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
             if (lastTextEndTime == 0) {
                 lastTextEndTime = GetTime();
             }
-            if (currentDialogIndex < totalDialogTexts - 1 && IsKeyPressed(KEY_ENTER)) {
+            if ((currentDialogIndex < totalDialogTexts - 1) && (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))) {
                 currentDialogIndex++;
                 displayedTextLength = 0;
                 memset(displayedText, 0, sizeof(displayedText));
@@ -1543,7 +1545,12 @@ void processarTelaVazia(GameScreen *currentScreen) {
         DrawText(displayedText, 80, SCREEN_HEIGHT - 120, 20, WHITE);
 
         if (displayedTextLength == strlen(dialogTexts[currentDialogIndex]) && currentDialogIndex < totalDialogTexts - 1) {
-            DrawText("Pressione ENTER para continuar...", SCREEN_WIDTH - 300, SCREEN_HEIGHT - 40, 16, GRAY);
+            comandoJogador(&usandoControle);
+            if (usandoControle) {
+                DrawMenuOptionsWithButtons("Pressione [A] para continuar...", SCREEN_WIDTH - 300, SCREEN_HEIGHT - 40, 16, 1.30f, GRAY, true, controlesTexture10, botaoAreas10);
+            } else {
+                DrawText("Pressione ENTER para continuar...", SCREEN_WIDTH - 300, SCREEN_HEIGHT - 40, 16, GRAY);
+            }
         }
     }
 

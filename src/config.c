@@ -111,7 +111,7 @@ void DrawMenuOptionsWithButtons(const char *text, int posX, int posY, int fontSi
             else if (*ptr == 'A') botaoIndex = 1;
             else if (*ptr == 'B') botaoIndex = 2;
             else if (*ptr == 'X') botaoIndex = 3;
-            else if (*ptr == 'K') botaoIndex = 4;
+            else if (*ptr == 'H') botaoIndex = 4;
             else if (*ptr == 'L') botaoIndex = 5;
 
             if (usandoControle && botaoIndex >= 0) {

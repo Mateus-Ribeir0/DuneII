@@ -138,7 +138,7 @@ void exibirRankingScreen(GameScreen *currentScreen) {
 
         if (usandoControle) {
             instrucoes = "[Y] Menu principal";
-            anterior = "[K] Anterior";
+            anterior = "[H] Anterior";
             proxima = "[L] Proxima";
         } else {
             instrucoes = "[Q] Menu principal";
