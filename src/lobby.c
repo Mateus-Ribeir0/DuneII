@@ -799,9 +799,185 @@ void processarTelaVazia(GameScreen *currentScreen) {
                 waitingForInput = false;
 
                 if (IsKeyPressed(KEY_P)) {
-                    // Ação para poupar
-                    // Adicione sua lógica aqui
-                    break;
+                    // Carregar sons
+                    Sound sparingMusic = LoadSound("static/music/sparingMusic.wav");
+                    Sound knifeStab = LoadSound("static/music/knifeStab.wav");
+                    Sound throatCut = LoadSound("static/music/throatCut.wav");
+                    Sound falasVillain = LoadSound("static/music/falasVillain.wav");
+
+                    PlaySound(sparingMusic);
+
+                    // Textos a serem exibidos sequencialmente
+                    const char *texts[] = {
+                        "Nós temos muitas semelhanças...",
+                        "Somos dois lados da mesma moeda...",
+                        "O que você quer, é apenas prosperar o que é seu...",
+                        "Assim como eu quero fazer com o que é meu...",
+                        "Pensando nisso...",
+                        "Quer unir Arrakis com Zarn."
+                    };
+
+                    const int totalTexts = sizeof(texts) / sizeof(texts[0]);
+                    int currentTextIndex = 0;
+
+                    // Configuração do efeito de digitação
+                    char displayedText[256] = "";
+                    int totalChars = 0;
+                    int displayedChars = 0;
+
+                    double textStartTime = GetTime();
+                    double delayAfterFullText = 2.0; // 2 segundos após texto completo
+                    double redScreenStartTime = 0.0;
+
+                    bool waitingForNextText = false;
+                    bool dialogComplete = false;
+                    bool redScreenActive = false;
+                    bool finalTextActive = false;
+                    bool fadeOutActive = false;
+                    float redOpacity = 0.0f; // Opacidade do vermelho
+                    float finalTextOpacity = 1.0f;
+
+                    // Texto final
+                    const char *finalText = "Eu não faço acordo com Arrakis.";
+                    char displayedFinalText[256] = "";
+                    int finalTextLength = strlen(finalText);
+                    int displayedFinalChars = 0;
+                    double finalTextStartTime = 0.0;
+                    double finalTextHoldTime = 4.0; // 4 segundos com o texto completo na tela
+                    double fadeOutStartTime = 0.0;
+
+                    while (!WindowShouldClose()) {
+                        BeginDrawing();
+                        ClearBackground(BLACK);
+
+                        if (!dialogComplete) {
+                            const char *currentText = texts[currentTextIndex];
+                            totalChars = strlen(currentText);
+
+                            if (!waitingForNextText) {
+                                // Atualizar efeito de digitação
+                                double elapsed = GetTime() - textStartTime;
+                                displayedChars = (int)(elapsed / 0.1); // Velocidade de 100ms por caractere
+
+                                if (displayedChars > totalChars) {
+                                    displayedChars = totalChars;
+                                    waitingForNextText = true;  // Esperar antes de avançar para o próximo texto
+                                    if (currentTextIndex == totalTexts - 1) {
+                                        dialogComplete = true; // Último texto, finalizar diálogo
+                                        StopSound(sparingMusic); // Parar música imediatamente
+                                        redScreenStartTime = GetTime();
+                                        redScreenActive = true;
+                                    } else {
+                                        textStartTime = GetTime(); // Marcar tempo de exibição do texto completo
+                                    }
+                                }
+
+                                strncpy(displayedText, currentText, displayedChars);
+                                displayedText[displayedChars] = '\0';
+                            }
+
+                            // Exibir caixa de texto
+                            int textWidth = MeasureText(displayedText, 20);
+                            int boxWidth = textWidth + 20;
+                            int boxHeight = 60;
+                            float boxX = (GetScreenWidth() - boxWidth) / 2;
+                            float boxY = GetScreenHeight() - 100; // Posição próxima da parte inferior da tela
+
+                            DrawRectangle(boxX, boxY, boxWidth, boxHeight, BLACK); // Fundo preto
+                            DrawRectangleLines(boxX, boxY, boxWidth, boxHeight, WHITE); // Bordas finas brancas
+                            DrawText(displayedText, boxX + 10, boxY + 20, 20, WHITE);
+
+                            // Avançar para o próximo texto após o atraso
+                            if (waitingForNextText && GetTime() - textStartTime >= delayAfterFullText && currentTextIndex < totalTexts - 1) {
+                                currentTextIndex++;
+                                textStartTime = GetTime(); // Reiniciar tempo para o próximo texto
+                                displayedChars = 0;
+                                waitingForNextText = false;
+                            }
+                        }
+
+                        // Tela vermelha e sons
+                        if (redScreenActive) {
+                            double elapsedRed = GetTime() - redScreenStartTime;
+
+                            if (elapsedRed >= 0.7 && elapsedRed < 1.7) {
+                                // Tocar som de facada após 0.7 segundo
+                                if (!IsSoundPlaying(knifeStab)) PlaySound(knifeStab);
+                                redOpacity = 1.0f; // Tela vermelha com opacidade máxima
+                            } else if (elapsedRed >= 1.7 && elapsedRed < 2.7) {
+                                // Tocar som de corte após facada
+                                if (!IsSoundPlaying(throatCut)) PlaySound(throatCut);
+                            } else if (elapsedRed >= 2.7) {
+                                // Diminuir opacidade gradualmente
+                                redOpacity -= GetFrameTime() * 2; // Fade mais rápido
+                                if (redOpacity <= 0.0f) {
+                                    redScreenActive = false; // Tela vermelha desativa
+                                    finalTextActive = true; // Ativar texto final
+                                    finalTextStartTime = GetTime();
+                                }
+                            }
+
+                            // Desenhar tela vermelha com opacidade
+                            DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(RED, redOpacity));
+                        }
+
+                        // Texto final com efeito de digitação
+                        if (finalTextActive) {
+                            double elapsedFinal = GetTime() - finalTextStartTime;
+
+                            if (elapsedFinal < finalTextLength * 0.1) {
+                                // Digitação do texto final
+                                displayedFinalChars = (int)(elapsedFinal / 0.1);
+                                strncpy(displayedFinalText, finalText, displayedFinalChars);
+                                displayedFinalText[displayedFinalChars] = '\0';
+
+                                // Tocar som enquanto texto está sendo digitado
+                                if (!IsSoundPlaying(falasVillain)) {
+                                    PlaySound(falasVillain);
+                                }
+                            } else if (elapsedFinal >= finalTextLength * 0.1 && elapsedFinal < finalTextLength * 0.1 + finalTextHoldTime) {
+                                // Texto completo na tela
+                                strncpy(displayedFinalText, finalText, finalTextLength);
+
+                                // Parar som ao finalizar a digitação
+                                if (IsSoundPlaying(falasVillain)) {
+                                    StopSound(falasVillain);
+                                }
+                            } else if (elapsedFinal >= finalTextLength * 0.1 + finalTextHoldTime) {
+                                // Iniciar fade-out
+                                if (!fadeOutActive) {
+                                    fadeOutActive = true;
+                                    fadeOutStartTime = GetTime();
+                                }
+                                // Reduzir opacidade gradualmente
+                                finalTextOpacity -= GetFrameTime();
+                                if (finalTextOpacity <= 0.0f) {
+                                    break; // Encerrar o loop
+                                }
+                            }
+
+                            // Exibir texto final no centro da tela
+                            int finalTextWidth = MeasureText(displayedFinalText, 40); // Tamanho grande
+                            int finalTextX = (GetScreenWidth() - finalTextWidth) / 2;
+                            int finalTextY = GetScreenHeight() / 2 - 20;
+
+                            DrawText(displayedFinalText, finalTextX, finalTextY, 40, Fade(WHITE, finalTextOpacity));
+                        }
+
+                        EndDrawing();
+                    }
+
+                    // Ações finais
+                    atualizarRanking(playerName, playerMoney);
+                    zerarMonetaria();
+                    resetarJogo();
+                    *currentScreen = RANKINGS;
+
+                    // Limpar recursos de som
+                    UnloadSound(sparingMusic);
+                    UnloadSound(knifeStab);
+                    UnloadSound(throatCut);
+                    UnloadSound(falasVillain);
                 }
                 if (IsKeyPressed(KEY_K)) {
                     StopSound(breathingSound); // Parar o som de respiração
@@ -1281,7 +1457,6 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
 
         EndDrawing();
-
     }
 
     if (isWalking) {
