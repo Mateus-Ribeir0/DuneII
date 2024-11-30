@@ -84,6 +84,7 @@ extern char playerName[MAX_NAME_LENGTH];
 extern bool usandoControle;
 extern bool telaVaziaBloqueada;
 extern bool spaceshipAnimationPlayed;
+extern bool contFinal;
 
 
 void comandoJogador(bool *usandoControle);

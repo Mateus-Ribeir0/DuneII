@@ -9,8 +9,9 @@ float playerLucky = 5.0;
 double lastWaterUpdateTime = 0.0;
 char playerName[MAX_NAME_LENGTH] = "";
 bool usandoControle = true;
-extern bool telaVaziaBloqueada = true;
+extern bool telaVaziaBloqueada;
 bool spaceshipAnimationPlayed = false;
+bool contFinal = true;
 
 
 void comandoJogador(bool *usandoControle) {

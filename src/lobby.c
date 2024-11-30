@@ -42,7 +42,7 @@ const char* mensagem = NULL;
 static float spaceshipPositionX = -128;
 // static bool isInExtendedLobby = false;
 static bool isWarMusicPlaying = false;
-
+bool telaVaziaBloqueada = true;
 
 
 Rectangle npcslobbyCollisionBox;
@@ -81,6 +81,7 @@ void iniciarLobby() {
         isMusicPlaying = true; 
     } else {
         ResumeMusicStream(lobbyMusic);
+        telaVaziaBloqueada = true;
     }
 }
 
@@ -181,12 +182,13 @@ void processarEntradaLobby(GameScreen *currentScreen) {
     movePlayer(dx, dy);
 
     if (player_x >= MAPA_LARGURA - 1) { // Jogador tenta sair pelo limite direito do mapa
-        if (itemsCollected >= 3 && spaceshipAnimationPlayed) {
-            static bool telaVaziaBloqueada = false; // Verifica se o jogador tem mais de 4 especiarias
-            *currentScreen = EMPTY_SCREEN; 
+        if (itemsCollected >= 3 && spaceshipAnimationPlayed && contFinal) {
+            telaVaziaBloqueada = false; // Verifica se o jogador tem mais de 4 especiarias
+            contFinal = false;
+            *currentScreen = EMPTY_SCREEN;
             return;
         } else {
-            static bool telaVaziaBloqueada = true;// Impede o jogador de sair e exibe uma mensagem
+            telaVaziaBloqueada = true;// Impede o jogador de sair e exibe uma mensagem
             player_x = MAPA_LARGURA - 1; // Reposiciona o jogador antes do limite
         }
     }
@@ -1447,8 +1449,10 @@ void processarTelaVazia(GameScreen *currentScreen) {
                                 UnloadTexture(empty_villain);
                                 UnloadTexture(villain_sombra);
                                 UnloadTexture(controlesTexture10);
-
-                                telaVaziaBloqueada = true;
+                                
+                                player_x = MAPA_LARGURA / 2;
+                                player_y = MAPA_ALTURA / 2;
+                                //telaVaziaBloqueada = true;
                                 *currentScreen = LOBBY;   
                                 break;                    
                             }

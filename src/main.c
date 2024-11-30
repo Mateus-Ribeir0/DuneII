@@ -35,7 +35,7 @@ int main() {
                     iniciarLobby();
                     lobbyInitialized = true;
                 }
-                spaceshipAnimationPlayed = false;
+                //spaceshipAnimationPlayed = false;
                 processarEntradaLobby(&currentScreen);
 
                 if (currentScreen != LOBBY && lobbyInitialized) {
@@ -58,7 +58,7 @@ int main() {
                 break;
             case RANKINGS:
                 exibirRankingScreen(&currentScreen);
-                spaceshipAnimationPlayed = false;
+                //spaceshipAnimationPlayed = false;
                 break;
             case EMPTY_SCREEN:
                 processarTelaVazia(&currentScreen);
