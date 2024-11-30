@@ -1,6 +1,6 @@
 #include "menu.h"
 
-static Texture2D background, logo, objetivoImage;
+static Texture2D background, logo, objetivoImage, objetivoImage1;
 static Music titleMusic;
 static Sound rankingssfx;
 static Sound controlssfx;
@@ -240,6 +240,7 @@ void atualizarMenu(GameScreen *currentScreen) {
     
     if (IsKeyPressed(KEY_C) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) {
         PlaySound(controlssfx);
+        comandoJogador(&usandoControle);
         *currentScreen = OBJETIVO;  
     } else if (IsKeyPressed(KEY_R) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_LEFT)) {
         PlaySound(rankingssfx);
@@ -249,16 +250,22 @@ void atualizarMenu(GameScreen *currentScreen) {
 
 void exibirObjetivo(GameScreen *currentScreen) {
     objetivoImage = LoadTexture("static/image/objetivo.png");
+    objetivoImage1 = LoadTexture("static/image/objetivo_xbox.png");
 
     while (!WindowShouldClose()) {
         UpdateMusicStream(titleMusic);
+        comandoJogador(&usandoControle);
 
         Rectangle source = { 0.0f, 0.0f, (float)objetivoImage.width, (float)objetivoImage.height };
         Rectangle dest = { 0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT };
         Vector2 origin = { 0.0f, 0.0f };
 
         BeginDrawing();
-        DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE);
+        if (usandoControle) {
+            DrawTexturePro(objetivoImage1, source, dest, origin, 0.0f, WHITE);
+        } else {
+            DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE);
+        }
         EndDrawing();
 
         if (IsKeyPressed(KEY_Q) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
@@ -298,5 +305,6 @@ void finalizarMenu() {
     UnloadMusicStream(titleMusic);
     UnloadTexture(controlesTexture);
     UnloadTexture(objetivoImage); 
+    UnloadTexture(objetivoImage1); 
     CloseWindow();
 }
