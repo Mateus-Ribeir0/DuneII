@@ -179,14 +179,17 @@ void processarEntradaLobby(GameScreen *currentScreen) {
     if (IsKeyPressed(KEY_W)) dy = -1;
     if (IsKeyPressed(KEY_S)) dy = 1;
 
-
     movePlayer(dx, dy);
 
-    if (player_x >= (MAPA_LARGURA - 1) && !telaVaziaBloqueada) {
-        if (dx == 1) { // Pressionou 'D' para ir à telaVazia
-            *currentScreen = EMPTY_SCREEN; // Transição para a tela vazia
-            telaVaziaBloqueada = true;    // Bloquear permanentemente o acesso à telaVazia
+    // Condição para acessar o chefe (boss)
+    if (player_x >= MAPA_LARGURA - 1) { // Jogador tenta sair pelo limite direito do mapa
+        if (itemsCollected >= 3 && !spaceshipAnimationPlayed) { // Verifica se o jogador tem mais de 4 especiarias
+            *currentScreen = EMPTY_SCREEN; // Transição para a tela do chefe
             return;
+        } else {
+            // Impede o jogador de sair e exibe uma mensagem
+            player_x = MAPA_LARGURA - 2; // Reposiciona o jogador antes do limite
+            mensagem = "Você precisa de mais especiarias para enfrentar o chefe!";
         }
     }
 
@@ -213,7 +216,7 @@ void processarEntradaLobby(GameScreen *currentScreen) {
         if (usandoControle) {
             mensagem = "Deseja viajar para Bashir'har?\nDificuldade: Media\n\nPressione: [Y]";
         } else {
-            mensagem = "Deseja viajar para Bashir'har?\nDificuldade: Media\n\nPressione: [P]";;
+            mensagem = "Deseja viajar para Bashir'har?\nDificuldade: Media\n\nPressione: [P]";
         }
 
         pertoDePortal = true;
@@ -262,9 +265,11 @@ void processarEntradaLobby(GameScreen *currentScreen) {
         resetarJogo();
         return;
     }
+
     verificarProximidadePoco(player_x * TILE_SIZE, player_y * TILE_SIZE);
     drawLobby();
 }
+
 static double lastWaterAttemptTime = -120.0; // Tempo da última tentativa
 static bool lastAttemptSuccessful = true;   // Indica se a última tentativa foi bem-sucedida
 
