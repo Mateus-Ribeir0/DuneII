@@ -85,6 +85,7 @@ extern bool usandoControle;
 extern bool telaVaziaBloqueada;
 extern bool spaceshipAnimationPlayed;
 
+
 void comandoJogador(bool *usandoControle);
 void DrawDialogBoxWithButtons(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool usandoControle, Texture2D texture, Rectangle *botaoAreas, float scale);
 void DrawMenuOptionsWithButtons(const char *text, int posX, int posY, int fontSize, float buttonScale, Color textColor, bool usandoControle, Texture2D texture, Rectangle *botaoAreas);
