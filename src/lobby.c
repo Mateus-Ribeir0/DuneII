@@ -40,7 +40,7 @@ const int widthMercador = 620;
 const char* mensagem = NULL;
 static bool spaceshipAnimationPlayed = false;
 static float spaceshipPositionX = -128;
-static bool isInExtendedLobby = false;
+//static bool isInExtendedLobby = false;
 static bool isWarMusicPlaying = false;
 
 static bool telaVaziaBloqueada = false; // Variável para bloquear a telaVazia após a sequência final
@@ -120,7 +120,6 @@ int isPlayerNearMerchant() {
 
 void DrawDialogBox(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool isPortalDialog) {
     if (isPortalDialog) width = 420;
-    else width = 600; 
 
     DrawRectangleRounded((Rectangle){ posX, posY, width, height }, 0.1f, 16, boxColor);
 
@@ -195,9 +194,9 @@ void processarEntradaLobby(GameScreen *currentScreen) {
         (player_y >= PORTAL_LOBBY_MAPA1_Y - 1 && player_y < PORTAL_LOBBY_MAPA1_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
         if (usandoControle) {
-            mensagem = "Deseja viajar para Zamirat?\nDificuldade: Facil\nPressione: [Y]";
+            mensagem = "Deseja viajar para Zamirat?\nDificuldade: Facil\n\nPressione: [Y]";
         } else {
-            mensagem = "Deseja viajar para Zamirat?\nDificuldade: Facil\nPressione: [P]";
+            mensagem = "Deseja viajar para Zamirat?\nDificuldade: Facil\n\nPressione: [P]";
         }
 
         pertoDePortal = true;
@@ -212,9 +211,9 @@ void processarEntradaLobby(GameScreen *currentScreen) {
         (player_y >= PORTAL_LOBBY_MAPA2_Y - 1 && player_y < PORTAL_LOBBY_MAPA2_Y + PORTAL_VERTICAL_ALTURA + 1)) {
         
         if (usandoControle) {
-            mensagem = "Deseja viajar para Bashir'har?\nDificuldade: Media\nPressione: [Y]";
+            mensagem = "Deseja viajar para Bashir'har?\nDificuldade: Media\n\nPressione: [Y]";
         } else {
-            mensagem = "Deseja viajar para Bashir'har?\nDificuldade: Media\nPressione: [P]";;
+            mensagem = "Deseja viajar para Bashir'har?\nDificuldade: Media\n\nPressione: [P]";;
         }
 
         pertoDePortal = true;
@@ -229,9 +228,9 @@ void processarEntradaLobby(GameScreen *currentScreen) {
         (player_y >= PORTAL_LOBBY_MAPA3_Y - 1 && player_y < PORTAL_LOBBY_MAPA3_Y + PORTAL_HORIZONTAL_ALTURA + 1)) {
         
         if (usandoControle) {
-            mensagem = "Deseja viajar para Qasr'Rahim?\nDificuldade: Dificil\nPressione: [Y]";
+            mensagem = "Deseja viajar para Qasr'Rahim?\nDificuldade: Dificil\n\nPressione: [Y]";
         } else {
-            mensagem = "Deseja viajar para Qasr'Rahim?\nDificuldade: Dificil\nPressione: [P]";
+            mensagem = "Deseja viajar para Qasr'Rahim?\nDificuldade: Dificil\n\nPressione: [P]";
         }
 
         pertoDePortal = true;
@@ -272,13 +271,11 @@ static bool lastAttemptSuccessful = true;   // Indica se a última tentativa foi
 void tentarRecuperarAguaNoPoco() {
     double currentTime = GetTime();
 
-    // Chance e resultado
-    int chance = GetRandomValue(0, 99); // Chance baseada na sorte
+    int chance = GetRandomValue(0, 99); 
     int aguaRecuperada = 0;
     bool sucesso = false;
     char sucessoMensagem[128];
 
-    // Determinar sucesso com base na sorte
     if (playerLucky == 20 && chance < 20) {
         sucesso = true;
         aguaRecuperada = GetRandomValue(1, 5);
@@ -290,36 +287,43 @@ void tentarRecuperarAguaNoPoco() {
         aguaRecuperada = GetRandomValue(3, 8);
     }
 
-    // Processar sucesso ou falha
     if (sucesso) {
-        playerWater = fmin(playerWater + aguaRecuperada, 100.0); // Evitar ultrapassar 100%
-        snprintf(sucessoMensagem, sizeof(sucessoMensagem), 
-                 "Parabéns! Você recuperou %d%% de água do poço.\n\n\nAperte[ENTER] para voltar.", aguaRecuperada);
-        DrawDialogBox(sucessoMensagem, 100, 550, 600, 100, WHITE, GREEN, false);
-        lastAttemptSuccessful = true; // Marca a última tentativa como bem-sucedida
-    } else {
-        DrawDialogBox("Parece que está sem sorte, você não conseguiu nada\ndessa vez, tente na próxima...\n\nAperte[ENTER] para voltar.", 100, 550, 600, 100, WHITE, RED, false);
-        lastAttemptSuccessful = false; // Marca a última tentativa como falha
-        lastWaterAttemptTime = currentTime; // Atualiza o tempo da tentativa somente se falhar
-    }
-
-    // Manter a mensagem até o jogador pressionar ENTER
-    while (!IsKeyPressed(KEY_ENTER)) {
-        BeginDrawing();
-        UpdateMusicStream(lobbyMusic);
-        if (sucesso) {
-            DrawDialogBox(sucessoMensagem, 100, 550, 600, 100, WHITE, GREEN, false);
-        } else {
-            DrawDialogBox("Parece que está sem sorte, você não conseguiu nada\ndessa vez, tente na próxima...\n\nAperte[ENTER] para voltar.", 100, 550, 600, 100, WHITE, RED, false);
+        while (true) {
+            UpdateMusicStream(lobbyMusic);
+            BeginDrawing();
+            if (usandoControle) {
+                snprintf(sucessoMensagem, sizeof(sucessoMensagem), "Parabens! Voce recuperou %d%% de agua do poco.\n\nAperte [B]para voltar.", aguaRecuperada);
+                DrawDialogBoxWithButtons(sucessoMensagem, 110, 550, 600, 100, WHITE, GREEN, usandoControle, controlesTexture, botaoAreas, 1.50);
+            } else {
+                snprintf(sucessoMensagem, sizeof(sucessoMensagem), "Parabéns! Você recuperou %d%% de água do poço.\n\nAperte [ENTER] para voltar.", aguaRecuperada);
+                DrawDialogBox(sucessoMensagem, 100, 550, 600, 100, WHITE, GREEN, false);
+            }
+            EndDrawing();
+            if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
         }
-        EndDrawing();
+        playerWater = fmin(playerWater + aguaRecuperada, 100.0);
+        lastAttemptSuccessful = true;
+    } else {
+        while (true) {
+            UpdateMusicStream(lobbyMusic);
+            BeginDrawing();
+            if (usandoControle) {
+                DrawDialogBoxWithButtons("Parece que esta sem sorte, voce nao conseguiu nada\ndessa vez, tente na proxima...\n\nAperte [B]para voltar", 110, 550, 600, 100, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+            } else {
+                DrawDialogBox("Parece que está sem sorte, você não conseguiu nada\ndessa vez, tente na próxima...\n\nAperte[ENTER] para voltar", 100, 550, 600, 100, WHITE, RED, false);
+            }
+            EndDrawing();
+            if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+        }
+        lastAttemptSuccessful = false;
+        lastWaterAttemptTime = currentTime;
     }
 }
 
 void verificarProximidadePoco(float playerX, float playerY) {
     const float areas[][4] = {
-        {720, 160, 80, 80}, // Coordenadas do primeiro poço
-        {100, 550, 80, 80}  // Coordenadas do segundo poço
+        {720, 160, 80, 80},
+        {100, 550, 80, 80} 
     };
     const int numAreas = sizeof(areas) / sizeof(areas[0]);
     double currentTime = GetTime();
@@ -333,28 +337,31 @@ void verificarProximidadePoco(float playerX, float playerY) {
         if (playerX >= areaX - 10 && playerX <= areaX + areaWidth + 10 &&
             playerY >= areaY - 10 && playerY <= areaY + areaHeight + 10) {
 
-            // Permitir nova tentativa apenas após 10 segundos em caso de falha
             if (!lastAttemptSuccessful && (currentTime - lastWaterAttemptTime < 10.0)) {
                 DrawDialogBox("Ainda não é possível tentar novamente. Volte depois.", 
                               100, 550, 600, 100, WHITE, RED, false);
                 return;
             }
+            
+            if (usandoControle) {
+                DrawDialogBoxWithButtons("Voce deseja tentar recuperar agua do poco?\n\n[A]Sim\n[X]Nao", 100, 550, 600, 100, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.30);
+            } else {
+                DrawDialogBox("Você deseja tentar recuperar água do poço?\n\n[1] Sim\n[2] Não", 100, 550, 600, 100, WHITE, BLACK, false);
+            }
 
-            // Exibir a mensagem para tentar recuperar água
-            DrawDialogBox("Você deseja tentar recuperar água do poço?\n\n[1] Sim\n[2] Não", 
-                          100, 550, 600, 100, WHITE, BLACK, false);
-
-            if (IsKeyPressed(KEY_ONE)) {
-                tentarRecuperarAguaNoPoco(); // Tentar recuperar água
-            } else if (IsKeyPressed(KEY_TWO)) {
-                DrawDialogBox("Você decidiu não tentar agora.\n\n\nAperte[ENTER] para voltar.", 
-                              100, 550, 600, 100, WHITE, GRAY, false);
-                while (!IsKeyPressed(KEY_ENTER)) {
+            if (IsKeyPressed(KEY_ONE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
+                tentarRecuperarAguaNoPoco();
+            } else if (IsKeyPressed(KEY_TWO) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_LEFT)) {
+                while (true) {
                     BeginDrawing();
                     UpdateMusicStream(lobbyMusic);
-                    DrawDialogBox("Você decidiu não tentar agora.\n\n\nAperte[ENTER] para voltar.", 
-                                  100, 550, 600, 100, WHITE, GRAY, false);
+                    if (usandoControle) {
+                        DrawDialogBoxWithButtons("Voce decidiu nao tentar agora\n\nAperte [B]para voltar", 100, 550, 600, 100, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                    } else {
+                        DrawDialogBox("Você decidiu não tentar agora\n\nAperte [ENTER] para voltar", 100, 550, 600, 100, WHITE, GRAY, false);
+                    }
                     EndDrawing();
+                    if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
                 }
             }
 
@@ -379,10 +386,10 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static Sound gameOverSoundWar;
 
     #define MAX_OCCURRENCES 15
-    static Vector2 warningPositions[MAX_OCCURRENCES]; // Posições dos Warnings
-    static double occurrenceTimers[MAX_OCCURRENCES];  // Timers para cada Warning/Explosion
-    static bool warningsActive[MAX_OCCURRENCES];     // Status de Warning ativo
-    static bool explosionsActive[MAX_OCCURRENCES];   // Status de Explosion ativo
+    //static Vector2 warningPositions[MAX_OCCURRENCES]; // Posições dos Warnings
+    //static double occurrenceTimers[MAX_OCCURRENCES];  // Timers para cada Warning/Explosion
+    //static bool warningsActive[MAX_OCCURRENCES];     // Status de Warning ativo
+    //static bool explosionsActive[MAX_OCCURRENCES];   // Status de Explosion ativo
     #define TOTAL_EXPLOSIONS 20
 
     // Configurações para as explosões
@@ -400,7 +407,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
     static bool initialized = false;
     static double startTime = 0;
-    static bool dialogTriggered = false;
+    //static bool dialogTriggered = false;
     static bool windMusicStarted = false;
     static bool battleMusicStarted = false;
     static bool soundPlayed = false;
@@ -432,7 +439,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
     static int displayedTextLength = 0;
     static double lastTextEndTime = 0;
     static bool hideDialog = false;
-    static double explosionStartTime = 0; // Tempo em que a explosão começou
+    //static double explosionStartTime = 0; // Tempo em que a explosão começou
 
     if (!initialized) {
         empty_personagem = LoadTexture("static/image/newstoppedsprites.png");
@@ -1320,7 +1327,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
     // Mostrar diálogo e retrato
     if (GetTime() - startTime >= 3.0 && !hideDialog) {
-        dialogTriggered = true;
+        //dialogTriggered = true;
 
         // Retrato do vilão
         Rectangle villainPortraitDest = { SCREEN_WIDTH - 338, SCREEN_HEIGHT - 418, 288, 288 };
@@ -2049,355 +2056,489 @@ void drawLobby() {
         if (!isInteractingWithMerchant) {
             merchantMood = 0; 
 
-            DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1] para vender especiarias\n[2] para comprar uma bolsa nova\n[3] para comprar garrafa de água\n[4] para comprar itens de sorte",
+            if (usandoControle) {
+                DrawDialogBoxWithButtons("Ola viajante, o que podemos negociar hoje?\n\n[X] para vender especiarias\n[Y] para comprar uma bolsa nova\n[B] para comprar garrafa de agua\n[A] para comprar itens de sorte",
+                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.30);
+            } else {
+                DrawDialogBox("Olá viajante, o que podemos negociar hoje?\n\n[1]  para vender especiarias\n[2] para comprar uma bolsa nova\n[3] para comprar garrafa de água\n[4] para comprar itens de sorte",
                         100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+            }
 
-            if (IsKeyPressed(KEY_ONE)) isInteractingWithMerchant = 1;
-            else if (IsKeyPressed(KEY_TWO)) isInteractingWithMerchant = 2;
-            else if (IsKeyPressed(KEY_THREE)) isInteractingWithMerchant = 3;
-            else if (IsKeyPressed(KEY_FOUR)) isInteractingWithMerchant = 4;
+            if (IsKeyPressed(KEY_ONE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_LEFT)) isInteractingWithMerchant = 1;
+            else if (IsKeyPressed(KEY_TWO) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) isInteractingWithMerchant = 2;
+            else if (IsKeyPressed(KEY_THREE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) isInteractingWithMerchant = 3;
+            else if (IsKeyPressed(KEY_FOUR) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) isInteractingWithMerchant = 4;
 
         } else {
-
             switch (isInteractingWithMerchant) {
                 case 1: 
-                static int merchantMessage = 0;
+                    static int merchantMessage = 0;
 
-                if (merchantMessage == 0) {
-                    if (itemsCollected > 0) {
-                        playerMoney += itemsCollected * 300;
-                        itemsCollected = 0;
-                        merchantMessage = 1;
-                        merchantMood = 1; 
-                    } else {
-                        merchantMessage = -1;
-                        merchantMood = 2; 
+                    if (merchantMessage == 0) {
+                        if (itemsCollected > 0) {
+                            playerMoney += itemsCollected * 300;
+                            itemsCollected = 0;
+                            merchantMessage = 1;
+                            merchantMood = 1; 
+                        } else {
+                            merchantMessage = -1;
+                            merchantMood = 2; 
+                        }
                     }
-                }
 
-                if (merchantMessage == 1) {
-                 
-                    while (!IsKeyPressed(KEY_ENTER)) {
-            
-                        UpdateMusicStream(lobbyMusic);
-
-                 
-                        BeginDrawing();
-                        DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE);
-                        DrawDialogBox("Obrigado pela venda, espero que prospere!\n\n\nAperte[ENTER] para voltar.", 
-                                    100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                        EndDrawing();
-                    }
-                    merchantMessage = 0;
-                    merchantMood = 0; 
-                    isInteractingWithMerchant = 0;
-                } else if (merchantMessage == -1) {
-                   
-                    while (!IsKeyPressed(KEY_ENTER)) {
-              
-                        UpdateMusicStream(lobbyMusic);
-
-        
-                        BeginDrawing();
-                        DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); 
-                        DrawDialogBox("Saia daqui, você não tem nenhuma especiaria para\nnegociar!\n\n\nAperte[ENTER] para voltar.", 
-                                    100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                        EndDrawing();
-                    }
-                    merchantMessage = 0;
-                    merchantMood = 0; 
-                    isInteractingWithMerchant = 0;
-                }
-                break;
-
-
-                case 2: 
-                DrawDialogBox("Qual bolsa deseja comprar?\n\n[1]  Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000",
-                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-
-                if (IsKeyPressed(KEY_ONE)) { 
-                    if (playerMoney >= 5000) {
-                        MAX_ESPECIARIAS = 12;
-                        playerMoney -= 5000;
-                        merchantMood = 1; 
-
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            UpdateMusicStream(lobbyMusic); 
-                            BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
-                            DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                            EndDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                        merchantMood = 0; 
-                    } else {
-                        merchantMood = 2; 
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            UpdateMusicStream(lobbyMusic); 
-                            BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); 
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                        merchantMood = 0; 
-                    }
-                } else if (IsKeyPressed(KEY_TWO)) { 
-                    if (playerMoney >= 10000) {
-                        MAX_ESPECIARIAS = 24;
-                        playerMoney -= 10000;
-                        merchantMood = 1; 
-
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            UpdateMusicStream(lobbyMusic); 
-                            BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
-                            DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                            EndDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                        merchantMood = 0;
-                    } else {
-                        merchantMood = 2; 
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            UpdateMusicStream(lobbyMusic); 
-                            BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); 
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                        merchantMood = 0;
-                    }
-                } else if (IsKeyPressed(KEY_THREE)) { 
-                    if (playerMoney >= 15000) {
-                        MAX_ESPECIARIAS = 32;
-                        playerMoney -= 15000;
-                        merchantMood = 1; 
-
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            UpdateMusicStream(lobbyMusic); 
-                            BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE);
-                            DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                            EndDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                        merchantMood = 0; 
-                    } else {
-                        merchantMood = 2; 
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            UpdateMusicStream(lobbyMusic); 
-                            BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); 
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                        merchantMood = 0;
-                    }
-                }
-                break;
-
-
-                case 3: 
-                DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1]  Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000",
-                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-
-                if (IsKeyPressed(KEY_ONE)) {
-                    if (playerMoney >= 3000) {
-                        playerWater = fmin(playerWater + GARRAFA_PEQUENA_CAPACIDADE, 100);
-                        playerMoney -= 3000;
-                        merchantMood = 1; 
-
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            UpdateMusicStream(lobbyMusic); 
-                            BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
-                            DrawDialogBox("Obrigado pela compra! Aproveite sua água.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-                            EndDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                        merchantMood = 0; 
-                    } else {
-                        merchantMood = 2; 
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            UpdateMusicStream(lobbyMusic); 
-                            BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); 
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                        merchantMood = 0; 
-                    }
-                } else if (IsKeyPressed(KEY_TWO)) {
-                    if (playerMoney >= 5000) {
-                        playerWater = fmin(playerWater + GARRAFA_MEDIA_CAPACIDADE, 100);
-                        playerMoney -= 5000;
-                        merchantMood = 1; 
-
-                        while (!IsKeyPressed(KEY_ENTER)) {
+                    if (merchantMessage == 1) {
+                        while (true) {
                             UpdateMusicStream(lobbyMusic);
                             BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
-                            DrawDialogBox("Obrigado pela compra! Aproveite sua água.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                            DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE);
+
+                            if (usandoControle) {
+                                DrawDialogBoxWithButtons("Obrigado pela venda, espero que prospere!\n\n\n\nAperte [B]para voltar",
+                                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                            } else {
+                                DrawDialogBox("Obrigado pela venda, espero que prospere!\n\n\n\nAperte [ENTER] para voltar", 
+                                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);    
+                            }
+
                             EndDrawing();
+
+                            if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
                         }
-                        isInteractingWithMerchant = 0;
+                        merchantMessage = 0;
                         merchantMood = 0; 
-                    } else {
-                        merchantMood = 2; 
-                        while (!IsKeyPressed(KEY_ENTER)) {
+                        isInteractingWithMerchant = 0;
+                    } else if (merchantMessage == -1) {
+                        while (true) {
                             UpdateMusicStream(lobbyMusic);
                             BeginDrawing();
                             DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                        }
-                        isInteractingWithMerchant = 0;
-                        merchantMood = 0; 
-                    }
-                } else if (IsKeyPressed(KEY_THREE)) {
-                    if (playerMoney >= 7000) {
-                        playerWater = fmin(playerWater + GARRAFA_GRANDE_CAPACIDADE, 100);
-                        playerMoney -= 7000;
-                        merchantMood = 1; 
 
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            UpdateMusicStream(lobbyMusic); 
-                            BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
-                            DrawDialogBox("Obrigado pela compra! Aproveite sua água.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                            if (usandoControle) {
+                                DrawDialogBoxWithButtons("Saia daqui, voce nao tem nenhuma especiaria para\nnegociar!\n\n\nAperte [B]para voltar",
+                                        100, 550, widthMercador, heigthMercador, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+                            } else {
+                                DrawDialogBox("Saia daqui, você não tem nenhuma especiaria para\nnegociar!\n\n\nAperte [ENTER] para voltar", 
+                                        100, 550, widthMercador, heigthMercador, WHITE, RED, false);   
+                            }
+                            
                             EndDrawing();
+
+                            if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
                         }
-                        isInteractingWithMerchant = 0;
+                        merchantMessage = 0;
                         merchantMood = 0; 
-                    } else {
-                        merchantMood = 2; 
-                        while (!IsKeyPressed(KEY_ENTER)) {
-                            UpdateMusicStream(lobbyMusic); 
-                            BeginDrawing();
-                            DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); 
-                            DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
-                                        100, 550, widthMercador, heigthMercador, WHITE, RED, false);
-                            EndDrawing();
-                        }
                         isInteractingWithMerchant = 0;
-                        merchantMood = 0; 
                     }
-                }
+                break;
+
+                case 2:
+                    if (usandoControle) {
+                        DrawDialogBoxWithButtons("Qual bolsa deseja comprar?\n\n[A]Media (12 especiarias) - 5000\n[X]Grande (24 especiarias) - 10000\n[Y]Super (32 especiarias) - 15000",
+                                100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.30);
+                    } else {
+                        DrawDialogBox("Qual bolsa deseja comprar?\n\n[1]  Média (12 especiarias) - 5000\n[2] Grande (24 especiarias) - 10000\n[3] Super (32 especiarias) - 15000",
+                                100, 550, widthMercador, heigthMercador, WHITE, BLACK, false); 
+                    }
+
+                    if (IsKeyPressed(KEY_ONE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) { 
+                        if (playerMoney >= 5000) {
+                            MAX_ESPECIARIAS = 12;
+                            playerMoney -= 5000;
+                            merchantMood = 1; 
+
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Obrigado pela compra! Aproveite sua nova bolsa\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa\n\n\n\nAperte [ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0; 
+                        } else {
+                            merchantMood = 2; 
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); 
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Voce nao tem dinheiro suficiente para essa compra\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Você não tem dinheiro suficiente para essa compra\n\n\n\nAperte[ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0; 
+                        }
+                    } else if (IsKeyPressed(KEY_TWO) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_LEFT)) { 
+                        if (playerMoney >= 10000) {
+                            MAX_ESPECIARIAS = 24;
+                            playerMoney -= 10000;
+                            merchantMood = 1; 
+
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Obrigado pela compra! Aproveite sua nova bolsa\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa\n\n\n\nAperte [ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0;
+                        } else {
+                            merchantMood = 2; 
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); 
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Voce nao tem dinheiro suficiente para essa compra\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Você não tem dinheiro suficiente para essa compra\n\n\n\nAperte[ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0;
+                        }
+                    } else if (IsKeyPressed(KEY_THREE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) { 
+                        if (playerMoney >= 15000) {
+                            MAX_ESPECIARIAS = 32;
+                            playerMoney -= 15000;
+                            merchantMood = 1; 
+
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Obrigado pela compra! Aproveite sua nova bolsa\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Obrigado pela compra! Aproveite sua nova bolsa\n\n\n\nAperte [ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0; 
+                        } else {
+                            merchantMood = 2; 
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE); 
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Voce nao tem dinheiro suficiente para essa compra\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Você não tem dinheiro suficiente para essa compra\n\n\n\nAperte[ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0;
+                        }
+                    }
+                break;
+
+                case 3:
+                    if (usandoControle) {
+                        DrawDialogBoxWithButtons("Qual garrafa de agua deseja comprar?\n\n[A]Pequena (10%) - 3000\n[X]Media (20%) - 5000\n[Y]Grande (30%) - 7000",
+                                100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.30);
+                    } else {
+                        DrawDialogBox("Qual garrafa de água deseja comprar?\n\n[1]  Pequena (10%) - 3000\n[2] Média (20%) - 5000\n[3] Grande (30%) - 7000",
+                                100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                    }
+
+                    if (IsKeyPressed(KEY_ONE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
+                        if (playerMoney >= 3000) {
+                            playerWater = fmin(playerWater + GARRAFA_PEQUENA_CAPACIDADE, 100);
+                            playerMoney -= 3000;
+                            merchantMood = 1; 
+
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Obrigado pela compra! Aproveite sua agua.\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Obrigado pela compra! Aproveite sua água.\n\n\n\nAperte [ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0; 
+                        } else {
+                            merchantMood = 2; 
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Voce nao tem dinheiro suficiente para essa compra\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Você não tem dinheiro suficiente para essa compra\n\n\n\nAperte [ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0; 
+                        }
+                    } else if (IsKeyPressed(KEY_TWO) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_LEFT)) { 
+                        if (playerMoney >= 5000) {
+                            playerWater = fmin(playerWater + GARRAFA_MEDIA_CAPACIDADE, 100);
+                            playerMoney -= 5000;
+                            merchantMood = 1; 
+                            
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Obrigado pela compra! Aproveite sua agua\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Obrigado pela compra! Aproveite sua água\n\n\n\nAperte [ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0; 
+                        } else {
+                            merchantMood = 2; 
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Voce nao tem dinheiro suficiente para essa compra\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Você não tem dinheiro suficiente para essa compra\n\n\n\nAperte [ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0; 
+                        }
+                    } else if (IsKeyPressed(KEY_THREE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
+                        if (playerMoney >= 7000) {
+                            playerWater = fmin(playerWater + GARRAFA_GRANDE_CAPACIDADE, 100);
+                            playerMoney -= 7000;
+                            merchantMood = 1; 
+
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE); 
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Obrigado pela compra! Aproveite sua agua\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Obrigado pela compra! Aproveite sua água\n\n\n\nAperte [ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0; 
+                        } else {
+                            merchantMood = 2; 
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
+                                BeginDrawing();
+                                DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Voce nao tem dinheiro suficiente para essa compra\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Você não tem dinheiro suficiente para essa compra\n\n\n\nAperte [ENTER] para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                }
+                                EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
+                            }
+                            isInteractingWithMerchant = 0;
+                            merchantMood = 0;
+                        }
+                    }
                 break;
 
                 case 4:
-                    DrawDialogBox("Qual item de sorte deseja comprar?\n\n[1] Ferradura (20%) - 3000\n[2] Amuleto (30%) - 7000\n[3] Trevo (50%) - 10000",
+                    if (usandoControle) {
+                        DrawDialogBoxWithButtons("Qual item de sorte deseja comprar?\n\n[A] Ferradura (20%) - 3000\n[X] Amuleto (30%) - 7000\n[Y] Trevo (50%) - 10000",
+                                100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.30);
+                    } else {
+                        DrawDialogBox("Qual item de sorte deseja comprar?\n\n[1] Ferradura (20%) - 3000\n[2] Amuleto (30%) - 7000\n[3] Trevo (50%) - 10000",
                                 100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
-
-                    if (IsKeyPressed(KEY_ONE)) { 
+                    }
+                    
+                    if (IsKeyPressed(KEY_ONE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
                         if (playerMoney >= FERRADURA_PRECO) {
                             playerLucky = FERRADURA_SORTE;
                             playerMoney -= FERRADURA_PRECO;
                             merchantMood = 1;
 
-                            while (!IsKeyPressed(KEY_ENTER)) {
+                            while (true) {
                                 UpdateMusicStream(lobbyMusic);
                                 BeginDrawing();
                                 DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE);
-                                DrawDialogBox("Obrigado pela compra! Aproveite sua sorte.\n\n\nAperte[ENTER] para voltar.",
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Obrigado pela compra! Aproveite sua sorte\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Obrigado pela compra! Aproveite sua sorte\n\n\n\nAperte [ENTER] para voltar",
                                             100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                }
                                 EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
                             }
                             isInteractingWithMerchant = 0;
                             merchantMood = 0;
                         } else {
-                            merchantMood = 2;
-                            while (!IsKeyPressed(KEY_ENTER)) {
-                                UpdateMusicStream(lobbyMusic);
+                            merchantMood = 2; 
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
                                 BeginDrawing();
                                 DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
-                                DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Voce nao tem dinheiro suficiente para essa compra\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Você não tem dinheiro suficiente para essa compra\n\n\n\nAperte [ENTER] para voltar",
                                             100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                }
                                 EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
                             }
                             isInteractingWithMerchant = 0;
                             merchantMood = 0;
                         }
-                    } else if (IsKeyPressed(KEY_TWO)) { 
+                    } else if (IsKeyPressed(KEY_TWO) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_LEFT)) { 
                         if (playerMoney >= AMULETO_PRECO) {
                             playerLucky = AMULETO_SORTE;
                             playerMoney -= AMULETO_PRECO;
                             merchantMood = 1;
 
-                            while (!IsKeyPressed(KEY_ENTER)) {
+                            while (true) {
                                 UpdateMusicStream(lobbyMusic);
                                 BeginDrawing();
                                 DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE);
-                                DrawDialogBox("Obrigado pela compra! Aproveite sua sorte.\n\n\nAperte[ENTER] para voltar.",
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Obrigado pela compra! Aproveite sua sorte\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Obrigado pela compra! Aproveite sua sorte\n\n\n\nAperte [ENTER] para voltar",
                                             100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                }
                                 EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
                             }
                             isInteractingWithMerchant = 0;
                             merchantMood = 0;
                         } else {
-                            merchantMood = 2;
-                            while (!IsKeyPressed(KEY_ENTER)) {
-                                UpdateMusicStream(lobbyMusic);
+                            merchantMood = 2; 
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
                                 BeginDrawing();
                                 DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
-                                DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Voce nao tem dinheiro suficiente para essa compra\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Você não tem dinheiro suficiente para essa compra\n\n\n\nAperte [ENTER] para voltar",
                                             100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                }
                                 EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
                             }
                             isInteractingWithMerchant = 0;
                             merchantMood = 0;
                         }
-                    } else if (IsKeyPressed(KEY_THREE)) { 
+                    } else if (IsKeyPressed(KEY_THREE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) { 
                         if (playerMoney >= TREVO_PRECO) {
                             playerLucky = TREVO_SORTE;
                             playerMoney -= TREVO_PRECO;
                             merchantMood = 1;
 
-                            while (!IsKeyPressed(KEY_ENTER)) {
+                            while (true) {
                                 UpdateMusicStream(lobbyMusic);
                                 BeginDrawing();
                                 DrawTexturePro(velho, sourceRecVelhoFeliz, destRecVelho, originVelho, 0.0f, WHITE);
-                                DrawDialogBox("Obrigado pela compra! Aproveite sua sorte.\n\n\nAperte[ENTER] para voltar.",
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Obrigado pela compra! Aproveite sua sorte\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Obrigado pela compra! Aproveite sua sorte\n\n\n\nAperte [ENTER] para voltar",
                                             100, 550, widthMercador, heigthMercador, WHITE, BLACK, false);
+                                }
                                 EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
                             }
                             isInteractingWithMerchant = 0;
                             merchantMood = 0;
                         } else {
-                            merchantMood = 2;
-                            while (!IsKeyPressed(KEY_ENTER)) {
-                                UpdateMusicStream(lobbyMusic);
+                            merchantMood = 2; 
+                            while (true) {
+                                UpdateMusicStream(lobbyMusic); 
                                 BeginDrawing();
                                 DrawTexturePro(velho, sourceRecVelhoPuto, destRecVelho, originVelho, 0.0f, WHITE);
-                                DrawDialogBox("Você não tem dinheiro suficiente para essa compra.\n\n\nAperte[ENTER] para voltar.",
+                                if (usandoControle) {
+                                    DrawDialogBoxWithButtons("Voce nao tem dinheiro suficiente para essa compra\n\n\n\nAperte [B]para voltar",
+                                            100, 550, widthMercador, heigthMercador, WHITE, RED, usandoControle, controlesTexture, botaoAreas, 1.50);
+                                } else {
+                                    DrawDialogBox("Você não tem dinheiro suficiente para essa compra\n\n\n\nAperte [ENTER] para voltar",
                                             100, 550, widthMercador, heigthMercador, WHITE, RED, false);
+                                }
                                 EndDrawing();
+                                if (IsKeyPressed(KEY_ENTER) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) break;
                             }
                             isInteractingWithMerchant = 0;
                             merchantMood = 0;
                         }
                     }
-                    break;
-
+                break;
             }   
         }
     } else if (mensagem != NULL) {
-        DrawDialogBoxWithButtons(mensagem, 110, 550, 400, 110, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas);
+        DrawDialogBoxWithButtons(mensagem, 110, 550, 400, 110, WHITE, BLACK, usandoControle, controlesTexture, botaoAreas, 1.50);
     } else if (telaVaziaBloqueada){
         isInteractingWithMerchant = 0;
     } else {
