@@ -1,4 +1,4 @@
-TARGET = dune_game
+TARGET = DuneII
 
 CC = gcc
 CFLAGS = -Wall -std=c99
@@ -17,11 +17,9 @@ else ifeq ($(UNAME_S), Darwin)
     LIBS = -L../raylib/src -lraylib -lm -lpthread -ldl -framework OpenGL -framework Cocoa -framework IOKit
     CFLAGS += -I../raylib/src
 endif
-$(TARGET): $(SOURCES)
-	$(CC) $(CFLAGS) $(SOURCES) -I$(INCLUDE_DIR) -o $(TARGET) $(LIBS)
 
 $(TARGET): $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) $(SOURCES) -I$(INCLUDE_DIR) -o $(TARGET) $(LIBS) || ($(MAKE) clean && $(MAKE))
+	$(CC) $(CFLAGS) $(SOURCES) -I$(INCLUDE_DIR) -o $(TARGET) $(LIBS)
 
 clean:
 	rm -f $(TARGET)

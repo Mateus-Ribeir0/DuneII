@@ -1,6 +1,6 @@
 #include "menu.h"
 
-static Texture2D background, logo, objetivoImage;
+static Texture2D background, logo, objetivoImage, objetivoImage1;
 static Music titleMusic;
 static Sound rankingssfx;
 static Sound controlssfx;
@@ -240,6 +240,7 @@ void atualizarMenu(GameScreen *currentScreen) {
     
     if (IsKeyPressed(KEY_C) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) {
         PlaySound(controlssfx);
+        comandoJogador(&usandoControle);
         *currentScreen = OBJETIVO;  
     } else if (IsKeyPressed(KEY_R) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_LEFT)) {
         PlaySound(rankingssfx);
@@ -249,16 +250,22 @@ void atualizarMenu(GameScreen *currentScreen) {
 
 void exibirObjetivo(GameScreen *currentScreen) {
     objetivoImage = LoadTexture("static/image/objetivo.png");
+    objetivoImage1 = LoadTexture("static/image/objetivo_xbox.png");
 
     while (!WindowShouldClose()) {
         UpdateMusicStream(titleMusic);
+        comandoJogador(&usandoControle);
 
         Rectangle source = { 0.0f, 0.0f, (float)objetivoImage.width, (float)objetivoImage.height };
         Rectangle dest = { 0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT };
         Vector2 origin = { 0.0f, 0.0f };
 
         BeginDrawing();
-        DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE);
+        if (usandoControle) {
+            DrawTexturePro(objetivoImage1, source, dest, origin, 0.0f, WHITE);
+        } else {
+            DrawTexturePro(objetivoImage, source, dest, origin, 0.0f, WHITE);
+        }
         EndDrawing();
 
         if (IsKeyPressed(KEY_Q) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_UP)) {
@@ -271,21 +278,38 @@ void exibirObjetivo(GameScreen *currentScreen) {
 void drawMenu() {
     int mainTextY = 400;
     int optionsY = mainTextY + 100;
-    int spacingX = 50;
-    int textSize = 25;
-    int centerX = SCREEN_WIDTH / 2;
+    int textSizeMain = 30; 
+    int textSizeOptions = 25; 
+    int spacingX = 150; 
+    int centerX = SCREEN_WIDTH / 2; 
 
     BeginDrawing();
     desenharBackgroundComLogo();
     
     if (usandoControle) {
-        DrawMenuOptionsWithButtons("Pressione [A] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 24) / 2, mainTextY, 30, 2.0f, WHITE, true, controlesTexture, botaoAreas1);
-        DrawMenuOptionsWithButtons("[X] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, 25, 1.8f, WHITE, true, controlesTexture, botaoAreas1);
-        DrawMenuOptionsWithButtons("[B] Controles", centerX + spacingX, optionsY, 25, 1.8f, WHITE, true, controlesTexture, botaoAreas1);
+        const char *mainText = "Pressione [A] para Jogar";
+        int mainTextWidth = MeasureText(mainText, textSizeMain);
+        DrawMenuOptionsWithButtons(mainText, centerX - mainTextWidth / 2, mainTextY, textSizeMain, 2.0f, WHITE, true, controlesTexture, botaoAreas1);
+        
+        const char *rankingText = "[X] Rankings";
+        const char *controlsText = "[B] Controles";
+
+        int totalWidth = MeasureText(rankingText, textSizeOptions) + spacingX + MeasureText(controlsText, textSizeOptions);
+
+        DrawMenuOptionsWithButtons(rankingText, centerX - totalWidth / 2, optionsY, textSizeOptions, 1.8f, WHITE, true, controlesTexture, botaoAreas1);
+        DrawMenuOptionsWithButtons(controlsText, centerX + totalWidth / 2 - MeasureText(controlsText, textSizeOptions), optionsY, textSizeOptions, 1.8f, WHITE, true, controlesTexture, botaoAreas1);
     } else {
-        DrawText("Pressione [ENTER] para Jogar", SCREEN_WIDTH / 2 - MeasureText("Pressione [ENTER] para Jogar", 30) / 2, mainTextY, 30, WHITE);
-        DrawText("[R] Rankings", centerX - MeasureText("[R] Rankings", textSize) - spacingX, optionsY, textSize, WHITE);
-        DrawText("[C] Controles", centerX + spacingX, optionsY, textSize, WHITE);
+        const char *mainText = "Pressione [ENTER] para Jogar";
+        int mainTextWidth = MeasureText(mainText, textSizeMain);
+        DrawText(mainText, centerX - mainTextWidth / 2, mainTextY, textSizeMain, WHITE);
+        
+        const char *rankingText = "[R] Rankings";
+        const char *controlsText = "[C] Controles";
+
+        int totalWidth = MeasureText(rankingText, textSizeOptions) + spacingX + MeasureText(controlsText, textSizeOptions);
+
+        DrawText(rankingText, centerX - totalWidth / 2, optionsY, textSizeOptions, WHITE);
+        DrawText(controlsText, centerX + totalWidth / 2 - MeasureText(controlsText, textSizeOptions), optionsY, textSizeOptions, WHITE);
     }
 
     EndDrawing();
@@ -298,5 +322,6 @@ void finalizarMenu() {
     UnloadMusicStream(titleMusic);
     UnloadTexture(controlesTexture);
     UnloadTexture(objetivoImage); 
+    UnloadTexture(objetivoImage1); 
     CloseWindow();
 }

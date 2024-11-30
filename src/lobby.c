@@ -24,6 +24,7 @@ static Music warMusic;
 static Texture2D controlesTexture;
 Rectangle botaoAreas[4];
 
+
 int MAX_ESPECIARIAS = BOLSA_CAPACIDADE_PEQUENA;
 static float portalAnimationTimer = 0.0f;
 const double MESSAGE_DURATION = 5.0;
@@ -847,7 +848,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                     int displayedFinalChars = 0;
                     double finalTextStartTime = 0.0;
                     double finalTextHoldTime = 4.0; // 4 segundos com o texto completo na tela
-                    double fadeOutStartTime = 0.0;
+                    //double fadeOutStartTime = 0.0;
 
                     while (!WindowShouldClose()) {
                         BeginDrawing();
@@ -950,7 +951,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                                 // Iniciar fade-out
                                 if (!fadeOutActive) {
                                     fadeOutActive = true;
-                                    fadeOutStartTime = GetTime();
+                                    //fadeOutStartTime = GetTime();
                                 }
                                 // Reduzir opacidade gradualmente
                                 finalTextOpacity -= GetFrameTime();
@@ -1108,10 +1109,6 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         EndDrawing();
                     }
 
-                    // Parte do "slashing"
-                    // Carregar o sprite para a animação de "slash"
-                    Texture2D slashSprite = LoadTexture("static/image/slash.png");
-
                     // Carregar o som "slashing.wav"
                     Sound slashingSound = LoadSound("static/music/slashing.wav");
                     SetSoundVolume(slashingSound, 1.0f); // Ajustar o volume, se necessário
@@ -1233,7 +1230,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         float farMountainsScrollOffset = 0.0f;
                         float farMountainsScrollSpeed = 20.0f;
 
-                        float rectangleOpacity = 1.0f;
+                        //float rectangleOpacity = 1.0f;
 
                         // Textos sequenciais
                         const char *texts[] = {
@@ -1278,7 +1275,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         const float textFadeSpeed = 1.0f;
 
                         // Controlar quando o fundo RGB(210, 83, 76) e sprites devem ser exibidos
-                        bool elementsVisible = false;
+                        //bool elementsVisible = false;
 
                         // Retângulo branco
                         float whiteRectangleOpacity = 1.0f;    // Opacidade inicial do retângulo branco
@@ -1350,7 +1347,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                             EndDrawing();
                         }
 
-                        elementsVisible = true;
+                        //elementsVisible = true;
 
                         // Loop principal
                         while (!WindowShouldClose()) {
@@ -1649,7 +1646,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
             }
 
             if (fireballInTile) {
-                Rectangle sourceRecFireball = {0, 0, 68, 9};
+                //Rectangle sourceRecFireball = {0, 0, 68, 9};
                 Vector2 fireballPosition = {fireballPositionX, y * TILE_SIZE + (TILE_SIZE - 32) / 2};
                 Rectangle destRecFireball = {fireballPosition.x, fireballPosition.y, 32 * (68.0f / 9.0f), 32};
 
@@ -1874,8 +1871,8 @@ void drawLobby() {
     Rectangle destRecVendinha = { 20, 20, 123* 0.8 , 120* 0.8  };
     Rectangle sourceRecMonster = { 282, 13, 106, 116 };
     Rectangle sourceRecbones1 = { 557, 60, 45, 37 };
-    Rectangle npcslobby = { 0, 0, 64, 64 };
-    Rectangle npcslobby2 = { 0, 128, 64, 64 };
+    //Rectangle npcslobby = { 0, 0, 64, 64 };
+    //Rectangle npcslobby2 = { 0, 128, 64, 64 };
     Rectangle sourceRecbones2 = { 557, 60, 45, 37 };
     Rectangle sourceRecbones3 = { 557, 60, 45, 37 };
     Rectangle sourceRecbones4 = { 557, 60, 45, 37 };

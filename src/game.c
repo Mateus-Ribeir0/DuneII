@@ -682,7 +682,7 @@ void drawGame() {
     float dialogBoxY = SCREEN_HEIGHT - 200; // Posição Y da caixa de diálogo
     float dialogBoxWidth = 500;        // Largura maior da caixa de diálogo
     float dialogBoxHeight = 100;       // Altura da caixa de diálogo
-    float scaleFactor = 1.3f;          // Fator de escala para os sprites
+    //float scaleFactor = 1.3f;          // Fator de escala para os sprites
 
     Color map0Color = (Color){210, 178, 104, 255};
     Color map1Color = (Color){210, 178, 104, 255};
@@ -896,7 +896,6 @@ void drawGame() {
     }
 
     // Variáveis de controle
-    static int estadoAposta = 0;       // Controle do estado da aposta
     static bool exibirDialogNpc = false; // Controle de exibição do diálogo
     static bool apostaResolvida = false; // Se o resultado já foi exibido
     static bool apostaVitoria = false;  // Resultado da aposta (true = vitória)
