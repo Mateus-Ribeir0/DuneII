@@ -491,7 +491,7 @@ Vector2 posicoesPedras[NUM_PEDRAS] = {
 #define DUNAS_MAPA3 10
 
 Point posicoesDunasMapa1[DUNAS_MAPA1] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5} };
-Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 18}, {5, 17}, {35, 5}, {26, 11}};
+Point posicoesDunasMapa2[DUNAS_MAPA2] = { {10, 9}, {15, 12}, {25, 16}, {5, 17}, {35, 5}, {26, 11}};
 Point posicoesDunasMapa3[DUNAS_MAPA3] = {
     {8, 8}, 
     {14, 12},
