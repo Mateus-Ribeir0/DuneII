@@ -339,7 +339,7 @@ void iniciarGame() {
     deathEmotiva = LoadSound("static/music/deathemotiva.mp3");
     SetSoundVolume(musicaMapa2, 0.8f);
     monsterGrowl2 = LoadSound("static/music/monsterGrowl2.wav");
-    heartbeatSound = LoadSound("static/music/heartbeat.wav");
+    heartbeatSound = LoadSound("static/music/heartbeat.mp3");
     SetSoundVolume(heartbeatSound, 1.0f);
 
 
@@ -1413,7 +1413,7 @@ void playGame(GameScreen *currentScreen) {
     EndDrawing();
 
     PlaySound(spellCastSound);
-    sleep(2);
+    portable_sleep(2);
 
     if (mapaAtual == 0) {
         PlaySound(musicaMapa0);
@@ -1451,7 +1451,7 @@ void playGame(GameScreen *currentScreen) {
             ClearBackground(BLACK);
             desenharAnimacaoMorte(personagem, personagemMorto);
             DrawText("GAME OVER - Você ficou sem água!", 10, 40, 20, RED);
-            sleep(3);
+            portable_sleep(3);
             atualizarRanking(playerName, playerMoney);
             zerarMonetaria();
             *currentScreen = RANKINGS;
@@ -1513,7 +1513,7 @@ void playGame(GameScreen *currentScreen) {
             StopSound(musicaMapa1);
             StopSound(musicaMapa2);
             PlaySound(spellCastSound);
-            sleep(2);
+            portable_sleep(2);
 
             showLoadingScreen(loadingImagesLobby);
             *currentScreen = LOBBY;
@@ -1582,16 +1582,16 @@ void playGame(GameScreen *currentScreen) {
                 StopSound(musicaMapa1);
                 StopSound(musicaMapa2);
                 
-                sleep(1);
+                portable_sleep(1);
                 PlaySound(gameOverSound);
-                sleep(1);
+                portable_sleep(1);
 
                 Texture2D personagemMorto = LoadTexture("static/image/dead.png");
                 ClearBackground(BLACK);
                 desenharAnimacaoMorte(personagem, personagemMorto);
                 deathEmotivaTocando = 1;
                 PlaySound(deathEmotiva);
-                sleep(3);
+                portable_sleep(3);
 
                 Vector2 spritePos = {GetScreenWidth() / 2, GetScreenHeight() / 2};
                 float scale = 10.0f;
@@ -1650,11 +1650,11 @@ void playGame(GameScreen *currentScreen) {
 
                     EndDrawing();
 
-                    sleep(0.5);
+                    portable_sleep(0.5);
                 }
                 ClearBackground(BLACK);
 
-                sleep(2);
+                portable_sleep(2);
 
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
@@ -1677,7 +1677,7 @@ void playGame(GameScreen *currentScreen) {
                     EndDrawing();
                 }
 
-                sleep(9);
+                portable_sleep(9);
 
                 atualizarRanking(playerName, playerMoney);
                 zerarMonetaria();
@@ -1763,16 +1763,16 @@ void playGame(GameScreen *currentScreen) {
                         StopSound(musicaMapa1);
                         StopSound(musicaMapa2);
 
-                        sleep(1);
+                        portable_sleep(1);
                         PlaySound(gameOverSound);
-                        sleep(1);
+                        portable_sleep(1);
 
                         Texture2D personagemMorto = LoadTexture("static/image/dead.png");
                         ClearBackground(BLACK);
                         desenharAnimacaoMorte(personagem, personagemMorto);
                         deathEmotivaTocando = 1;
                         PlaySound(deathEmotiva);
-                        sleep(3);
+                        portable_sleep(3);
 
                         Vector2 spritePos = {GetScreenWidth() / 2, GetScreenHeight() / 2};
                         float scale = 10.0f;
@@ -1831,11 +1831,11 @@ void playGame(GameScreen *currentScreen) {
 
                             EndDrawing();
 
-                            sleep(0.5);
+                            portable_sleep(0.5);
                         }
                         ClearBackground(BLACK);
 
-                        sleep(2);
+                        portable_sleep(2);
 
                         const char *euFalhei = "Eu... Eu falhei minha missão...";
                         int caractereExibido = 0;
@@ -1858,7 +1858,7 @@ void playGame(GameScreen *currentScreen) {
                             EndDrawing();
                         }
 
-                        sleep(2);
+                        portable_sleep(2);
 
                         atualizarRanking(playerName, playerMoney);
                         zerarMonetaria();
@@ -1881,16 +1881,16 @@ void playGame(GameScreen *currentScreen) {
                 StopSound(musicaMapa1);
                 StopSound(musicaMapa2);
                 
-                sleep(1);
+                portable_sleep(1);
                 PlaySound(gameOverSound);
-                sleep(1);
+                portable_sleep(1);
 
                 Texture2D personagemMorto = LoadTexture("static/image/dead.png");
                 ClearBackground(BLACK);
                 desenharAnimacaoMorte(personagem, personagemMorto);
                 deathEmotivaTocando = 1;
                 PlaySound(deathEmotiva);
-                sleep(3);
+                portable_sleep(3);
 
                 Vector2 spritePos = {GetScreenWidth() / 2, GetScreenHeight() / 2};
                 float scale = 10.0f;
@@ -1949,11 +1949,11 @@ void playGame(GameScreen *currentScreen) {
 
                     EndDrawing();
 
-                    sleep(0.5);
+                    portable_sleep(0.5);
                 }
                 ClearBackground(BLACK);
 
-                sleep(2);
+                portable_sleep(2);
 
                 const char *euFalhei = "Eu... Eu falhei minha missão...";
                 int caractereExibido = 0;
@@ -1976,7 +1976,7 @@ void playGame(GameScreen *currentScreen) {
                     EndDrawing();
                 }
 
-                sleep(2);
+                portable_sleep(2);
 
                 
 

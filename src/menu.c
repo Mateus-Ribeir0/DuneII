@@ -220,10 +220,10 @@ void iniciarMenu(GameScreen *currentScreen) {
     SetTargetFPS(60);
     Texture2D introImage = LoadTexture("static/image/intro.png");
     showFadingImage(introImage, 2.0f);
-    sleep(1);
+    portable_sleep(2);
     Texture2D introImage2 = LoadTexture("static/image/intro2.png");
     showFadingImage(introImage2, 2.0f);
-    sleep(1);
+    portable_sleep(2);
     UnloadTexture(introImage);
     *currentScreen = TITLE;
 }

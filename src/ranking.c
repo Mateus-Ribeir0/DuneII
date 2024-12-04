@@ -73,9 +73,9 @@ void exibirRankingScreen(GameScreen *currentScreen) {
     carregarRanking();
 
     backgroundTexture = LoadTexture("static/image/fundo2.png");
-    rankingMusic = LoadSound("static/music/musica.mp3");
+    rankingMusic = LoadSound("static/music/epicversion2.mp3");
     controlesTexture = LoadTexture("static/image/Xbox_one.png");
-    SetSoundVolume(rankingMusic, 0.6f);
+    SetSoundVolume(rankingMusic, 1.2f);
     PlaySound(rankingMusic);
 
     botaoAreas2[0] = (Rectangle){0, 80, 16, 16};  // Botão Y

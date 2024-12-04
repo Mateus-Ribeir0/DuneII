@@ -13,6 +13,12 @@ extern bool telaVaziaBloqueada;
 bool spaceshipAnimationPlayed = false;
 bool contFinal = true;
 
+void portable_sleep(int seconds) {
+    struct timespec ts;
+    ts.tv_sec = seconds;
+    ts.tv_nsec = 0;
+    while (nanosleep(&ts, &ts) == -1);
+}
 
 void comandoJogador(bool *usandoControle) {
     if (IsGamepadAvailable(0) && (

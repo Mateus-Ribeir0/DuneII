@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #include <unistd.h>
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -90,5 +91,6 @@ extern bool contFinal;
 void comandoJogador(bool *usandoControle);
 void DrawDialogBoxWithButtons(const char *text, int posX, int posY, int width, int height, Color boxColor, Color textColor, bool usandoControle, Texture2D texture, Rectangle *botaoAreas, float scale);
 void DrawMenuOptionsWithButtons(const char *text, int posX, int posY, int fontSize, float buttonScale, Color textColor, bool usandoControle, Texture2D texture, Rectangle *botaoAreas);
+void portable_sleep(int seconds);
 
 #endif

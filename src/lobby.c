@@ -43,6 +43,8 @@ static float spaceshipPositionX = -128;
 // static bool isInExtendedLobby = false;
 static bool isWarMusicPlaying = false;
 bool telaVaziaBloqueada = true;
+static int merchantMessage = 0;
+
 
 
 Rectangle npcslobbyCollisionBox;
@@ -67,7 +69,7 @@ void iniciarLobby() {
     bonesTexture = LoadTexture("static/image/bones.png");
     sombra = LoadTexture("static/image/sombras.png");
     spaceshipTexture = LoadTexture("static/image/spaceships.png");
-    warMusic = LoadMusicStream("static/music/warMusic.wav");
+    warMusic = LoadMusicStream("static/music/warMusic.mp3");
     controlesTexture = LoadTexture("static/image/Xbox_one.png");
 
     botaoAreas[0] = (Rectangle){0, 80, 16, 16};  // Botão Y
@@ -458,10 +460,10 @@ void processarTelaVazia(GameScreen *currentScreen) {
         villain_portrait = LoadTexture("static/image/villainPortrait.png");
         warningSign = LoadTexture("static/image/WarningSign05.png");
         fireballSprite = LoadTexture("static/image/Fireball68x9.png");
-        windMusic = LoadMusicStream("static/music/wind.wav");
-        battleMusic = LoadMusicStream("static/music/battleMusic.wav");
-        machineLoadingSound = LoadSound("static/music/machineLoading.wav");
-        typingSound = LoadSound("static/music/falas.wav");
+        windMusic = LoadMusicStream("static/music/wind.mp3");
+        battleMusic = LoadMusicStream("static/music/battleMusic.mp3");
+        machineLoadingSound = LoadSound("static/music/machineLoading.mp3");
+        typingSound = LoadSound("static/music/falas.mp3");
         gameOverSoundWar = LoadSound("static/music/deathsound.wav");
         cannonSound = LoadSound("static/music/cannon.wav");
         explosionSprite = LoadTexture("static/image/Explosion.png");
@@ -559,7 +561,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
         }
 
         // Tocar o som "laugh.wav" após 1.5 segundos
-        Sound laughSound = LoadSound("static/music/laugh.wav");
+        Sound laughSound = LoadSound("static/music/laugh.mp3");
         PlaySound(laughSound);
 
         // Esperar 1 segundo após "laugh.wav" começar a tocar
@@ -587,7 +589,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
         bool dialogComplete = false;
 
         // Carregar som de falas
-        Sound falasSound = LoadSound("static/music/falas.wav");
+        Sound falasSound = LoadSound("static/music/falas.mp3");
 
         // Mostrar os diálogos sequencialmente
         while (currentDialogIndex < dialogCount) {
@@ -777,8 +779,8 @@ void processarTelaVazia(GameScreen *currentScreen) {
             choiceText = "Poupar? [P] | Matar? [K]";
         }
 
-        Sound breathingSound = LoadSound("static/music/breathing.wav");
-        Sound suspenseSound = LoadSound("static/music/suspenseMusic.wav");
+        Sound breathingSound = LoadSound("static/music/breathing.mp3");
+        Sound suspenseSound = LoadSound("static/music/suspenseMusic.mp3");
         Texture2D slashSprite = LoadTexture("static/image/slash.png"); // Sprite do slash
 
         SetSoundVolume(breathingSound, 1.0f); // Ajuste o volume do som
@@ -807,10 +809,10 @@ void processarTelaVazia(GameScreen *currentScreen) {
 
                 if (IsKeyPressed(KEY_P) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) {
                     // Carregar sons
-                    Sound sparingMusic = LoadSound("static/music/sparingMusic.wav");
-                    Sound knifeStab = LoadSound("static/music/knifeStab.wav");
+                    Sound sparingMusic = LoadSound("static/music/sparingMusic.mp3");
+                    Sound knifeStab = LoadSound("static/music/knifeStab.mp3");
                     Sound throatCut = LoadSound("static/music/throatCut.wav");
-                    Sound falasVillain = LoadSound("static/music/falasVillain.wav");
+                    Sound falasVillain = LoadSound("static/music/falasVillain.mp3");
 
                     PlaySound(sparingMusic);
 
@@ -1170,7 +1172,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         EndDrawing();
                     }
 
-                    Sound creditosMusicRun = LoadSound("static/music/creditosMusic.wav");
+                    Sound creditosMusicRun = LoadSound("static/music/creditosMusic.mp3");
                     PlaySound(creditosMusicRun);
 
                     double startTimeRun1 = GetTime();
@@ -1690,7 +1692,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                         BeginDrawing();
                         ClearBackground(BLACK);
 
-                        sleep(1);
+                        portable_sleep(2);
 
                         // Desenhar texto "GAME OVER" com opacidade
                         DrawTextEx(
@@ -1709,7 +1711,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                     }
 
                     // Esperar 1 segundo com o texto visível antes de continuar
-                    sleep(1);
+                    portable_sleep(1);
 
                     // Reiniciar jogo
                     atualizarRanking(playerName, playerMoney);
@@ -1834,7 +1836,7 @@ void processarTelaVazia(GameScreen *currentScreen) {
                     }
 
                     // Esperar 1 segundo com o texto visível antes de continuar
-                    sleep(1);
+                    portable_sleep(1);
 
                     // Reiniciar jogo
                     atualizarRanking(playerName, playerMoney);
@@ -2258,7 +2260,7 @@ void drawLobby() {
         } else {
             switch (isInteractingWithMerchant) {
                 case 1: 
-                    static int merchantMessage = 0;
+                    merchantMessage = 0;
 
                     if (merchantMessage == 0) {
                         if (itemsCollected > 0) {
