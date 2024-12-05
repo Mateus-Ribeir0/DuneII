@@ -1,26 +1,28 @@
 TARGET = DuneII
 
-CC = gcc
-CFLAGS = -Wall -std=c99 -I$(PROJECT_INCLUDE_DIR) -I$(RAYLIB_INCLUDE_DIR)
-
 SRC_DIR = src
-PROJECT_INCLUDE_DIR = include
-RAYLIB_INCLUDE_DIR = include_raylib
+INCLUDE_DIR = include
 LIB_DIR = lib_raylib
 RELEASE_DIR = release
 
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
 
 UNAME_S := $(shell uname -s)
+
 ifeq ($(UNAME_S), Linux)
-    LIBS = -L$(LIB_DIR) -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+    CC = gcc
+    CFLAGS = -Wall -std=c99 -I$(INCLUDE_DIR)
+    LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
     EXE_EXT =
 else ifeq ($(UNAME_S), Darwin)
+    CC = gcc
+    CFLAGS = -Wall -std=c99 -I$(INCLUDE_DIR)
     LIBS = -L$(LIB_DIR) -lraylib -lm -lpthread -framework OpenGL -framework Cocoa -framework IOKit
     EXE_EXT =
 else
+    CC = gcc
+    CFLAGS = -Wall -std=c99 -I$(INCLUDE_DIR) -mwindows
     LIBS = -L$(LIB_DIR) -lraylib -lopengl32 -lgdi32 -lwinmm
-    CFLAGS += -mwindows
     ICON_RC = resource.rc
     ICON_OBJ = resource.o
     EXE_EXT = .exe

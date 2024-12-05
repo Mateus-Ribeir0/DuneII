@@ -1,4 +1,5 @@
 #include "config.h"
+#include <time.h>
 
 int player_x = MAPA_LARGURA / 2;
 int player_y = MAPA_ALTURA / 2;
@@ -8,16 +9,18 @@ float playerWater = 100.0;
 float playerLucky = 5.0;
 double lastWaterUpdateTime = 0.0;
 char playerName[MAX_NAME_LENGTH] = "";
-bool usandoControle = true;
+bool usandoControle = false;
 extern bool telaVaziaBloqueada;
 bool spaceshipAnimationPlayed = false;
 bool contFinal = true;
 
 void portable_sleep(int seconds) {
-    struct timespec ts;
-    ts.tv_sec = seconds;
-    ts.tv_nsec = 0;
-    while (nanosleep(&ts, &ts) == -1);
+    clock_t start_time = clock();
+    clock_t end_time = start_time + seconds * CLOCKS_PER_SEC;
+
+    while (clock() < end_time) {
+        // Espera até o tempo definido
+    }
 }
 
 void comandoJogador(bool *usandoControle) {
